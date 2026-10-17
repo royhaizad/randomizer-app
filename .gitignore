@@ -1,0 +1,6 @@
+# Local preview server (not part of the app)
+.claude/
+
+# Personal notes and data backups
+Randomizer-Handoff.md
+Randomizer-Backup-*.txt
