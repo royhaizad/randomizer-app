@@ -1,7 +1,10 @@
 // Offline support. Opens instantly from the saved copy, then quietly
 // downloads any newer version in the background for next time.
-const CACHE = 'randomizer-v1';
-const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+const CACHE = 'randomizer-v2';
+const FILES = [
+  './', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png',
+  './fonts/plus-jakarta-sans-latin.woff2',
+];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)));
