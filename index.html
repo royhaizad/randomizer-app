@@ -37,6 +37,7 @@
     --text-glow: none;
     --danger: #DC2626;
     --shadow: 0 1px 2px rgba(12, 18, 26, 0.04), 0 8px 24px rgba(12, 18, 26, 0.06);
+    --lift: 0 12px 28px rgba(12, 18, 26, 0.16);
     --radius: 18px;
     color-scheme: light dark;
   }
@@ -56,6 +57,7 @@
       --text-glow: 0 0 32px rgba(34, 211, 238, 0.35);
       --danger: #F87171;
       --shadow: none;
+      --lift: 0 12px 32px rgba(0, 0, 0, 0.6);
     }
   }
 
@@ -224,6 +226,30 @@
   /* ---------- Manage (edit lists) ---------- */
   .move { display: flex; gap: 2px; flex: none; }
   .move .iconbtn:disabled { opacity: 0.25; }
+
+  /* ---------- Drag to reorder ---------- */
+  .grip {
+    width: 36px; height: 44px; flex: none;
+    display: grid; place-items: center;
+    color: var(--muted); opacity: 0.7;
+    touch-action: none; cursor: grab;
+  }
+  .row .grip { margin-right: -8px; }
+  /* Edit lists rows carry arrows + handle, so keep them compact to leave room for names. */
+  .row:has(.move) { gap: 10px; padding-right: 8px; }
+  .row:has(.move) .grip { width: 28px; margin-right: 0; }
+  .move .iconbtn.sm { width: 34px; }
+  .item-row .grip { margin-left: -12px; }
+  [data-sort] { position: relative; }
+  [data-sort] > * { transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1); }
+  [data-sort].sorting { overflow: visible; }
+  [data-sort] > .dragging {
+    position: relative; z-index: 5; transition: none;
+    background: var(--surface-2); border-radius: 14px; border-color: transparent;
+    box-shadow: var(--lift);
+  }
+  body.is-dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; }
+  [data-sort="lists"] > .row { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
   /* ---------- Bottom sheet ---------- */
   .sheet { position: fixed; inset: 0; z-index: 10; }
@@ -408,7 +434,9 @@ const I = {
   lists: ic("M12 20h9|M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z", 20),
   download: ic("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4|M7 10l5 5 5-5|M12 15V3", 20),
   upload: ic("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4|M17 8l-5-5-5 5|M12 3v12", 20),
+  grip: ic("M9 6h.01|M15 6h.01|M9 12h.01|M15 12h.01|M9 18h.01|M15 18h.01", 20, 3),
 };
+const grip = `<span class="grip" aria-hidden="true">${I.grip}</span>`;
 
 function render() {
   const r = route();
@@ -437,7 +465,7 @@ function renderHome() {
           <div class="row-sub">${last ? "Last: " + esc(last) : "No picks yet"}</div>
         </span>
         <span class="count">${l.items.length}</span>
-        <span class="chev">${I.chev}</span>
+        ${grip}
       </button>`;
   }).join("");
 
@@ -448,7 +476,7 @@ function renderHome() {
         <button class="iconbtn" data-act="menu" aria-label="Menu">${I.more}</button>
       </header>
       ${db.lists.length
-        ? `<div class="group">${rows}</div>`
+        ? `<div class="group" data-sort="lists">${rows}</div>`
         : `<p class="hint">No lists yet.</p><button class="btn ghost" data-act="newList">+ New list</button>`}
     </main>`;
 }
@@ -509,6 +537,7 @@ function renderResult(list) {
 function renderEdit(list) {
   const items = list.items.map((it, i) => `
     <div class="item-row">
+      ${grip}
       <input class="item-in" data-field="item" data-i="${i}" value="${esc(it)}" enterkeyhint="done" aria-label="Item ${i + 1}">
       <button class="iconbtn sm" data-act="delItem" data-i="${i}" aria-label="Delete ${esc(it)}">${I.x}</button>
     </div>`).join("");
@@ -525,7 +554,7 @@ function renderEdit(list) {
         <input class="input" data-field="name" value="${esc(list.name)}" aria-label="List name" enterkeyhint="done">
       </div>
       <div class="label">Items · <span id="itemCount">${list.items.length}</span></div>
-      ${list.items.length ? `<div class="group">${items}</div>` : `<p class="hint">No items yet. Add your first one below.</p>`}
+      ${list.items.length ? `<div class="group" data-sort="items">${items}</div>` : `<p class="hint">No items yet. Add your first one below.</p>`}
       <button class="dangerbtn" data-act="deleteList">Delete this list</button>
       <form class="addbar" data-form="add">
         <input class="input" id="addInput" placeholder="Add an item…" enterkeyhint="send" autocomplete="off">
@@ -547,6 +576,7 @@ function renderManage() {
         <button class="iconbtn sm" data-act="up" data-i="${i}" aria-label="Move up" ${i === 0 ? "disabled" : ""}>${I.up}</button>
         <button class="iconbtn sm" data-act="down" data-i="${i}" aria-label="Move down" ${i === n - 1 ? "disabled" : ""}>${I.down}</button>
       </span>
+      ${grip}
     </div>`).join("");
 
   app.innerHTML = `
@@ -555,8 +585,8 @@ function renderManage() {
         <h1>Edit lists</h1>
         <button class="pill" data-act="done">Done</button>
       </header>
-      <p class="hint">Tap a list to edit its name and items. Use the arrows to reorder.</p>
-      ${n ? `<div class="group">${rows}</div>` : ""}
+      <p class="hint">Tap a list to edit its name and items. Drag a list, or use the arrows, to reorder.</p>
+      ${n ? `<div class="group" data-sort="lists">${rows}</div>` : ""}
       <button class="btn ghost" data-act="newList">+ New list</button>
     </main>`;
 }
@@ -754,6 +784,103 @@ document.addEventListener("submit", (e) => {
   $("#addInput").focus();
   scrollTo(0, document.body.scrollHeight); // show the item you just added
 });
+
+/* =========================================================
+   6b. Drag to reorder
+   Lists: drag the ⋮⋮ handle, or press and hold a row.
+   Items: drag the ⋮⋮ handle (holding a text field selects text).
+   ========================================================= */
+const HOLD_MS = 400;
+let hold = null;          // waiting for a long-press to finish
+let drag = null;          // the row being dragged
+let suppressClickUntil = 0;
+
+document.addEventListener("pointerdown", (e) => {
+  if (e.button !== 0 || drag) return;
+  const row = e.target.closest("[data-sort] > *");
+  if (!row) return;
+  if (e.target.closest(".grip")) { e.preventDefault(); startDrag(row, e.pointerId, e.clientY); return; }
+  if (row.parentElement.dataset.sort !== "lists" || e.target.closest(".move")) return;
+  const h = { row, id: e.pointerId, x: e.clientX, y: e.clientY };
+  h.timer = setTimeout(() => { hold = null; startDrag(h.row, h.id, h.y); }, HOLD_MS);
+  hold = h;
+});
+
+document.addEventListener("pointermove", (e) => {
+  // Moving before the hold finishes means you're scrolling, not dragging.
+  if (hold && e.pointerId === hold.id && Math.hypot(e.clientX - hold.x, e.clientY - hold.y) > 8) cancelHold();
+  // Only the finger that started the drag moves it (ignore a second finger).
+  if (drag && e.pointerId === drag.id) { drag.y = e.clientY; layoutDrag(); }
+});
+document.addEventListener("pointerup", endPointer);
+document.addEventListener("pointercancel", endPointer);
+// Stop the page from scrolling under your finger while a row is lifted.
+document.addEventListener("touchmove", (e) => { if (drag) e.preventDefault(); }, { passive: false });
+// No Android long-press menu on list rows.
+document.addEventListener("contextmenu", (e) => { if (drag || hold || e.target.closest('[data-sort="lists"]')) e.preventDefault(); });
+// The tap that ends a drag shouldn't also open the list.
+document.addEventListener("click", (e) => {
+  if (performance.now() < suppressClickUntil) { e.stopPropagation(); e.preventDefault(); }
+}, true);
+
+function cancelHold() { if (hold) { clearTimeout(hold.timer); hold = null; } }
+function endPointer(e) {
+  if (hold && e.pointerId === hold.id) cancelHold();
+  if (drag && e.pointerId === drag.id) endDrag();
+}
+
+function startDrag(row, pointerId, y) {
+  const group = row.parentElement;
+  const rows = [...group.children];
+  const from = rows.indexOf(row);
+  drag = { group, rows, row, from, to: from, id: pointerId, y, startY: y + scrollY, h: row.offsetHeight };
+  try { row.setPointerCapture(pointerId); } catch (e) {}
+  group.classList.add("sorting");
+  row.classList.add("dragging");
+  row.style.transform = "scale(1.02)";
+  document.body.classList.add("is-dragging");
+  if (navigator.vibrate) navigator.vibrate(15);
+  requestAnimationFrame(autoScroll);
+}
+
+// Move the lifted row with your finger and slide the others out of the way.
+function layoutDrag() {
+  const { rows, row, from, h } = drag;
+  const dy = drag.y + scrollY - drag.startY;
+  row.style.transform = `translateY(${dy}px) scale(1.02)`;
+  const center = row.offsetTop + h / 2 + dy;
+  let to = 0;
+  rows.forEach((r, i) => { if (i !== from && center > r.offsetTop + r.offsetHeight / 2) to++; });
+  rows.forEach((r, i) => {
+    if (i === from) return;
+    const shift = from < to && i > from && i <= to ? -h : from > to && i >= to && i < from ? h : 0;
+    r.style.transform = shift ? `translateY(${shift}px)` : "";
+  });
+  if (to !== drag.to && navigator.vibrate) navigator.vibrate(5);
+  drag.to = to;
+}
+
+// Scroll the page when you drag near the top or bottom edge (long lists).
+function autoScroll() {
+  if (!drag) return;
+  const edge = 90, y = drag.y;
+  const speed = y < edge ? -(edge - y) / 5 : y > innerHeight - edge ? (y - (innerHeight - edge)) / 5 : 0;
+  if (speed) { scrollBy(0, speed); layoutDrag(); }
+  requestAnimationFrame(autoScroll);
+}
+
+function endDrag() {
+  const { group, from, to } = drag;
+  drag = null;
+  document.body.classList.remove("is-dragging");
+  suppressClickUntil = performance.now() + 400;
+  if (to !== from) {
+    const arr = group.dataset.sort === "lists" ? db.lists : currentList().items;
+    arr.splice(to, 0, ...arr.splice(from, 1));
+    save();
+  }
+  render();
+}
 
 /* =========================================================
    7. Backup & restore (same format as the old app)
