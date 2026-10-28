@@ -164,7 +164,16 @@
   .toggle[aria-checked="true"] .switch::after { transform: translateX(14px); background: var(--accent-ink); }
 
   /* ---------- Top bar (result + edit) ---------- */
-  .topbar { display: flex; align-items: center; gap: 6px; height: 56px; margin: 8px -6px 0; }
+  /* Pinned to the top of the screen. It runs edge to edge (and up under the
+     status bar) with the page's own background, so content scrolls under it. */
+  .topbar {
+    position: sticky; top: 0; z-index: 4;
+    display: flex; align-items: center; gap: 6px;
+    height: calc(64px + env(safe-area-inset-top));
+    margin: calc(-1 * env(safe-area-inset-top)) -16px 0;
+    padding: calc(8px + env(safe-area-inset-top)) 10px 0;
+    background: radial-gradient(120% 50% at 50% -10%, var(--accent-soft), transparent 60%) fixed, var(--bg);
+  }
   .top-title { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: var(--muted); }
 
   /* ---------- Result screen ---------- */
