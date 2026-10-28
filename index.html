@@ -88,6 +88,102 @@
   /* ---------- Shared pieces ---------- */
   .head { display: flex; align-items: center; justify-content: space-between; padding: 20px 2px 16px; }
   .head h1 { margin: 0; font-size: 28px; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; }
+  /* Home header: die logo, app name + one-line tagline, then + and menu. */
+  .head:has(.logo) { justify-content: flex-start; gap: 12px; }
+  .logo {
+    width: 46px; height: 46px; flex: none;
+    display: grid; place-items: center;
+    border-radius: 14px;
+    background: var(--accent-soft); color: var(--accent);
+    box-shadow: var(--glow);
+  }
+  .head-text { flex: 1; min-width: 0; }
+  .tagline { margin: 4px 0 0; font-size: 13px; line-height: 1.35; color: var(--muted); }
+  .head:has(.logo) > .iconbtn { margin-right: -6px; }
+
+  /* Home: search + sort, then label filter chips. */
+  .toolbar { display: flex; gap: 8px; margin: 0 0 10px; }
+  .search {
+    flex: 1; min-width: 0; height: 44px; padding: 0 12px;
+    display: flex; align-items: center; gap: 8px;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    color: var(--muted);
+  }
+  .search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .search svg { flex: none; }
+  .search input { flex: 1; min-width: 0; height: 100%; background: none; border: 0; outline: none; color: var(--text); font-size: 16px; }
+  .search input::placeholder { color: var(--muted); }
+  .sortbtn { height: 44px; padding: 0 14px; display: flex; align-items: center; gap: 6px; border-radius: 14px; flex: none; }
+  .chips-row {
+    display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+    margin: 0 -16px 12px; padding: 2px 16px;
+  }
+  .chips-row::-webkit-scrollbar { display: none; }
+  .chip {
+    flex: none; height: 34px; padding: 0 14px;
+    display: flex; align-items: center; gap: 7px;
+    border: 1px solid var(--line); border-radius: 999px;
+    background: var(--surface); font-size: 14px; font-weight: 600; color: var(--muted);
+  }
+  .chip i { width: 8px; height: 8px; border-radius: 50%; background: hsl(var(--h) 75% 55%); }
+  .chip.on { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .chip.on i { background: currentColor; }
+  .no-match { text-align: center; padding: 24px 0; }
+  .no-match .hint { margin-bottom: 12px; }
+
+  /* Label pills (on Home rows, the edit screen and the Labels sheet). */
+  .pill-label {
+    display: inline-block; vertical-align: 1px;
+    margin-right: 6px; padding: 1px 8px; border-radius: 999px;
+    font-size: 12px; font-weight: 600; line-height: 18px;
+    background: hsl(var(--h) 80% 50% / 0.14); color: hsl(var(--h) 65% 36%);
+  }
+  @media (prefers-color-scheme: dark) { .pill-label { color: hsl(var(--h) 85% 72%); } }
+  .row .row-text > .pill-label { font-size: 14px; line-height: 24px; padding: 1px 10px; }
+  .labels-in {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 6px 0;
+    height: auto; min-height: 50px; padding: 10px 14px; margin-bottom: 22px; text-align: left;
+  }
+  .labels-in:active { background: var(--surface-2); }
+  .labels-add { font-size: 15px; color: var(--accent); font-weight: 600; }
+
+  /* Option badges: a wrapping row of pills under an option. */
+  .badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+  .badges .pill-label { margin-right: 0; }
+  .answer-badges { justify-content: center; gap: 8px; margin-top: -8px; }
+  .answer-badges .pill-label { font-size: 15px; line-height: 22px; padding: 3px 12px; }
+  .answer-badges.reveal { animation: reveal 0.6s cubic-bezier(0.3, 1.6, 0.5, 1) 0.15s both; }
+  .item-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .item-main .badges { margin: 0 0 11px; }
+  .item-main:has(.badges) .item-in { height: 40px; margin-top: 2px; }
+  .iconbtn.has-badges { color: var(--accent); }
+  .item-row.ro { display: block; }
+  .item-row.ro .badges { margin-top: 4px; }
+  .sheet-label { margin-top: 18px; }
+  .still { animation: none !important; }
+
+  /* Floating "+" on Home: bottom right, inside the app's column on wide screens. */
+  .fab {
+    position: fixed; z-index: 5;
+    right: max(16px, calc((100vw - 560px) / 2 + 16px));
+    bottom: calc(20px + env(safe-area-inset-bottom));
+    width: 60px; height: 60px;
+    display: grid; place-items: center;
+    border: 0; border-radius: 20px;
+    background: var(--accent); color: var(--accent-ink);
+    box-shadow: var(--glow), var(--lift);
+    transition: transform 0.08s ease;
+  }
+  .fab:active { transform: scale(0.94); }
+  .view:has(> .fab) { padding-bottom: calc(96px + env(safe-area-inset-bottom)); } /* last row can scroll clear of it */
+  /* While a list is lifted, + becomes a trash can: drop the list on it to delete. */
+  .fab > span { display: grid; }
+  .fab-trash { display: none !important; }
+  body.is-dragging .fab { background: var(--danger); color: #FFFFFF; box-shadow: var(--lift); transition: transform 0.15s cubic-bezier(0.3, 1.5, 0.5, 1); }
+  body.is-dragging .fab-plus { display: none; }
+  body.is-dragging .fab-trash { display: grid !important; }
+  body.is-dragging .fab.armed { transform: scale(1.2); box-shadow: 0 0 0 8px rgba(220, 38, 38, 0.25), var(--lift); }
+  [data-sort] > .dragging.to-trash { opacity: 0.6; }
 
   .iconbtn {
     width: 44px; height: 44px; flex: none;
@@ -124,11 +220,19 @@
   .row.compact { min-height: 52px; padding: 10px 16px; }
 
   .emoji {
+    position: relative;
     width: 42px; height: 42px; flex: none;
     display: grid; place-items: center;
     border-radius: 12px;
     background: var(--surface-2);
     font-size: 22px;
+  }
+  .badge {
+    position: absolute; right: -5px; bottom: -5px;
+    width: 20px; height: 20px;
+    display: grid; place-items: center;
+    border-radius: 7px; border: 2px solid var(--surface);
+    background: var(--accent); color: var(--accent-ink);
   }
   .row-text { flex: 1; min-width: 0; }
   .row-name, .row-sub, .ellip { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -156,12 +260,18 @@
   .btn.ghost { margin-top: 12px; flex: none; width: 100%; color: var(--accent); background: transparent; border-style: dashed; }
   .btn.sm { height: 48px; flex: none; padding: 0 20px; border-radius: 12px; }
   .btn[aria-disabled="true"], .linkbtn[aria-disabled="true"] { opacity: 0.45; }
+  .btn.danger { background: var(--danger); color: #FFFFFF; border-color: transparent; }
+  .ask-text { white-space: pre-line; margin-bottom: 20px; }
 
   /* Wheel toggle: a switch inside a normal button */
   .switch { position: relative; width: 36px; height: 22px; flex: none; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); transition: background 0.2s ease; }
   .switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--muted); transition: transform 0.2s ease, background 0.2s ease; }
   .toggle[aria-checked="true"] .switch { background: var(--accent); border-color: transparent; }
   .toggle[aria-checked="true"] .switch::after { transform: translateX(14px); background: var(--accent-ink); }
+  /* Category on/off switch in Edit multiple */
+  .catsw { flex: none; display: grid; place-items: center; padding: 12px 4px; margin: -12px 0; background: none; border: 0; cursor: pointer; }
+  .row.off .row-text { opacity: 0.45; }
+  .group-hint { margin: 10px 4px 16px; font-size: 13px; }
 
   /* ---------- Top bar (result + edit) ---------- */
   /* Pinned to the top of the screen. It runs edge to edge (and up under the
@@ -269,6 +379,62 @@
   }
   .linkbtn:active { background: var(--surface-2); }
 
+  /* ---------- Multiple result: one row per category ---------- */
+  .combo { width: 100%; text-align: left; }
+  .combo-row { display: flex; align-items: center; padding-right: 6px; }
+  .combo-row + .combo-row { border-top: 1px solid var(--line); }
+  .combo-row.locked { background: var(--accent-soft); }
+  .combo-main { flex: 1; min-width: 0; display: block; padding: 14px 6px 14px 18px; background: none; border: 0; text-align: left; }
+  .combo-main:active { background: var(--surface-2); }
+  .combo-cat { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .combo-val { display: block; margin-top: 3px; font-size: clamp(22px, 6.4vw, 28px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; overflow-wrap: anywhere; }
+  .lockbtn { color: var(--muted); }
+  .combo-row .grip { margin-left: -4px; }
+  .combo-row.locked .lockbtn { color: var(--accent); }
+  .combo.reveal .combo-row { animation: row-in 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) both; animation-delay: calc(var(--k) * 70ms); }
+  @keyframes row-in { from { opacity: 0; transform: scale(0.8); filter: blur(6px); } }
+  .combo-hint { margin: 0; min-height: 44px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--muted); }
+
+  /* Slot machine (Reels toggle on): a gold marquee frame with chasing bulbs,
+     a color stripe per category and a reel window that spins. */
+  .slots { position: relative; width: 100%; animation: slots-in 0.5s cubic-bezier(0.3, 1.5, 0.5, 1); }
+  @keyframes slots-in { from { transform: scale(0.6); opacity: 0; } }
+  .slots-glow {
+    position: absolute; inset: -12% -6%; border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(255, 70, 90, 0.55), rgba(255, 195, 0, 0.25) 55%, transparent);
+    animation: glow 1.6s ease-in-out infinite alternate, hue 5s linear infinite;
+  }
+  .slots.won .slots-glow { animation: glow 0.25s ease-in-out infinite alternate, hue 1s linear infinite; }
+  .slots-frame {
+    position: relative; padding: 14px; border-radius: 28px;
+    background: linear-gradient(135deg, #FFE7A0, #E0A100 50%, #9C6400);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  }
+  .slots .combo { position: relative; border: 0; border-radius: 16px; box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.25); }
+  .slots .combo-row { box-shadow: inset 6px 0 var(--c); }
+  .slots .combo-main { padding-top: 7px; padding-bottom: 7px; } /* keeps the machine about as tall as the plain result */
+  .slots .combo-val { margin-top: 1px; }
+  .bulbs { position: absolute; inset: 0; pointer-events: none; }
+  .bulbs i {
+    --d: 0.22s;
+    position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%;
+    background: #FFF6C8; box-shadow: 0 0 6px #FFE7A0;
+    animation: bulb-dot var(--d) steps(1) infinite;
+  }
+  .bulbs i:nth-child(even) { animation-delay: calc(var(--d) / -2); }
+  .slots.won .bulbs i { animation: flash-dot 0.18s steps(1) infinite; }
+  @keyframes bulb-dot { 50% { background: #7A5200; box-shadow: none; } }
+  @keyframes flash-dot { 50% { background: #FF4D6D; box-shadow: 0 0 8px #FF4D6D; } }
+  .reel {
+    height: 38px; overflow: hidden;
+    -webkit-mask: linear-gradient(transparent, #000 16%, #000 84%, transparent);
+            mask: linear-gradient(transparent, #000 16%, #000 84%, transparent);
+  }
+  .reel .strip { display: block; }
+  .reel .strip span { display: block; height: 38px; line-height: 38px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .combo-row.landed .reel { animation: land 0.35s ease-out; }
+  @keyframes land { 40% { transform: scale(1.06); color: #E0A100; } }
+
   /* ---------- Edit list screen ---------- */
   .name-row { display: flex; gap: 10px; margin: 8px 0 10px; }
   .input {
@@ -279,6 +445,18 @@
   .input:focus, .item-in:focus { outline: none; }
   .input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
   .emoji-in { width: 58px; flex: none; text-align: center; font-size: 22px; padding: 0; }
+  button.emoji-in { position: relative; display: grid; place-items: center; padding: 6px; }
+  button.emoji-in:active { background: var(--surface-2); }
+  .emoji-in .badge { background: var(--surface-2); color: var(--muted); border-color: var(--bg); }
+  /* Uploaded icon images fill the emoji tiles; elsewhere they sit inline like an emoji. */
+  .icon-img { width: 1.3em; height: 1.3em; border-radius: 6px; object-fit: cover; vertical-align: -0.3em; }
+  .emoji .icon-img, .emoji-in .icon-img { width: 100%; height: 100%; border-radius: 10px; vertical-align: top; }
+  .top-icon { display: grid; place-items: center; }
+  .top-icon .icon-img { width: 26px; height: 26px; }
+  .stack { margin-bottom: 22px; }
+  .item-row.ro { padding: 14px 16px; color: var(--muted); font-size: 15px; min-height: 0; }
+  .sub-from { display: flex; }
+  .sub-from > span:first-child { flex: none; }
   /* Description box starts at one line and grows as you type (see autoGrow). */
   .desc-in { display: block; height: auto; min-height: 50px; padding: 12px 14px; margin-bottom: 22px; line-height: 1.45; resize: none; overflow: hidden; }
   .desc-in::placeholder { color: var(--muted); }
@@ -296,6 +474,8 @@
     background: linear-gradient(to bottom, transparent, var(--bg) 30%);
   }
   .addbar .btn { box-shadow: none; }
+  /* Category editor: the add field sits right under the options instead of the bottom. */
+  .addbar.inline { position: static; margin: 12px 0 0; padding: 0; background: none; }
 
   /* ---------- Manage (edit lists) ---------- */
   .move { display: flex; gap: 2px; flex: none; }
@@ -323,7 +503,7 @@
     box-shadow: var(--lift);
   }
   body.is-dragging { -webkit-user-select: none; user-select: none; cursor: grabbing; }
-  [data-sort="lists"] > .row { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  [data-sort="lists"] > .row, [data-sort="cats"] > .row, [data-sort="combo"] > * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 
   /* ---------- Bottom sheet ---------- */
   .sheet { position: fixed; inset: 0; z-index: 10; }
@@ -341,7 +521,10 @@
   }
   .handle { width: 40px; height: 4px; border-radius: 4px; background: var(--line); margin: 0 auto 14px; }
   @media (prefers-color-scheme: dark) { .handle { background: rgba(255, 255, 255, 0.18); } }
-  .sheet-title { margin: 0 4px 14px; font-size: 18px; font-weight: 700; }
+  .sheet-title { margin: 0 4px 14px; padding-right: 44px; font-size: 18px; font-weight: 700; }
+  /* Close button: top right, beside the title, and stays put while a long sheet scrolls. */
+  .sheet-x-wrap { position: sticky; top: 0; z-index: 2; height: 0; display: flex; justify-content: flex-end; }
+  .sheet-x { width: 36px; height: 36px; margin: -7px -2px 0 0; border-radius: 50%; background: var(--surface-2); color: var(--muted); }
   .menu-icon { width: 42px; height: 42px; flex: none; display: grid; place-items: center; border-radius: 12px; background: var(--accent-soft); color: var(--accent); }
   .foot { font-size: 13px; color: var(--muted); text-align: center; margin: 16px 0 0; line-height: 1.5; }
   @keyframes up { from { transform: translateY(100%); } to { transform: none; } }
@@ -370,6 +553,7 @@
 <div id="sheet" class="sheet" hidden></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <input type="file" id="file" accept=".txt,.json,text/plain,application/json" hidden>
+<input type="file" id="imgFile" accept="image/*" hidden>
 
 <script>
 /* =========================================================
@@ -386,6 +570,71 @@ const EMOJI = {
   "Sahur protein apa": "🌙", "Fun activities": "🎳", "Menunggu?": "⏳"
 };
 const DEFAULT_EMOJI = "🎲";
+const MULTI_EMOJI = "🧩";
+
+// The first Multiple: the same filters as randompokemon.com, one pick from each.
+const POKEMON = {
+  name: "Random Pokémon",
+  emoji: "⚡",
+  description: "Region, type, rarity, stage, form, nature and gender",
+  cats: {
+    "Region": ["Kanto", "Johto", "Hoenn", "Sinnoh", "Unova", "Kalos", "Alola", "Galar", "Hisui", "Paldea", "Kitakami", "Blueberry Academy"],
+    "Type": ["Bug", "Dark", "Dragon", "Electric", "Fairy", "Fighting", "Fire", "Flying", "Ghost", "Grass", "Ground", "Ice", "Normal", "Poison", "Psychic", "Rock", "Steel", "Water"],
+    "Rarity": ["Regular", "Sub-Legendary", "Legendary", "Mythical", "Paradox", "Ultra Beast"],
+    "Stage": ["Unevolved", "Evolved once", "Evolved twice"],
+    "Form": ["Regular form", "Alternate form", "Mega Evolution", "Gigantamax"],
+    "Nature": ["Adamant", "Bashful", "Bold", "Brave", "Calm", "Careful", "Docile", "Gentle", "Hardy", "Hasty", "Impish", "Jolly", "Lax", "Lonely", "Mild", "Modest", "Naive", "Naughty", "Quiet", "Quirky", "Rash", "Relaxed", "Sassy", "Serious", "Timid"],
+    "Gender": ["Male", "Female", "Genderless"],
+  },
+};
+// Every country in the world: the 193 UN members plus Palestine and Vatican City.
+const COUNTRIES = {
+  name: "Random country",
+  emoji: "🌍",
+  description: "Choose 1 country in the world",
+  items: ["Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan",
+    "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
+    "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Côte d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czechia",
+    "Democratic Republic of the Congo", "Denmark", "Djibouti", "Dominica", "Dominican Republic",
+    "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia",
+    "Fiji", "Finland", "France",
+    "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
+    "Haiti", "Honduras", "Hungary",
+    "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy",
+    "Jamaica", "Japan", "Jordan",
+    "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan",
+    "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg",
+    "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar",
+    "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway",
+    "Oman",
+    "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal",
+    "Qatar",
+    "Romania", "Russia", "Rwanda",
+    "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "São Tomé and Príncipe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
+    "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Türkiye", "Turkmenistan", "Tuvalu",
+    "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan",
+    "Vanuatu", "Vatican City", "Venezuela", "Vietnam",
+    "Yemen",
+    "Zambia", "Zimbabwe"],
+};
+
+// What each nature does: the stat it raises, then the one it lowers (by 10%).
+// The other five natures (Bashful, Docile, Hardy, Quirky, Serious) change nothing.
+const NATURE_FX = {
+  Adamant: "Atk SpA", Bold: "Def Atk", Brave: "Atk Spe", Calm: "SpD Atk", Careful: "SpD SpA", Gentle: "SpD Def",
+  Hasty: "Spe Def", Impish: "Def SpA", Jolly: "Spe SpA", Lax: "Def SpD", Lonely: "Atk Def", Mild: "SpA Def",
+  Modest: "SpA Atk", Naive: "Spe SpD", Naughty: "Atk SpD", Quiet: "SpA Spe", Rash: "SpA SpD", Relaxed: "Def Spe",
+  Sassy: "SpD Spe", Timid: "Spe Atk",
+};
+// Option badges for a list of natures, e.g. Adamant → ["+10% Atk", "−10% SpA"].
+const natureBadges = (names) => Object.fromEntries(names.filter((n) => POKEMON.cats.Nature.includes(n)).map((n) => [n,
+  NATURE_FX[n] ? NATURE_FX[n].split(" ").map((s, i) => (i ? "−10% " : "+10% ") + s) : ["No effect"]]));
+
+const pokemonMulti = () => ({
+  id: uid(), name: POKEMON.name, emoji: POKEMON.emoji, description: POKEMON.description, type: "multi",
+  cats: Object.entries(POKEMON.cats).map(([name, items]) =>
+    ({ id: uid(), name, items, ...(name === "Nature" && { badges: natureBadges(items) }) })),
+});
 
 /* =========================================================
    2. Saving (everything lives on this phone only)
@@ -402,14 +651,43 @@ function listsFromBackup(obj, order = []) {
 }
 
 function load() {
+  let d;
   try {
     const saved = JSON.parse(localStorage.getItem(KEY));
     if (saved && Array.isArray(saved.lists)) {
       delete saved.skips; // left over from the old "Skip today" button
-      return saved;
+      d = saved;
     }
   } catch (e) {}
-  return { lists: listsFromBackup(BACKUP, ORDER), history: {} };
+  d = d || { lists: listsFromBackup(BACKUP, ORDER), history: {} };
+  // Add the Pokémon Multiple once; if you delete it, it stays gone.
+  if (!d.seeded) {
+    if (!d.lists.some((l) => l.name === POKEMON.name)) d.lists.unshift(pokemonMulti());
+    d.seeded = true;
+  }
+  // Same for the country list, added at the end.
+  if (!d.seededCountries) {
+    if (!d.lists.some((l) => l.name === COUNTRIES.name)) {
+      d.lists.push({ id: uid(), name: COUNTRIES.name, emoji: COUNTRIES.emoji, description: COUNTRIES.description, items: [...COUNTRIES.items], created: Date.now() });
+    }
+    d.seededCountries = true;
+  }
+  // Once: give a Multiple's "Nature" category the stat effects of each nature.
+  if (!d.natureBadges) {
+    d.lists.forEach((l) => l.type === "multi" && l.cats.forEach((c) => {
+      if (/^natures?$/i.test(c.name.trim()) && !c.badges) {
+        const b = natureBadges(c.items);
+        if (Object.keys(b).length) c.badges = b;
+      }
+    }));
+    d.natureBadges = true;
+  }
+  // Lists made before "Date created" existed count as created in their current order.
+  const base = Date.now() - d.lists.length * 1000;
+  d.lists.forEach((l, i) => { if (!l.created) l.created = base + i * 1000; });
+  // Home: how lists are sorted, and which label they're filtered by.
+  d.view = d.view || { sort: "custom", label: null };
+  return d;
 }
 
 let db = load();
@@ -420,6 +698,20 @@ function save() {
 save();
 
 const findList = (id) => db.lists.find((l) => l.id === id);
+
+// A "Multiple" is a list of categories; each roll picks one option from every
+// category: { type: "multi", cats: [{ id, name, link?, items }] }.
+// `link` points at one of your normal lists: its options are used too (kept in
+// sync), and `items` are extra options only this category has.
+const isMulti = (l) => l.type === "multi";
+const linkedList = (c) => {
+  const l = c.link && findList(c.link);
+  return l && !isMulti(l) ? l : null;
+};
+const catOptions = (c) => {
+  const l = linkedList(c);
+  return [...new Set([...(l ? l.items : []), ...c.items])];
+};
 
 /* =========================================================
    3. Random pick, history and the wheel
@@ -446,12 +738,35 @@ function roll(list) {
 
 function record(list) {
   const h = db.history[list.id] || (db.history[list.id] = []);
+  const v = isMulti(list) ? (Object.keys(cur.picks).length ? { ...cur.picks } : null) : cur.item;
   if (cur.rec) h.shift();
-  cur.rec = !!cur.item;
-  if (cur.item) h.unshift(cur.item);
+  cur.rec = !!v;
+  if (v) h.unshift(v);
   h.length = Math.min(h.length, 6);
   save();
 }
+
+// Multiple: re-pick every category except the locked ones. With `keepValid`
+// (a category changed while editing) only the missing or outdated ones are
+// picked, without the reels.
+function rollCombo(list, keepValid) {
+  const before = cur.picks, picks = {};
+  for (const c of liveCats(list)) {
+    const o = catOptions(c), old = before[c.id];
+    if ((keepValid || cur.locks.has(c.id)) && o.includes(old)) picks[c.id] = old;
+    else { picks[c.id] = o[rand(o.length)]; cur.locks.delete(c.id); }
+  }
+  cur.before = before;
+  cur.picks = picks;
+  cur.spin = !keepValid && !!db.wheel;
+  record(list);
+}
+// Categories in play: switched on (`off` is set in Edit) and with something to pick.
+const liveCats = (list) => list.cats.filter((c) => !c.off && catOptions(c).length);
+const comboStale = (list) => {
+  const live = liveCats(list);
+  return live.length !== Object.keys(cur.picks).length || live.some((c) => !catOptions(c).includes(cur.picks[c.id]));
+};
 
 // The wheel: one slice per item, drawn in a 300×300 box, first slice at the top.
 // Slices are spun inside a static gold rim of marquee bulbs.
@@ -618,14 +933,98 @@ function spin(list) {
   }, () => {});
 }
 
+// Multiple with the toggle on: a slot machine with one reel per unlocked
+// category. Reels start on the last answer, spin and stop one by one, top
+// to bottom, inside a gold marquee frame, then fanfare and the answer.
+const sfxStop = () => tone(320, 0, 0.09, "square", 0.07, 140); // reel "clunk"
+
+function placeBulbs(el) {
+  const w = el.offsetWidth, h = el.offsetHeight, m = 7, gap = 22;
+  const nx = Math.max(2, Math.round((w - 2 * m) / gap)), ny = Math.max(2, Math.round((h - 2 * m) / gap));
+  const pts = [];
+  for (let i = 0; i < nx; i++) pts.push([m + ((w - 2 * m) * i) / nx, m]);
+  for (let i = 0; i < ny; i++) pts.push([w - m, m + ((h - 2 * m) * i) / ny]);
+  for (let i = 0; i < nx; i++) pts.push([w - m - ((w - 2 * m) * i) / nx, h - m]);
+  for (let i = 0; i < ny; i++) pts.push([m, h - m - ((h - 2 * m) * i) / ny]);
+  el.innerHTML = pts.map(([x, y]) => `<i style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px"></i>`).join("");
+}
+
+function slotSpin(list, reels) {
+  const box = $(".slots"), me = cur, token = (cur.spinToken = {});
+  const done = () => cur === me && me.spinToken === token;
+  placeBulbs($(".bulbs"));
+  box.classList.add("spinning");
+  sfx.start();
+
+  const runs = reels.map((c, k) => {
+    const win = $(`.reel[data-cat="${c.id}"]`), strip = win.firstElementChild, h = win.offsetHeight;
+    const o = catOptions(c), pick = me.picks[c.id], other = () => o.find((x) => x !== pick);
+    const seq = [o.includes(me.before[c.id]) ? me.before[c.id] : o[rand(o.length)]];
+    const len = 14 + k * 5;
+    while (seq.length < len - 1) {
+      let x;
+      do x = o[rand(o.length)]; while (x === seq[seq.length - 1]);
+      seq.push(x);
+    }
+    if (seq[seq.length - 1] === pick) seq[seq.length - 1] = other();
+    seq.push(pick, other()); // the one after shows in the little bounce
+    strip.innerHTML = seq.map((x) => `<span>${esc(x)}</span>`).join("");
+    const anim = strip.animate([{ transform: "translateY(0)" }, { transform: `translateY(${-(len - 1) * h}px)` }],
+      { duration: 1500 + k * 550, easing: "cubic-bezier(0.25, 0.75, 0.3, 1.04)", fill: "forwards" });
+    anim.finished.then(() => {
+      if (!done()) return;
+      sfxStop();
+      win.closest(".combo-row").classList.add("landed");
+      if (navigator.vibrate) navigator.vibrate(8);
+    }, () => {});
+    return { strip, h, anim, at: 0 };
+  });
+
+  // Click as options pass under each reel's window.
+  let lastTick = 0;
+  (function watch() {
+    if (!done()) return;
+    let moving = false;
+    for (const r of runs) {
+      if (r.anim.playState === "finished") continue;
+      moving = true;
+      const at = Math.round(-new DOMMatrix(getComputedStyle(r.strip).transform).f / r.h);
+      if (at !== r.at) {
+        r.at = at;
+        if (performance.now() - lastTick > 35) { lastTick = performance.now(); sfx.tick(); }
+      }
+    }
+    if (moving) requestAnimationFrame(watch);
+  })();
+
+  Promise.all(runs.map((r) => r.anim.finished)).then(() => {
+    if (!done()) return;
+    box.classList.replace("spinning", "won");
+    sfx.win();
+    confetti(box);
+    if (navigator.vibrate) navigator.vibrate([20, 40, 20]);
+    box.animate([{ transform: "scale(1)" }, { transform: "scale(1.05)" }, { transform: "scale(1)" }], { duration: 500, easing: "cubic-bezier(0.3, 1.5, 0.5, 1)" });
+    setTimeout(() => {
+      if (!done()) return;
+      box.animate([{ opacity: 1 }, { opacity: 0, transform: "scale(0.92)" }], { duration: 220, easing: "ease-in", fill: "forwards" })
+        .finished.then(() => {
+          if (!done()) return;
+          me.spin = false;
+          me.reveal = true;
+          if (route().view === "list") render();
+        }, () => {});
+    }, 1500);
+  }, () => {});
+}
+
 /* =========================================================
    4. Navigation (works with Android's back gesture)
    ========================================================= */
 const depth = () => (history.state && history.state.d) || 0;
 
 function route() {
-  const [, view, id] = (location.hash.slice(1) || "/").split("/");
-  return { view: view || "home", id };
+  const [, view, id, sub] = (location.hash.slice(1) || "/").split("/");
+  return { view: view || "home", id, sub };
 }
 function go(path) {
   history.pushState({ d: depth() + 1 }, "", "#" + path);
@@ -668,17 +1067,75 @@ const I = {
   download: ic("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4|M7 10l5 5 5-5|M12 15V3", 20),
   upload: ic("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4|M17 8l-5-5-5 5|M12 3v12", 20),
   grip: ic("M9 6h.01|M15 6h.01|M9 12h.01|M15 12h.01|M9 18h.01|M15 18h.01", 20, 3),
+  plus: ic("M12 5v14|M5 12h14", 24, 2.2),
+  trash: ic("M3 6h18|M8 6V4h8v2|M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6|M10 11v6|M14 11v6", 24),
+  layers: ic("M12 2L2 7l10 5 10-5-10-5z|M2 17l10 5 10-5|M2 12l10 5 10-5", 20),
+  layersSm: ic("M12 2L2 7l10 5 10-5-10-5z|M2 17l10 5 10-5|M2 12l10 5 10-5", 11, 2.6),
+  link: ic("M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71|M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71", 20),
+  lock: ic("M6 11h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z|M8 11V7a4 4 0 0 1 8 0v4", 20),
+  unlock: ic("M6 11h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z|M8 11V7a4 4 0 0 1 7.75-1.4", 20),
 };
+I.cameraSm = ic("M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z|M12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", 10, 2.6);
+I.image = ic("M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z|M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z|M21 15l-5-5L5 21", 20);
+
+I.search = ic("M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16z|M21 21l-4.35-4.35", 18);
+I.sort = ic("M7 4v16|M3 8l4-4 4 4|M17 20V4|M13 16l4 4 4-4", 18);
+
+// Labels: your own tags on a list (e.g. "Food", "Weekend"), shown as little
+// colored pills. Each label always gets the same color, picked from its name.
+const labelHue = (s) => [...s.toLowerCase()].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 360, 7);
+const labelPill = (s) => `<span class="pill-label" style="--h:${labelHue(s)}">${esc(s)}</span>`;
+const allLabels = () => [...new Set(db.lists.flatMap((l) => l.labels || []))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+const labelsField = (l) => `
+  <div class="label">Labels</div>
+  <button class="input labels-in" data-act="labelSheet" aria-label="Edit labels">
+    ${(l.labels || []).map(labelPill).join("")}<span class="labels-add">${l.labels && l.labels.length ? "Edit" : "+ Add a label"}</span>
+  </button>`;
+
+I.tag = ic("M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.8z|M7 7h.01", 18);
+
+// Option badges: little notes on one option, e.g. Adamant → "+10% Atk", "−10% SpA".
+// Kept on whatever holds the options (a list, or a Multiple's category) as
+// `badges: { "Adamant": ["+10% Atk", "−10% SpA"] }`.
+// Badges starting with + are green and with − red; others get a color from their text.
+const badgesOf = (owner, item) => (owner && owner.badges && owner.badges[item]) || [];
+// A category's option can also carry badges from its linked list.
+const optionBadges = (list, cat, item) =>
+  cat ? [...new Set([...badgesOf(cat, item), ...badgesOf(linkedList(cat), item)])] : badgesOf(list, item);
+const badgeHue = (s) => (/^\+/.test(s) ? 140 : /^[−-]/.test(s) ? 0 : labelHue(s));
+const badgePills = (arr, cls = "") => arr.length
+  ? `<span class="badges ${cls}">${arr.map((b) => `<span class="pill-label" style="--h:${badgeHue(b)}">${esc(b)}</span>`).join("")}</span>`
+  : "";
+const allBadges = (owner) => [...new Set(Object.values((owner && owner.badges) || {}).flat())].sort((a, b) => a.localeCompare(b));
+function setBadges(owner, item, arr) {
+  if (arr.length) (owner.badges = owner.badges || {})[item] = arr;
+  else if (owner.badges) delete owner.badges[item];
+  if (owner.badges && !Object.keys(owner.badges).length) delete owner.badges;
+}
+
+// A list's icon: your uploaded image if it has one, otherwise its emoji.
+const icon = (l) => (l.image ? `<img class="icon-img" src="${esc(l.image)}" alt="">` : esc(l.emoji));
+// Small corner badge on a Multiple's emoji, so it stands out from normal lists.
+const emojiBox = (l) => `<span class="emoji">${icon(l)}${isMulti(l) ? `<span class="badge" aria-label="Multiple">${I.layersSm}</span>` : ""}</span>`;
 const grip = `<span class="grip" aria-hidden="true">${I.grip}</span>`;
 
 function render() {
   const r = route();
   if (r.view === "home" || r.view === "manage") cur = null;
 
-  if (r.view === "list" || r.view === "edit") {
+  if (r.view === "list" || r.view === "edit" || r.view === "cat") {
     const list = findList(r.id);
     if (!list) { history.replaceState({ d: depth() }, "", "#/"); return render(); }
-    r.view === "list" ? renderResult(list) : renderEdit(list);
+    const multi = isMulti(list);
+    if (r.view === "cat") {
+      const cat = multi && list.cats.find((c) => c.id === r.sub);
+      if (!cat) { history.replaceState({ d: depth() }, "", "#/edit/" + list.id); return render(); }
+      renderCatEdit(list, cat);
+    } else if (r.view === "list") {
+      multi ? renderCombo(list) : renderResult(list);
+    } else {
+      multi ? renderMultiEdit(list) : renderEdit(list);
+    }
   } else if (r.view === "manage") {
     renderManage();
   } else {
@@ -687,30 +1144,82 @@ function render() {
   renderSheet();
 }
 
-function renderHome() {
-  const rows = db.lists.map((l) => {
+// Home search box text (kept while the app is open, not saved).
+let homeQuery = "";
+const SORTS = { custom: "My order", az: "A–Z", new: "Newest", old: "Oldest" };
+
+// The lists Home shows: filtered by the chosen label and search text, then sorted.
+function homeLists() {
+  const v = db.view, q = homeQuery.trim().toLowerCase();
+  let ls = db.lists.filter((l) =>
+    (!v.label || (l.labels || []).includes(v.label)) &&
+    (!q || [l.name, l.description || "", ...(l.labels || [])].some((s) => s.toLowerCase().includes(q))));
+  if (v.sort === "az") ls = [...ls].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
+  else if (v.sort === "new") ls = [...ls].sort((a, b) => b.created - a.created);
+  else if (v.sort === "old") ls = [...ls].sort((a, b) => a.created - b.created);
+  return ls;
+}
+// Drag to reorder only makes sense when every list is showing in your own order.
+const canReorder = () => (db.view.sort || "custom") === "custom" && !db.view.label && !homeQuery.trim();
+
+// Just the rows, so typing in the search box doesn't redraw (and unfocus) it.
+function fillHomeList() {
+  const box = $("#homeList");
+  if (!box) return;
+  const ls = homeLists(), sortable = canReorder();
+  const rows = ls.map((l) => {
+    const pills = (l.labels || []).map(labelPill).join("");
     return `
       <button class="row" data-act="open" data-id="${l.id}">
-        <span class="emoji">${esc(l.emoji)}</span>
+        ${emojiBox(l)}
         <span class="row-text">
           <div class="row-name">${esc(l.name)}</div>
-          ${l.description ? `<div class="row-sub">${esc(l.description)}</div>` : ""}
+          ${pills || l.description ? `<div class="row-sub">${pills}${esc(l.description || "")}</div>` : ""}
         </span>
-        <span class="count">${l.items.length}</span>
-        ${grip}
+        <span class="count">${isMulti(l) ? l.cats.length : l.items.length}</span>
+        ${sortable ? grip : ""}
       </button>`;
   }).join("");
+  box.innerHTML = ls.length
+    ? `<div class="group"${sortable ? ' data-sort="lists"' : ""}>${rows}</div>`
+    : `<div class="no-match"><p class="hint">No lists match${homeQuery.trim() ? ` “${esc(homeQuery.trim())}”` : ""}.</p><button class="pill" data-act="clearFilters">Clear search and filter</button></div>`;
+}
+
+function renderHome() {
+  const labels = allLabels();
+  if (db.view.label && !labels.includes(db.view.label)) db.view.label = null; // that label is gone
+  const chips = labels.length ? `
+    <div class="chips-row" role="toolbar" aria-label="Filter by label">
+      <button class="chip${db.view.label ? "" : " on"}" data-act="filterLabel" data-v="">All</button>
+      ${labels.map((s) => `<button class="chip${db.view.label === s ? " on" : ""}" data-act="filterLabel" data-v="${esc(s)}" style="--h:${labelHue(s)}"><i></i>${esc(s)}</button>`).join("")}
+    </div>` : "";
 
   app.innerHTML = `
     <main class="view">
       <header class="head">
-        <h1>Randomizer</h1>
+        <span class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="26" height="26"><rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/><circle cx="8.3" cy="8.3" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="15.7" cy="15.7" r="1.7" fill="currentColor"/></svg>
+        </span>
+        <div class="head-text">
+          <h1>Randomizer</h1>
+          <p class="tagline">Tap a list, get an answer.</p>
+        </div>
         <button class="iconbtn" data-act="menu" aria-label="Menu">${I.more}</button>
       </header>
-      ${db.lists.length
-        ? `<div class="group" data-sort="lists">${rows}</div>`
-        : `<p class="hint">No lists yet.</p><button class="btn ghost" data-act="newList">+ New list</button>`}
+      ${db.lists.length ? `
+      <div class="toolbar">
+        <label class="search">
+          ${I.search}
+          <input type="search" id="search" value="${esc(homeQuery)}" placeholder="Search lists" aria-label="Search lists" autocomplete="off" enterkeyhint="search">
+        </label>
+        <button class="pill sortbtn" data-act="sortSheet" aria-label="Sort: ${SORTS[db.view.sort || "custom"]}">${I.sort}${SORTS[db.view.sort || "custom"]}</button>
+      </div>
+      ${chips}
+      <div id="homeList"></div>`
+        : `<p class="hint">No lists yet.</p><button class="btn ghost" data-act="newPick">+ New list</button>`}
+      <button class="fab" data-act="newPick" aria-label="New randomizer"><span class="fab-plus">${I.plus}</span><span class="fab-trash">${I.trash}</span></button>
     </main>`;
+  fillHomeList();
 }
 
 function renderResult(list) {
@@ -735,7 +1244,8 @@ function renderResult(list) {
   } else if (spinning) {
     stage = wheelSVG(list.items);
   } else {
-    stage = `<p class="answer ${size(cur.item)}${cur.reveal ? " reveal" : ""}">${esc(cur.item)}</p>`;
+    stage = `<p class="answer ${size(cur.item)}${cur.reveal ? " reveal" : ""}">${esc(cur.item)}</p>` +
+      badgePills(badgesOf(list, cur.item), `answer-badges${cur.reveal ? " reveal" : ""}`);
     cur.reveal = false;
   }
 
@@ -743,7 +1253,7 @@ function renderResult(list) {
     <main class="view">
       <div class="topbar">
         <button class="iconbtn" data-act="back" aria-label="Back">${I.back}</button>
-        <div class="top-title"><span>${esc(list.emoji)}</span><span class="ellip">${esc(list.name)}</span></div>
+        <div class="top-title"><span class="top-icon">${icon(list)}</span><span class="ellip">${esc(list.name)}</span></div>
         <button class="iconbtn" data-act="edit" aria-label="Edit list">${I.edit}</button>
       </div>
       <section class="stage${spinning ? " spin" : ""}" aria-live="polite">${stage}</section>
@@ -759,13 +1269,79 @@ function renderResult(list) {
   if (spinning) spin(list);
 }
 
+// Multiple: one row per category with its pick. Tap a row to choose it
+// yourself; the lock keeps it when you reroll (until you leave this screen).
+function renderCombo(list) {
+  if (!cur || cur.id !== list.id) {
+    cur = { id: list.id, picks: {}, locks: new Set(), rec: false };
+    rollCombo(list);
+  } else if (comboStale(list)) {
+    rollCombo(list, true); // a category changed while editing
+  }
+
+  const live = liveCats(list);
+  const reels = live.filter((c) => !cur.locks.has(c.id) && catOptions(c).length > 1);
+  if (cur.spin && (!reels.length || reducedMotion())) cur.spin = false;
+  const spinning = cur.spin;
+  const off = spinning ? 'aria-disabled="true"' : "";
+
+  const rows = live.map((c, k) => {
+    const locked = cur.locks.has(c.id);
+    const val = spinning && reels.includes(c)
+      ? `<span class="combo-val reel" data-cat="${c.id}"><span class="strip"><span>${esc(cur.picks[c.id])}</span></span></span>`
+      : `<span class="combo-val">${esc(cur.picks[c.id])}</span>${badgePills(optionBadges(list, c, cur.picks[c.id]))}`;
+    return `
+      <div class="combo-row${locked ? " locked" : ""}" data-cat="${c.id}" style="--k:${k};--c:${WHEEL_COLORS[k % WHEEL_COLORS.length]}">
+        <button class="combo-main" data-act="pickCat" data-cat="${c.id}" ${off}>
+          <span class="combo-cat">${esc(c.name)}</span>
+          ${val}
+        </button>
+        <button class="iconbtn lockbtn" data-act="lock" data-cat="${c.id}" aria-pressed="${locked}" aria-label="${locked ? "Unlock" : "Lock"} ${esc(c.name)}" ${off}>${locked ? I.lock : I.unlock}</button>
+        ${spinning ? "" : grip}
+      </div>`;
+  }).join("");
+
+  let stage;
+  if (!live.length) {
+    const allOff = list.cats.some((c) => c.off && catOptions(c).length);
+    stage = allOff ? `
+      <p class="empty-title">All categories are off</p>
+      <p class="empty-text">Turn one on in Edit to include it in the roll.</p>
+      <button class="btn primary sm" data-act="edit">Edit categories</button>` : `
+      <p class="empty-title">Nothing to pick yet</p>
+      <p class="empty-text">Add a category with a few options.</p>
+      <button class="btn primary sm" data-act="edit">Add categories</button>`;
+  } else {
+    // Drag a row (handle, or press and hold) to change the category order.
+    const combo = `<div class="group combo${cur.reveal ? " reveal" : ""}"${spinning ? "" : ' data-sort="combo"'}>${rows}</div>`;
+    stage = spinning
+      ? `<div class="slots"><div class="slots-glow"></div><div class="slots-frame"><div class="bulbs"></div>${combo}</div></div>`
+      : combo;
+    cur.reveal = false;
+  }
+
+  app.innerHTML = `
+    <main class="view">
+      <div class="topbar">
+        <button class="iconbtn" data-act="back" aria-label="Back">${I.back}</button>
+        <div class="top-title"><span class="top-icon">${icon(list)}</span><span class="ellip">${esc(list.name)}</span></div>
+        <button class="iconbtn" data-act="edit" aria-label="Edit multiple">${I.edit}</button>
+      </div>
+      <section class="stage combo-stage${spinning ? " spin" : ""}" aria-live="polite">${stage}</section>
+      ${live.length ? `
+      <div class="actions">
+        <p class="combo-hint">Tap a result to choose it yourself</p>
+        <div class="btn-row">
+          <button class="btn toggle" data-act="wheel" role="switch" aria-checked="${!!db.wheel}"><span class="switch" aria-hidden="true"></span> Reels</button>
+          <button class="btn primary" data-act="reroll" ${off}>${I.reroll} Reroll</button>
+        </div>
+      </div>` : ""}
+    </main>`;
+  if (spinning) slotSpin(list, reels);
+}
+
 function renderEdit(list) {
-  const items = list.items.map((it, i) => `
-    <div class="item-row">
-      ${grip}
-      <input class="item-in" data-field="item" data-i="${i}" value="${esc(it)}" enterkeyhint="done" aria-label="Item ${i + 1}">
-      <button class="iconbtn sm" data-act="delItem" data-i="${i}" aria-label="Delete ${esc(it)}">${I.x}</button>
-    </div>`).join("");
+  const items = list.items.map((it, i) => itemRow(list, it, i, "Item")).join("");
 
   app.innerHTML = `
     <main class="view">
@@ -775,10 +1351,11 @@ function renderEdit(list) {
         <button class="pill" data-act="back">Done</button>
       </div>
       <div class="name-row">
-        <input class="input emoji-in" data-field="emoji" value="${esc(list.emoji)}" aria-label="Emoji" enterkeyhint="done">
+        <button class="input emoji-in" data-act="iconSheet" aria-label="Change icon">${icon(list)}<span class="badge">${I.cameraSm}</span></button>
         <input class="input" data-field="name" value="${esc(list.name)}" aria-label="List name" enterkeyhint="done">
       </div>
       <textarea class="input desc-in" data-field="description" rows="1" placeholder="Add a description…" aria-label="Description">${esc(list.description || "")}</textarea>
+      ${labelsField(list)}
       <div class="label">Items · <span id="itemCount">${list.items.length}</span></div>
       ${list.items.length ? `<div class="group" data-sort="items">${items}</div>` : `<p class="hint">No items yet. Add your first one below.</p>`}
       <button class="dangerbtn" data-act="deleteList">Delete this list</button>
@@ -790,23 +1367,124 @@ function renderEdit(list) {
   autoGrow($(".desc-in"));
 }
 
+// One editable option: drag handle, its text, its badges, then badge and delete buttons.
+// `owner` holds the options: a list, or a Multiple's category.
+function itemRow(owner, it, i, noun) {
+  const b = badgesOf(owner, it);
+  return `
+    <div class="item-row">
+      ${grip}
+      <div class="item-main">
+        <input class="item-in" data-field="item" data-i="${i}" value="${esc(it)}" enterkeyhint="done" aria-label="${noun} ${i + 1}">
+        ${badgePills(b)}
+      </div>
+      <button class="iconbtn sm${b.length ? " has-badges" : ""}" data-act="badgeSheet" data-i="${i}" aria-label="Badges for ${esc(it)}">${I.tag}</button>
+      <button class="iconbtn sm" data-act="delItem" data-i="${i}" aria-label="Delete ${esc(it)}">${I.x}</button>
+    </div>`;
+}
+
+// Edit a Multiple: name, description and its categories. Tap a category to edit it.
+function renderMultiEdit(list) {
+  const rows = list.cats.map((c) => {
+    const l = linkedList(c), n = catOptions(c).length;
+    const from = l ? `<span>&nbsp;· </span><span class="ellip">${icon(l)} ${esc(l.name)}${c.items.length ? ` + ${c.items.length}` : ""}</span>` : "";
+    return `
+      <div class="row${c.off ? " off" : ""}" data-act="openCat" data-cat="${c.id}" role="button" tabindex="0">
+        <span class="row-text">
+          <div class="row-name">${esc(c.name)}</div>
+          <div class="row-sub sub-from"><span>${c.off ? "Off · " : ""}${n} option${n === 1 ? "" : "s"}</span>${from}</div>
+        </span>
+        <button class="toggle catsw" data-act="catActive" data-cat="${c.id}" role="switch" aria-checked="${!c.off}" aria-label="Include ${esc(c.name)} in the roll"><span class="switch" aria-hidden="true"></span></button>
+        <span class="chev">${I.chev}</span>
+        ${grip}
+      </div>`;
+  }).join("");
+
+  app.innerHTML = `
+    <main class="view">
+      <div class="topbar">
+        <button class="iconbtn" data-act="back" aria-label="Back">${I.back}</button>
+        <div class="top-title">Edit multiple</div>
+        <button class="pill" data-act="back">Done</button>
+      </div>
+      <div class="name-row">
+        <button class="input emoji-in" data-act="iconSheet" aria-label="Change icon">${icon(list)}<span class="badge">${I.cameraSm}</span></button>
+        <input class="input" data-field="name" value="${esc(list.name)}" aria-label="Name" enterkeyhint="done">
+      </div>
+      <textarea class="input desc-in" data-field="description" rows="1" placeholder="Add a description…" aria-label="Description">${esc(list.description || "")}</textarea>
+      ${labelsField(list)}
+      <div class="label">Categories · ${list.cats.length}</div>
+      ${list.cats.length
+        ? `<div class="group" data-sort="cats">${rows}</div>`
+        : `<p class="hint">No categories yet. Each category gives one result per roll.</p>`}
+      ${list.cats.length ? `<p class="hint group-hint">Switch a category off to leave it out of the roll.</p>` : ""}
+      <button class="btn ghost" data-act="addCat">+ Add category</button>
+      <button class="dangerbtn" data-act="deleteList">Delete this multiple</button>
+    </main>`;
+  autoGrow($(".desc-in"));
+}
+
+// Edit one category of a Multiple: its name, an optional linked list, and its own options.
+function renderCatEdit(list, cat) {
+  const l = linkedList(cat);
+  const items = cat.items.map((it, i) => itemRow(cat, it, i, "Option")).join("");
+  const linked = l ? l.items.map((it) => `<div class="item-row ro"><span>${esc(it)}</span>${badgePills(badgesOf(l, it))}</div>`).join("") : "";
+
+  app.innerHTML = `
+    <main class="view">
+      <div class="topbar">
+        <button class="iconbtn" data-act="back" aria-label="Back">${I.back}</button>
+        <div class="top-title"><span class="top-icon">${icon(list)}</span><span class="ellip">${esc(list.name)}</span></div>
+        <button class="pill" data-act="back">Done</button>
+      </div>
+      <div class="name-row">
+        <input class="input" data-field="catName" value="${esc(cat.name)}" placeholder="Category name" aria-label="Category name" enterkeyhint="done">
+      </div>
+      <div class="group stack">
+        <button class="row" data-act="linkSheet">
+          <span class="menu-icon">${I.link}</span>
+          <span class="row-text">
+            <div class="row-name">${l ? `${icon(l)} ${esc(l.name)}` : "Link a list"}</div>
+            <div class="row-sub">${l ? "Its options are used here and stay in sync" : "Use the options from one of your lists"}</div>
+          </span>
+          <span class="chev">${I.chev}</span>
+        </button>
+      </div>
+      ${l ? `
+      <div class="label">From ${esc(l.name)} · ${l.items.length}</div>
+      ${l.items.length ? `<div class="group stack">${linked}</div>` : `<p class="hint">That list is empty.</p>`}` : ""}
+      <div class="label">${l ? "Extra options" : "Options"} · ${cat.items.length}</div>
+      ${cat.items.length
+        ? `<div class="group" data-sort="items">${items}</div>`
+        : `<p class="hint">${l ? "Add options that only this category has." : "No options yet. Add your first one below, or link a list."}</p>`}
+      <form class="addbar inline" data-form="add">
+        <input class="input" id="addInput" placeholder="Add an option…" enterkeyhint="send" autocomplete="off">
+        <button class="btn primary sm" type="submit">Add</button>
+      </form>
+      <button class="dangerbtn" data-act="delCat">Delete this category</button>
+    </main>`;
+}
+
 function renderManage() {
   const n = db.lists.length;
-  const rows = db.lists.map((l, i) => `
+  const rows = db.lists.map((l, i) => {
+    const count = isMulti(l) ? `${l.cats.length} categories` : `${l.items.length} items`;
+    return `
     <div class="row" data-act="openEdit" data-id="${l.id}" role="button" tabindex="0">
-      <span class="emoji">${esc(l.emoji)}</span>
+      ${emojiBox(l)}
       <span class="row-text">
         <div class="row-name">${esc(l.name)}</div>
         ${l.description
-          ? `<div class="row-sub sub-split"><span class="ellip">${esc(l.description)}</span><span>&nbsp;· ${l.items.length} items</span></div>`
-          : `<div class="row-sub">${l.items.length} items · tap to edit</div>`}
+          ? `<div class="row-sub sub-split"><span class="ellip">${esc(l.description)}</span><span>&nbsp;· ${count}</span></div>`
+          : `<div class="row-sub">${count} · tap to edit</div>`}
       </span>
       <span class="move">
         <button class="iconbtn sm" data-act="up" data-i="${i}" aria-label="Move up" ${i === 0 ? "disabled" : ""}>${I.up}</button>
         <button class="iconbtn sm" data-act="down" data-i="${i}" aria-label="Move down" ${i === n - 1 ? "disabled" : ""}>${I.down}</button>
       </span>
       ${grip}
-    </div>`).join("");
+    </div>`;
+  }).join("");
 
   app.innerHTML = `
     <main class="view">
@@ -816,15 +1494,36 @@ function renderManage() {
       </header>
       <p class="hint">Tap a list to edit its name, description and items. Drag a list, or use the arrows, to reorder.</p>
       ${n ? `<div class="group" data-sort="lists">${rows}</div>` : ""}
-      <button class="btn ghost" data-act="newList">+ New list</button>
+      <button class="btn ghost" data-act="newPick">+ New list</button>
     </main>`;
 }
 
+// Our own "Are you sure?" sheet. The browser's confirm() box doesn't show
+// in some installed apps and previews (it just answers Cancel).
+// Resolves true for the main button; false for Cancel, a backdrop tap or Back.
+let asking = null;
+const plural = (n, one, many = one + "s") => `${n} ${n === 1 ? one : many}`;
+function ask(title, text, ok) {
+  return new Promise((resolve) => {
+    asking = { title, text, ok, resolve };
+    openSheet("confirm");
+  });
+}
+function answer(yes) {
+  const a = asking;
+  asking = null;
+  addEventListener("popstate", () => a.resolve(yes), { once: true }); // after the sheet has closed
+  history.back();
+}
+
 let shownSheet = null;
-function renderSheet() {
+// `again`: redraw the sheet that is already open (no slide-up, same scroll).
+function renderSheet(again) {
   const kind = history.state && history.state.sheet;
   const el = $("#sheet");
-  if (kind === shownSheet) return;
+  if (asking && kind !== "confirm" && shownSheet === "confirm") { asking.resolve(false); asking = null; }
+  if (kind === shownSheet && !again) return;
+  const keepScroll = again && el.querySelector(".panel") ? el.querySelector(".panel").scrollTop : 0;
   shownSheet = kind || null;
   document.body.style.overflow = kind ? "hidden" : "";
   if (!kind) { el.hidden = true; el.innerHTML = ""; return; }
@@ -834,6 +1533,7 @@ function renderSheet() {
     body = `
       <h2 class="sheet-title">Menu</h2>
       <div class="group">
+        <button class="row" data-act="menuNew"><span class="menu-icon">${I.plus}</span><span class="row-text"><div class="row-name">Add a list</div><div class="row-sub">New list or Multiple</div></span></button>
         <button class="row" data-act="manage"><span class="menu-icon">${I.lists}</span><span class="row-text"><div class="row-name">Edit lists</div><div class="row-sub">Add, rename, reorder, delete</div></span></button>
         <button class="row" data-act="export"><span class="menu-icon">${I.download}</span><span class="row-text"><div class="row-name">Back up</div><div class="row-sub">Save a backup file to Downloads</div></span></button>
         <button class="row" data-act="import"><span class="menu-icon">${I.upload}</span><span class="row-text"><div class="row-name">Restore from backup</div><div class="row-sub">Replace lists with a backup file</div></span></button>
@@ -844,22 +1544,130 @@ function renderSheet() {
     if (!list) { el.hidden = true; return; }
     const rows = list.items.map((it, i) => `
         <button class="row compact" data-act="choose" data-i="${i}">
-          <span class="row-text"><div class="row-name">${esc(it)}</div></span>
+          <span class="row-text"><div class="row-name">${esc(it)}</div>${badgePills(badgesOf(list, it))}</span>
           ${it === cur.item ? `<span class="check">${I.check}</span>` : ""}
         </button>`).join("");
-    body = `<h2 class="sheet-title">${esc(list.emoji)} Pick by hand</h2><div class="group">${rows}</div>`;
+    body = `<h2 class="sheet-title">${icon(list)} Pick by hand</h2><div class="group">${rows}</div>`;
+  } else if (kind === "confirm") {
+    if (!asking) { el.hidden = true; return; }
+    body = `
+      <h2 class="sheet-title">${esc(asking.title)}</h2>
+      <p class="hint ask-text">${esc(asking.text)}</p>
+      <div class="btn-row">
+        <button class="btn" data-act="askNo">Cancel</button>
+        <button class="btn danger" data-act="askYes">${esc(asking.ok)}</button>
+      </div>`;
+  } else if (kind === "labels") {
+    const list = currentList();
+    if (!list) { el.hidden = true; return; }
+    const mine = list.labels || [], all = allLabels();
+    const rows = all.map((s) => `
+        <button class="row compact" data-act="toggleLabel" data-v="${esc(s)}">
+          <span class="row-text">${labelPill(s)}</span>
+          ${mine.includes(s) ? `<span class="check">${I.check}</span>` : ""}
+        </button>`).join("");
+    body = `
+      <h2 class="sheet-title">Labels</h2>
+      <p class="hint">Filter by label on the Home screen.</p>
+      <form class="addbar inline" data-form="label">
+        <input class="input" id="labelInput" placeholder="New label…" maxlength="24" enterkeyhint="done" autocomplete="off">
+        <button class="btn primary sm" type="submit">Add</button>
+      </form>
+      ${all.length ? `<div class="label sheet-label">Tap to add or remove</div><div class="group">${rows}</div>` : ""}`;
+  } else if (kind === "badges") {
+    const owner = editOwner();
+    if (!owner || !owner.items.includes(badgeItem)) { el.hidden = true; return; }
+    const mine = badgesOf(owner, badgeItem);
+    // Badges un-ticked while the sheet is open stay listed, so they can be ticked again.
+    seenBadges = [...new Set([...seenBadges, ...allBadges(owner)])];
+    const all = [...seenBadges].sort((a, b) => a.localeCompare(b));
+    const rows = all.map((s) => `
+        <button class="row compact" data-act="toggleBadge" data-v="${esc(s)}">
+          <span class="row-text">${badgePills([s])}</span>
+          ${mine.includes(s) ? `<span class="check">${I.check}</span>` : ""}
+        </button>`).join("");
+    body = `
+      <h2 class="sheet-title">Badges · ${esc(badgeItem)}</h2>
+      <p class="hint">Shown with this option when it's picked. Start with + for green or − for red, e.g. +10% Atk.</p>
+      <form class="addbar inline" data-form="badge">
+        <input class="input" id="badgeInput" placeholder="New badge…" maxlength="24" enterkeyhint="done" autocomplete="off">
+        <button class="btn primary sm" type="submit">Add</button>
+      </form>
+      ${all.length ? `<div class="label sheet-label">Used in this ${route().view === "cat" ? "category" : "list"} · tap to add or remove</div><div class="group">${rows}</div>` : ""}`;
+  } else if (kind === "sort") {
+    const on = db.view.sort || "custom";
+    const rows = [["custom", "My order", "Drag lists to arrange them"], ["az", "Name A–Z", ""], ["new", "Newest first", "By date created"], ["old", "Oldest first", "By date created"]]
+      .map(([v, name, sub]) => `
+        <button class="row compact" data-act="setSort" data-v="${v}">
+          <span class="row-text"><div class="row-name">${name}</div>${sub ? `<div class="row-sub">${sub}</div>` : ""}</span>
+          ${on === v ? `<span class="check">${I.check}</span>` : ""}
+        </button>`).join("");
+    body = `<h2 class="sheet-title">Sort lists</h2><div class="group">${rows}</div>`;
+  } else if (kind === "icon") {
+    const list = currentList();
+    if (!list) { el.hidden = true; return; }
+    body = `
+      <h2 class="sheet-title">Icon</h2>
+      <div class="name-row">
+        <input class="input" data-field="emoji" value="${esc(list.emoji)}" placeholder="Type an emoji" aria-label="Emoji" enterkeyhint="done">
+      </div>
+      <div class="group">
+        <button class="row" data-act="uploadImg"><span class="menu-icon">${I.image}</span><span class="row-text"><div class="row-name">${list.image ? "Change image" : "Upload image"}</div><div class="row-sub">Use a photo or picture from this phone</div></span></button>
+        ${list.image ? `<button class="row" data-act="removeImg"><span class="menu-icon">${I.x}</span><span class="row-text"><div class="row-name">Remove image</div><div class="row-sub">Show the emoji instead</div></span></button>` : ""}
+      </div>`;
+  } else if (kind === "new") {
+    body = `
+      <h2 class="sheet-title">New randomizer</h2>
+      <div class="group">
+        <button class="row" data-act="newList" data-type="single"><span class="menu-icon">${I.hand}</span><span class="row-text"><div class="row-name">List</div><div class="row-sub">Pick one option from a list</div></span></button>
+        <button class="row" data-act="newList" data-type="multi"><span class="menu-icon">${I.layers}</span><span class="row-text"><div class="row-name">Multiple</div><div class="row-sub">Pick one option from each category</div></span></button>
+      </div>`;
+  } else if (kind === "pickCat") {
+    const list = cur && findList(cur.id), c = list && isMulti(list) && list.cats.find((x) => x.id === cur.pickCat);
+    if (!c) { el.hidden = true; return; }
+    const rows = catOptions(c).map((it, i) => `
+        <button class="row compact" data-act="chooseCat" data-i="${i}">
+          <span class="row-text"><div class="row-name">${esc(it)}</div>${badgePills(optionBadges(list, c, it))}</span>
+          ${it === cur.picks[c.id] ? `<span class="check">${I.check}</span>` : ""}
+        </button>`).join("");
+    body = `<h2 class="sheet-title">${esc(c.name)}</h2><p class="hint">Your choice stays locked when you reroll.</p><div class="group">${rows}</div>`;
+  } else if (kind === "link") {
+    const c = currentCat();
+    if (!c) { el.hidden = true; return; }
+    const lists = db.lists.filter((l) => !isMulti(l));
+    const rows = [{ id: "", emoji: "", name: "Don't link a list", items: null }, ...lists].map((l) => `
+        <button class="row compact" data-act="setLink" data-id="${l.id}">
+          <span class="row-text"><div class="row-name">${l.emoji ? icon(l) + " " : ""}${esc(l.name)}</div>${l.items ? `<div class="row-sub">${l.items.length} items</div>` : ""}</span>
+          ${(c.link || "") === l.id ? `<span class="check">${I.check}</span>` : ""}
+        </button>`).join("");
+    body = `<h2 class="sheet-title">Link a list</h2><p class="hint">Its options are used in this category and stay in sync when you edit that list.</p><div class="group">${rows}</div>`;
   }
 
   el.innerHTML = `
-    <div class="backdrop" data-act="closeSheet"></div>
-    <div class="panel" role="dialog" aria-modal="true"><div class="handle"></div>${body}</div>`;
+    <div class="backdrop${again ? " still" : ""}" data-act="closeSheet"></div>
+    <div class="panel${again ? " still" : ""}" role="dialog" aria-modal="true">
+      <div class="handle"></div>
+      <div class="sheet-x-wrap"><button class="iconbtn sheet-x" data-act="${kind === "confirm" ? "askNo" : "closeSheet"}" aria-label="Close">${I.x}</button></div>
+      ${body}
+    </div>`;
   el.hidden = false;
+  if (again) el.querySelector(".panel").scrollTop = keepScroll;
 }
 
 /* =========================================================
    6. What each button does
    ========================================================= */
 const currentList = () => findList(route().id);
+const currentCat = () => {
+  const l = currentList();
+  return l && isMulti(l) ? l.cats.find((c) => c.id === route().sub) : null;
+};
+// The options being edited: a list's items, or a category's own options.
+const editItems = () => (route().view === "cat" ? currentCat().items : currentList().items);
+// What holds those options (and their badges): the category, or the list.
+const editOwner = () => (route().view === "cat" ? currentCat() : currentList());
+let badgeItem = null; // the option whose Badges sheet is open
+let seenBadges = []; // badges listed in that sheet since it opened
 
 function uniqueName(name, exceptId) {
   const base = name.trim() || "Untitled";
@@ -875,18 +1683,42 @@ const actions = {
   menu: () => openSheet("menu"),
   back: () => {
     // Don't lose an item that was typed but not yet added.
-    const add = $("#addInput");
-    if (add && add.value.trim()) { currentList().items.push(add.value.trim()); save(); }
-    back("/");
+    const add = $("#addInput"), r = route();
+    if (add && add.value.trim()) { editItems().push(add.value.trim()); save(); }
+    back(r.view === "cat" ? "/edit/" + r.id : "/");
   },
   done: () => back("/"),
   edit: () => go("/edit/" + route().id),
   closeSheet,
 
   reroll: () => {
-    roll(currentList());
+    const list = currentList();
+    if (isMulti(list)) {
+      if (liveCats(list).every((c) => cur.locks.has(c.id))) return toast("Everything is locked");
+      rollCombo(list);
+    } else {
+      roll(list);
+    }
     if (navigator.vibrate) navigator.vibrate(10);
     render();
+  },
+  lock: (el) => {
+    if (cur.spin) return;
+    const id = el.dataset.cat;
+    cur.locks.has(id) ? cur.locks.delete(id) : cur.locks.add(id);
+    render();
+  },
+  pickCat: (el) => {
+    if (cur.spin) return;
+    cur.pickCat = el.dataset.cat;
+    openSheet("pickCat");
+  },
+  chooseCat: (el) => {
+    const list = findList(cur.id), c = list.cats.find((x) => x.id === cur.pickCat);
+    cur.picks[c.id] = catOptions(c)[+el.dataset.i];
+    cur.locks.add(c.id); // choosing by hand also locks it
+    record(list);
+    closeSheet();
   },
   wheel: (el) => {
     db.wheel = !db.wheel;
@@ -909,29 +1741,110 @@ const actions = {
   },
   up: (el) => move(+el.dataset.i, -1),
   down: (el) => move(+el.dataset.i, 1),
-  newList: () => {
-    const l = { id: uid(), name: uniqueName("New list"), emoji: DEFAULT_EMOJI, items: [] };
+  labelSheet: () => openSheet("labels"),
+  toggleLabel: (el) => {
+    const list = currentList(), s = el.dataset.v;
+    const labels = (list.labels || []).includes(s) ? list.labels.filter((x) => x !== s) : [...(list.labels || []), s];
+    setLabels(list, labels);
+  },
+  badgeSheet: (el) => {
+    badgeItem = editItems()[+el.dataset.i];
+    seenBadges = [];
+    openSheet("badges");
+  },
+  toggleBadge: (el) => {
+    const owner = editOwner(), s = el.dataset.v, b = badgesOf(owner, badgeItem);
+    setBadges(owner, badgeItem, b.includes(s) ? b.filter((x) => x !== s) : [...b, s]);
+    save();
+    render();
+    renderSheet(true);
+  },
+  sortSheet: () => openSheet("sort"),
+  setSort: (el) => {
+    db.view.sort = el.dataset.v;
+    save();
+    closeSheet();
+  },
+  filterLabel: (el) => {
+    db.view.label = el.dataset.v || null;
+    save();
+    render();
+  },
+  clearFilters: () => {
+    homeQuery = "";
+    db.view.label = null;
+    save();
+    render();
+  },
+  askYes: () => answer(true),
+  askNo: () => answer(false),
+  iconSheet: () => openSheet("icon"),
+  uploadImg: () => $("#imgFile").click(),
+  removeImg: () => {
+    delete currentList().image;
+    save();
+    closeSheet();
+  },
+  newPick: () => openSheet("new"),
+  // Swap the open menu for the "New randomizer" sheet, so Back returns home.
+  menuNew: () => {
+    history.replaceState({ d: depth(), sheet: "new" }, "", location.hash);
+    render();
+  },
+  newList: (el) => {
+    const l = el.dataset.type === "multi"
+      ? { id: uid(), name: uniqueName("New multiple"), emoji: MULTI_EMOJI, type: "multi", cats: [], created: Date.now() }
+      : { id: uid(), name: uniqueName("New list"), emoji: DEFAULT_EMOJI, items: [], created: Date.now() };
     db.lists.push(l);
     save();
-    go("/edit/" + l.id);
+    // Swap the open "New randomizer" sheet for the edit screen.
+    history.replaceState({ d: depth() }, "", "#/edit/" + l.id);
+    render();
     const name = $('[data-field="name"]');
     name.focus();
     name.select();
   },
   delItem: (el) => {
-    const list = currentList();
-    list.items.splice(+el.dataset.i, 1);
+    const items = editItems(), [gone] = items.splice(+el.dataset.i, 1);
+    if (!items.includes(gone)) setBadges(editOwner(), gone, []);
     save();
     render();
   },
-  deleteList: () => {
-    const list = currentList();
-    if (!confirm(`Delete “${list.name}” and its ${list.items.length} items?`)) return;
-    db.lists = db.lists.filter((l) => l.id !== list.id);
-    delete db.history[list.id];
+  deleteList: async () => {
+    if (await removeList(currentList())) back("/");
+  },
+
+  openCat: (el) => go(`/cat/${route().id}/${el.dataset.cat}`),
+  catActive: (el) => {
+    // Switched-off categories are left out of the roll (see liveCats).
+    const c = currentList().cats.find((x) => x.id === el.dataset.cat);
+    if (c.off) delete c.off; else c.off = true;
     save();
-    toast("List deleted");
-    back("/");
+    render();
+  },
+  addCat: () => {
+    const list = currentList(), c = { id: uid(), name: `Category ${list.cats.length + 1}`, items: [] };
+    list.cats.push(c);
+    save();
+    go(`/cat/${list.id}/${c.id}`);
+    const name = $('[data-field="catName"]');
+    name.focus();
+    name.select();
+  },
+  delCat: async () => {
+    const list = currentList(), c = currentCat();
+    if (c.items.length && !(await ask(`Delete “${c.name}”?`, `Its ${plural(c.items.length, "option")} will be deleted too.`, "Delete"))) return;
+    list.cats = list.cats.filter((x) => x !== c);
+    save();
+    back("/edit/" + list.id);
+  },
+  linkSheet: () => openSheet("link"),
+  setLink: (el) => {
+    const c = currentCat();
+    if (el.dataset.id) c.link = el.dataset.id;
+    else delete c.link;
+    save();
+    closeSheet();
   },
 
   export: () => {
@@ -943,6 +1856,38 @@ const actions = {
     closeSheet();
   },
 };
+
+// Save a list's labels, then redraw its edit screen and the open Labels sheet.
+function setLabels(list, labels) {
+  if (labels.length) list.labels = labels;
+  else delete list.labels;
+  save();
+  render();
+  renderSheet(true);
+}
+
+// Ask, then delete a list or Multiple. Resolves true if it was deleted.
+// (From its Edit screen, or by dropping it on the trash on Home.)
+async function removeList(list) {
+  const multi = isMulti(list);
+  // Multiples that link this list keep a copy of its options.
+  const users = multi ? [] : db.lists.filter((m) => isMulti(m) && m.cats.some((c) => c.link === list.id));
+  const msg = (multi ? `Its ${plural(list.cats.length, "category", "categories")}` : `Its ${plural(list.items.length, "item")}`) +
+    " will be deleted too." +
+    (users.length ? `\n\n${users.map((m) => `“${m.name}”`).join(", ")} uses this list and will keep a copy of its options.` : "");
+  if (!(await ask(`Delete “${list.name}”?`, msg, "Delete"))) return false;
+  users.forEach((m) => m.cats.forEach((c) => {
+    if (c.link !== list.id) return;
+    c.items = [...new Set([...list.items, ...c.items])];
+    if (list.badges) c.badges = { ...list.badges, ...(c.badges || {}) }; // keep its option badges too
+    delete c.link;
+  }));
+  db.lists = db.lists.filter((l) => l.id !== list.id);
+  delete db.history[list.id];
+  save();
+  toast(multi ? "Multiple deleted" : "List deleted");
+  return true;
+}
 
 function move(i, dir) {
   const j = i + dir;
@@ -961,7 +1906,7 @@ document.addEventListener("click", (e) => {
 // Reroll and Pick by hand (greyed out) only skip; Back, Edit and the Wheel
 // toggle still do their job. Runs before the handler above (capture phase).
 document.addEventListener("click", (e) => {
-  if (!cur || !cur.spin || !$(".wheel") || e.target.closest(".wheel")) return;
+  if (!cur || !cur.spin || !$(".wheel, .slots") || e.target.closest(".wheel, .slots")) return;
   const el = e.target.closest("[data-act]");
   if (el && el.getAttribute("aria-disabled") === "true") e.stopPropagation();
   const leaving = el && (el.dataset.act === "back" || el.dataset.act === "edit");
@@ -982,17 +1927,33 @@ document.addEventListener("change", (e) => {
     list.name = uniqueName(v, list.id);
     e.target.value = list.name;
   } else if (f === "emoji") {
-    list.emoji = v || DEFAULT_EMOJI;
+    // Typing an emoji switches back from an uploaded image to the emoji.
+    if (v) delete list.image;
+    list.emoji = v || list.emoji || DEFAULT_EMOJI;
     e.target.value = list.emoji;
+    save();
+    return render(); // updates the screen behind the Icon sheet
   } else if (f === "description") {
     if (v) list.description = v;
     else delete list.description;
     e.target.value = v;
     autoGrow(e.target);
+  } else if (f === "catName") {
+    currentCat().name = v || "Category";
+    e.target.value = currentCat().name;
   } else if (f === "item") {
-    const i = +e.target.dataset.i;
-    if (v) { list.items[i] = v; e.target.value = v; }
-    else { list.items.splice(i, 1); save(); return render(); }
+    const i = +e.target.dataset.i, items = editItems(), owner = editOwner(), old = items[i];
+    const b = badgesOf(owner, old);
+    if (v) {
+      items[i] = v;
+      e.target.value = v;
+      if (b.length && v !== old) { setBadges(owner, old, []); setBadges(owner, v, b); } // badges follow the rename
+    } else {
+      items.splice(i, 1);
+      if (!items.includes(old)) setBadges(owner, old, []);
+      save();
+      return render();
+    }
   }
   save();
 });
@@ -1004,25 +1965,57 @@ function autoGrow(el) {
 }
 document.addEventListener("input", (e) => {
   if (e.target.classList.contains("desc-in")) autoGrow(e.target);
+  if (e.target.id === "search") { homeQuery = e.target.value; fillHomeList(); }
 });
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && e.target.dataset && e.target.dataset.field && e.target.tagName !== "TEXTAREA") e.target.blur();
-  if (e.key === "Enter" && e.target.dataset && e.target.dataset.act === "openEdit") e.target.click();
+  if (e.key === "Enter" && e.target.id === "search") e.target.blur(); // hide the keyboard to see results
+  if (e.key === "Enter" && e.target.dataset && ["openEdit", "openCat"].includes(e.target.dataset.act)) e.target.click();
 });
 
 document.addEventListener("submit", (e) => {
+  if (e.target.dataset.form === "label") {
+    // New label from the Labels sheet. Reuse an existing label's spelling ("food" → "Food").
+    e.preventDefault();
+    const v = $("#labelInput").value.trim().replace(/\s+/g, " ");
+    const list = currentList();
+    if (!v || !list) return;
+    const s = allLabels().find((x) => x.toLowerCase() === v.toLowerCase()) || v;
+    if (!(list.labels || []).includes(s)) setLabels(list, [...(list.labels || []), s]);
+    else $("#labelInput").value = "";
+    $("#labelInput").focus(); // ready for the next one
+    return;
+  }
+  if (e.target.dataset.form === "badge") {
+    // New badge for the option in the Badges sheet ("-" typed as a minus sign).
+    e.preventDefault();
+    const owner = editOwner(), input = $("#badgeInput");
+    const v = input.value.trim().replace(/\s+/g, " ").replace(/^-/, "−");
+    if (!v || !owner) return;
+    const b = badgesOf(owner, badgeItem);
+    if (!b.includes(v)) {
+      setBadges(owner, badgeItem, [...b, v]);
+      save();
+      render();
+      renderSheet(true);
+    } else input.value = "";
+    $("#badgeInput").focus(); // ready for the next one
+    return;
+  }
   if (e.target.dataset.form !== "add") return;
   e.preventDefault();
   const input = $("#addInput");
   const v = input.value.trim();
   if (!v) return;
-  const list = currentList();
-  list.items.push(v);
+  editItems().push(v);
   save();
   render();
-  $("#addInput").focus();
-  scrollTo(0, document.body.scrollHeight); // show the item you just added
+  const next = $("#addInput"); // the screen was redrawn
+  next.focus();
+  // Show the item you just added (it's right above the add field).
+  if (e.target.classList.contains("inline")) next.scrollIntoView({ block: "center" });
+  else scrollTo(0, document.body.scrollHeight);
 });
 
 /* =========================================================
@@ -1039,10 +2032,10 @@ document.addEventListener("pointerdown", (e) => {
   if (e.button !== 0 || drag) return;
   const row = e.target.closest("[data-sort] > *");
   if (!row) return;
-  if (e.target.closest(".grip")) { e.preventDefault(); startDrag(row, e.pointerId, e.clientY); return; }
-  if (row.parentElement.dataset.sort !== "lists" || e.target.closest(".move")) return;
+  if (e.target.closest(".grip")) { e.preventDefault(); startDrag(row, e.pointerId, e.clientX, e.clientY); return; }
+  if (!["lists", "cats", "combo"].includes(row.parentElement.dataset.sort) || e.target.closest(".move")) return;
   const h = { row, id: e.pointerId, x: e.clientX, y: e.clientY };
-  h.timer = setTimeout(() => { hold = null; startDrag(h.row, h.id, h.y); }, HOLD_MS);
+  h.timer = setTimeout(() => { hold = null; startDrag(h.row, h.id, h.x, h.y); }, HOLD_MS);
   hold = h;
 });
 
@@ -1050,14 +2043,14 @@ document.addEventListener("pointermove", (e) => {
   // Moving before the hold finishes means you're scrolling, not dragging.
   if (hold && e.pointerId === hold.id && Math.hypot(e.clientX - hold.x, e.clientY - hold.y) > 8) cancelHold();
   // Only the finger that started the drag moves it (ignore a second finger).
-  if (drag && e.pointerId === drag.id) { drag.y = e.clientY; layoutDrag(); }
+  if (drag && e.pointerId === drag.id) { drag.x = e.clientX; drag.y = e.clientY; layoutDrag(); }
 });
 document.addEventListener("pointerup", endPointer);
 document.addEventListener("pointercancel", endPointer);
 // Stop the page from scrolling under your finger while a row is lifted.
 document.addEventListener("touchmove", (e) => { if (drag) e.preventDefault(); }, { passive: false });
 // No Android long-press menu on list rows.
-document.addEventListener("contextmenu", (e) => { if (drag || hold || e.target.closest('[data-sort="lists"]')) e.preventDefault(); });
+document.addEventListener("contextmenu", (e) => { if (drag || hold || e.target.closest('[data-sort="lists"], [data-sort="cats"], [data-sort="combo"]')) e.preventDefault(); });
 // The tap that ends a drag shouldn't also open the list.
 document.addEventListener("click", (e) => {
   if (performance.now() < suppressClickUntil) { e.stopPropagation(); e.preventDefault(); }
@@ -1069,11 +2062,11 @@ function endPointer(e) {
   if (drag && e.pointerId === drag.id) endDrag();
 }
 
-function startDrag(row, pointerId, y) {
+function startDrag(row, pointerId, x, y) {
   const group = row.parentElement;
   const rows = [...group.children];
   const from = rows.indexOf(row);
-  drag = { group, rows, row, from, to: from, id: pointerId, y, startY: y + scrollY, h: row.offsetHeight };
+  drag = { group, rows, row, from, to: from, id: pointerId, x, y, startY: y + scrollY, h: row.offsetHeight };
   try { row.setPointerCapture(pointerId); } catch (e) {}
   group.classList.add("sorting");
   row.classList.add("dragging");
@@ -1083,14 +2076,32 @@ function startDrag(row, pointerId, y) {
   requestAnimationFrame(autoScroll);
 }
 
+// On Home the "+" button turns into a trash can while a list is lifted:
+// is the finger over it (with a little extra room around it)?
+function overTrash() {
+  const f = drag.group.dataset.sort === "lists" && $(".fab");
+  if (!f) return false;
+  const r = f.getBoundingClientRect(), pad = 20;
+  return drag.x > r.left - pad && drag.x < r.right + pad && drag.y > r.top - pad && drag.y < r.bottom + pad;
+}
+
 // Move the lifted row with your finger and slide the others out of the way.
 function layoutDrag() {
   const { rows, row, from, h } = drag;
   const dy = drag.y + scrollY - drag.startY;
-  row.style.transform = `translateY(${dy}px) scale(1.02)`;
+  const trash = overTrash();
+  if (trash !== !!drag.trash) {
+    drag.trash = trash;
+    $(".fab").classList.toggle("armed", trash);
+    row.classList.toggle("to-trash", trash);
+    if (navigator.vibrate) navigator.vibrate(trash ? 25 : 5);
+  }
+  row.style.transform = `translateY(${dy}px) scale(${trash ? 0.9 : 1.02})`;
   const center = row.offsetTop + h / 2 + dy;
   let to = 0;
-  rows.forEach((r, i) => { if (i !== from && center > r.offsetTop + r.offsetHeight / 2) to++; });
+  // Over the trash, the other rows go back to where they were.
+  if (trash) to = from;
+  else rows.forEach((r, i) => { if (i !== from && center > r.offsetTop + r.offsetHeight / 2) to++; });
   rows.forEach((r, i) => {
     if (i === from) return;
     const shift = from < to && i > from && i <= to ? -h : from > to && i >= to && i < from ? h : 0;
@@ -1103,6 +2114,7 @@ function layoutDrag() {
 // Scroll the page when you drag near the top or bottom edge (long lists).
 function autoScroll() {
   if (!drag) return;
+  if (drag.trash) return requestAnimationFrame(autoScroll); // hold still over the trash
   const edge = 90, y = drag.y;
   const speed = y < edge ? -(edge - y) / 5 : y > innerHeight - edge ? (y - (innerHeight - edge)) / 5 : 0;
   if (speed) { scrollBy(0, speed); layoutDrag(); }
@@ -1110,28 +2122,106 @@ function autoScroll() {
 }
 
 function endDrag() {
-  const { group, from, to } = drag;
+  const { group, from, to, trash } = drag;
   drag = null;
   document.body.classList.remove("is-dragging");
   suppressClickUntil = performance.now() + 400;
-  if (to !== from) {
-    const arr = group.dataset.sort === "lists" ? db.lists : currentList().items;
+  if (trash) {
+    // Dropped on the trash: put the row back, then ask before deleting.
+    const list = db.lists[from];
+    render();
+    removeList(list).then((gone) => gone && render());
+    return;
+  }
+  if (to !== from && group.dataset.sort === "combo") {
+    // Result screen rows skip empty categories, so move by id and leave those where they are.
+    const list = currentList(), ids = [...group.children].map((r) => r.dataset.cat);
+    ids.splice(to, 0, ...ids.splice(from, 1));
+    const byId = Object.fromEntries(list.cats.map((c) => [c.id, c]));
+    let k = 0;
+    list.cats = list.cats.map((c) => (ids.includes(c.id) ? byId[ids[k++]] : c));
+    save();
+  } else if (to !== from) {
+    const s = group.dataset.sort;
+    const arr = s === "lists" ? db.lists : s === "cats" ? currentList().cats : editItems();
     arr.splice(to, 0, ...arr.splice(from, 1));
     save();
   }
   render();
 }
 
+// Uploaded icons are cropped to a square and shrunk to 160px, so they stay
+// small enough to keep on the phone (and in backups).
+function squareImage(file, size = 160) {
+  return new Promise((ok, fail) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const w = img.naturalWidth, h = img.naturalHeight, s = Math.min(w, h);
+      const c = document.createElement("canvas");
+      c.width = c.height = size;
+      c.getContext("2d").drawImage(img, (w - s) / 2, (h - s) / 2, s, s, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      ok(c.toDataURL("image/webp", 0.85));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); fail(); };
+    img.src = url;
+  });
+}
+
+$("#imgFile").addEventListener("change", async (e) => {
+  const file = e.target.files[0], list = currentList();
+  e.target.value = "";
+  if (!file || !list) return;
+  try { list.image = await squareImage(file); }
+  catch (err) { return toast("Couldn't open that image"); }
+  save();
+  if (history.state && history.state.sheet) closeSheet();
+  else render();
+});
+
 /* =========================================================
    7. Backup & restore
    Same format as the old app: { "List name": [items] }.
-   A list with a description is saved as { "List name": { description, items } }.
+   A list with a description, labels, option badges or image is saved as
+   { "List name": { description, labels, badges, image, items } }, where badges = { "option": ["badge"] }.
+   A Multiple: { "Name": { type: "multi", description, labels, image, categories: [{ name, off, link, items, badges }] } },
+   where `link` is the name of the linked list.
    ========================================================= */
 const backupItems = (v) => (Array.isArray(v) ? v : v && Array.isArray(v.items) ? v.items : null);
+const backupMulti = (v) => v && v.type === "multi" && Array.isArray(v.categories);
+const isImage = (s) => typeof s === "string" && s.startsWith("data:image/");
+// Option badges from a file: { "option": ["badge", …] }, anything else dropped.
+function cleanBadges(b) {
+  if (!b || typeof b !== "object" || Array.isArray(b)) return null;
+  const out = {};
+  for (const [k, v] of Object.entries(b)) {
+    const arr = Array.isArray(v) ? [...new Set(clean(v))] : [];
+    if (k.trim() && arr.length) out[k.trim()] = arr;
+  }
+  return Object.keys(out).length ? out : null;
+}
 
 function exportBackup() {
   const obj = {};
-  db.lists.forEach((l) => (obj[l.name] = l.description ? { description: l.description, items: l.items } : l.items));
+  db.lists.forEach((l) => {
+    const extra = {
+      ...(l.description && { description: l.description }),
+      ...(l.labels && { labels: l.labels }),
+      ...(l.badges && { badges: l.badges }),
+      ...(l.image && { image: l.image }),
+    };
+    if (isMulti(l)) {
+      obj[l.name] = {
+        type: "multi", ...extra,
+        categories: l.cats.map((c) => {
+          const k = linkedList(c);
+          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }) };
+        }),
+      };
+    } else {
+      obj[l.name] = Object.keys(extra).length ? { ...extra, items: l.items } : l.items;
+    }
+  });
   const blob = new Blob([JSON.stringify(obj)], { type: "text/plain" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -1149,20 +2239,45 @@ $("#file").addEventListener("change", async (e) => {
   if (!file) return;
   let obj;
   try { obj = JSON.parse(await file.text()); } catch (err) {}
-  const names = obj && typeof obj === "object" && !Array.isArray(obj) ? Object.keys(obj).filter((k) => backupItems(obj[k])) : [];
+  const names = obj && typeof obj === "object" && !Array.isArray(obj) ? Object.keys(obj).filter((k) => backupItems(obj[k]) || backupMulti(obj[k])) : [];
   if (!names.length) return toast("That file isn't a Randomizer backup");
-  if (!confirm(`Replace your ${db.lists.length} lists with the ${names.length} lists in this backup?`)) return;
+  if (!(await ask("Restore from backup?", `Your ${plural(db.lists.length, "list")} will be replaced with the ${plural(names.length, "list")} in this backup.`, "Replace"))) return;
 
   // Keep emoji and history for lists that have the same name. Old-format
-  // backups have no descriptions, so those lists keep their current one too.
+  // backups have no descriptions or images, so those lists keep their current ones too.
   const old = Object.fromEntries(db.lists.map((l) => [l.name, l]));
-  db.lists = names.map((n) => {
-    const name = n.trim(), prev = old[name], v = obj[n];
-    const list = { id: prev ? prev.id : uid(), name, emoji: prev ? prev.emoji : EMOJI[n] || EMOJI[name] || DEFAULT_EMOJI, items: clean(backupItems(v)) };
+  db.lists = names.map((n, i) => {
+    const name = n.trim(), prev = old[name], v = obj[n], multi = backupMulti(v);
+    const list = { id: prev ? prev.id : uid(), name, emoji: prev ? prev.emoji : EMOJI[n] || EMOJI[name] || (multi ? MULTI_EMOJI : DEFAULT_EMOJI) };
+    if (multi) {
+      list.type = "multi";
+      list.cats = v.categories.filter((c) => c && typeof c === "object").map((c) => ({
+        id: uid(),
+        name: String(c.name || "").trim() || "Category",
+        items: clean(Array.isArray(c.items) ? c.items : []),
+        ...(c.off === true && { off: true }),
+        ...(cleanBadges(c.badges) && { badges: cleanBadges(c.badges) }),
+        ...(c.link && { linkName: String(c.link).trim() }), // turned into an id below
+      }));
+    } else {
+      list.items = clean(backupItems(v));
+    }
     const description = Array.isArray(v) ? prev && prev.description : String(v.description || "").trim();
     if (description) list.description = description;
+    const image = Array.isArray(v) ? prev && prev.image : isImage(v.image) && v.image;
+    if (image) list.image = image;
+    const labels = Array.isArray(v) ? prev && prev.labels : Array.isArray(v.labels) && [...new Set(clean(v.labels))];
+    if (labels && labels.length) list.labels = labels;
+    const badges = multi ? null : Array.isArray(v) ? prev && prev.badges : cleanBadges(v.badges);
+    if (badges) list.badges = badges;
+    list.created = prev ? prev.created : Date.now() + i; // keeps the backup's order for "Date created"
     return list;
   });
+  const byName = Object.fromEntries(db.lists.filter((l) => !isMulti(l)).map((l) => [l.name, l.id]));
+  db.lists.filter(isMulti).forEach((m) => m.cats.forEach((c) => {
+    if (byName[c.linkName]) c.link = byName[c.linkName];
+    delete c.linkName;
+  }));
   const ids = new Set(db.lists.map((l) => l.id));
   for (const k of Object.keys(db.history)) if (!ids.has(k)) delete db.history[k];
   save();
