@@ -155,7 +155,7 @@
   .btn.primary { flex: 1.5; background: var(--accent); color: var(--accent-ink); border-color: transparent; box-shadow: var(--glow); }
   .btn.ghost { margin-top: 12px; flex: none; width: 100%; color: var(--accent); background: transparent; border-style: dashed; }
   .btn.sm { height: 48px; flex: none; padding: 0 20px; border-radius: 12px; }
-  .btn:disabled, .linkbtn:disabled { opacity: 0.45; }
+  .btn[aria-disabled="true"], .linkbtn[aria-disabled="true"] { opacity: 0.45; }
 
   /* Wheel toggle: a switch inside a normal button */
   .switch { position: relative; width: 36px; height: 22px; flex: none; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); transition: background 0.2s ease; }
@@ -740,10 +740,10 @@ function renderResult(list) {
       <section class="stage${spinning ? " spin" : ""}" aria-live="polite">${stage}</section>
       ${list.items.length ? `
       <div class="actions">
-        <button class="linkbtn" data-act="pick" ${spinning ? "disabled" : ""}>${I.hand} Pick by hand</button>
+        <button class="linkbtn" data-act="pick" ${spinning ? 'aria-disabled="true"' : ""}>${I.hand} Pick by hand</button>
         <div class="btn-row">
           <button class="btn toggle" data-act="wheel" role="switch" aria-checked="${!!db.wheel}"><span class="switch" aria-hidden="true"></span> Wheel</button>
-          <button class="btn primary" data-act="reroll" ${spinning ? "disabled" : ""}>${I.reroll} Reroll</button>
+          <button class="btn primary" data-act="reroll" ${spinning ? 'aria-disabled="true"' : ""}>${I.reroll} Reroll</button>
         </div>
       </div>` : ""}
     </main>`;
@@ -947,6 +947,20 @@ document.addEventListener("click", (e) => {
   const el = e.target.closest("[data-act]");
   if (el && !el.disabled && actions[el.dataset.act]) actions[el.dataset.act](el, e);
 });
+
+// While the wheel spins, a tap anywhere outside it skips straight to the answer.
+// Reroll and Pick by hand (greyed out) only skip; Back, Edit and the Wheel
+// toggle still do their job. Runs before the handler above (capture phase).
+document.addEventListener("click", (e) => {
+  if (!cur || !cur.spin || !$(".wheel") || e.target.closest(".wheel")) return;
+  const el = e.target.closest("[data-act]");
+  if (el && el.getAttribute("aria-disabled") === "true") e.stopPropagation();
+  const leaving = el && (el.dataset.act === "back" || el.dataset.act === "edit");
+  cur.spinToken = null; // stops the running spin's next steps
+  cur.spin = false;
+  cur.reveal = true;
+  if (!leaving) setTimeout(() => route().view === "list" && render());
+}, true);
 
 // Editing text fields saves automatically when you leave the field.
 document.addEventListener("change", (e) => {
