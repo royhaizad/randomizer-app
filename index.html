@@ -72,7 +72,7 @@
     -webkit-tap-highlight-color: transparent;
     overscroll-behavior-y: none;
   }
-  button, input { font: inherit; color: inherit; }
+  button, input, textarea { font: inherit; color: inherit; }
   button { cursor: pointer; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
@@ -134,6 +134,9 @@
   .row-name, .row-sub, .ellip { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .row-name { font-size: 16px; font-weight: 600; }
   .row-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  /* Long description is cut with … but the item count after it stays visible. */
+  .sub-split { display: flex; }
+  .sub-split > span:last-child { flex: none; }
   .count { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
   .chev { color: var(--muted); opacity: 0.6; display: grid; }
   .tag { font-size: 12px; color: var(--muted); background: var(--surface-2); padding: 3px 8px; border-radius: 999px; flex: none; }
@@ -198,7 +201,7 @@
   .linkbtn:active { background: var(--surface-2); }
 
   /* ---------- Edit list screen ---------- */
-  .name-row { display: flex; gap: 10px; margin: 8px 0 22px; }
+  .name-row { display: flex; gap: 10px; margin: 8px 0 10px; }
   .input {
     width: 100%; height: 50px; padding: 0 14px;
     background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
@@ -207,6 +210,9 @@
   .input:focus, .item-in:focus { outline: none; }
   .input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
   .emoji-in { width: 58px; flex: none; text-align: center; font-size: 22px; padding: 0; }
+  /* Description box starts at one line and grows as you type (see autoGrow). */
+  .desc-in { display: block; height: auto; min-height: 50px; padding: 12px 14px; margin-bottom: 22px; line-height: 1.45; resize: none; overflow: hidden; }
+  .desc-in::placeholder { color: var(--muted); }
   .label { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 4px 8px; }
   .item-row { display: flex; align-items: center; padding-left: 16px; padding-right: 4px; min-height: 52px; }
   .item-row + .item-row { border-top: 1px solid var(--line); }
@@ -460,6 +466,7 @@ function renderHome() {
         <span class="emoji">${esc(l.emoji)}</span>
         <span class="row-text">
           <div class="row-name">${esc(l.name)}</div>
+          ${l.description ? `<div class="row-sub">${esc(l.description)}</div>` : ""}
         </span>
         <span class="count">${l.items.length}</span>
         ${grip}
@@ -547,6 +554,7 @@ function renderEdit(list) {
         <input class="input emoji-in" data-field="emoji" value="${esc(list.emoji)}" aria-label="Emoji" enterkeyhint="done">
         <input class="input" data-field="name" value="${esc(list.name)}" aria-label="List name" enterkeyhint="done">
       </div>
+      <textarea class="input desc-in" data-field="description" rows="1" placeholder="Add a description…" aria-label="Description">${esc(list.description || "")}</textarea>
       <div class="label">Items · <span id="itemCount">${list.items.length}</span></div>
       ${list.items.length ? `<div class="group" data-sort="items">${items}</div>` : `<p class="hint">No items yet. Add your first one below.</p>`}
       <button class="dangerbtn" data-act="deleteList">Delete this list</button>
@@ -555,6 +563,7 @@ function renderEdit(list) {
         <button class="btn primary sm" type="submit">Add</button>
       </form>
     </main>`;
+  autoGrow($(".desc-in"));
 }
 
 function renderManage() {
@@ -564,7 +573,9 @@ function renderManage() {
       <span class="emoji">${esc(l.emoji)}</span>
       <span class="row-text">
         <div class="row-name">${esc(l.name)}</div>
-        <div class="row-sub">${l.items.length} items · tap to edit</div>
+        ${l.description
+          ? `<div class="row-sub sub-split"><span class="ellip">${esc(l.description)}</span><span>&nbsp;· ${l.items.length} items</span></div>`
+          : `<div class="row-sub">${l.items.length} items · tap to edit</div>`}
       </span>
       <span class="move">
         <button class="iconbtn sm" data-act="up" data-i="${i}" aria-label="Move up" ${i === 0 ? "disabled" : ""}>${I.up}</button>
@@ -579,7 +590,7 @@ function renderManage() {
         <h1>Edit lists</h1>
         <button class="pill" data-act="done">Done</button>
       </header>
-      <p class="hint">Tap a list to edit its name and items. Drag a list, or use the arrows, to reorder.</p>
+      <p class="hint">Tap a list to edit its name, description and items. Drag a list, or use the arrows, to reorder.</p>
       ${n ? `<div class="group" data-sort="lists">${rows}</div>` : ""}
       <button class="btn ghost" data-act="newList">+ New list</button>
     </main>`;
@@ -752,6 +763,11 @@ document.addEventListener("change", (e) => {
   } else if (f === "emoji") {
     list.emoji = v || DEFAULT_EMOJI;
     e.target.value = list.emoji;
+  } else if (f === "description") {
+    if (v) list.description = v;
+    else delete list.description;
+    e.target.value = v;
+    autoGrow(e.target);
   } else if (f === "item") {
     const i = +e.target.dataset.i;
     if (v) { list.items[i] = v; e.target.value = v; }
@@ -760,8 +776,17 @@ document.addEventListener("change", (e) => {
   save();
 });
 
+// The description box grows to fit its text (Enter adds a new line there).
+function autoGrow(el) {
+  el.style.height = "auto";
+  el.style.height = el.scrollHeight + 2 + "px"; // + top and bottom border
+}
+document.addEventListener("input", (e) => {
+  if (e.target.classList.contains("desc-in")) autoGrow(e.target);
+});
+
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" && e.target.dataset && e.target.dataset.field) e.target.blur();
+  if (e.key === "Enter" && e.target.dataset && e.target.dataset.field && e.target.tagName !== "TEXTAREA") e.target.blur();
   if (e.key === "Enter" && e.target.dataset && e.target.dataset.act === "openEdit") e.target.click();
 });
 
@@ -877,11 +902,15 @@ function endDrag() {
 }
 
 /* =========================================================
-   7. Backup & restore (same format as the old app)
+   7. Backup & restore
+   Same format as the old app: { "List name": [items] }.
+   A list with a description is saved as { "List name": { description, items } }.
    ========================================================= */
+const backupItems = (v) => (Array.isArray(v) ? v : v && Array.isArray(v.items) ? v.items : null);
+
 function exportBackup() {
   const obj = {};
-  db.lists.forEach((l) => (obj[l.name] = l.items));
+  db.lists.forEach((l) => (obj[l.name] = l.description ? { description: l.description, items: l.items } : l.items));
   const blob = new Blob([JSON.stringify(obj)], { type: "text/plain" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -899,15 +928,19 @@ $("#file").addEventListener("change", async (e) => {
   if (!file) return;
   let obj;
   try { obj = JSON.parse(await file.text()); } catch (err) {}
-  const names = obj && typeof obj === "object" && !Array.isArray(obj) ? Object.keys(obj).filter((k) => Array.isArray(obj[k])) : [];
+  const names = obj && typeof obj === "object" && !Array.isArray(obj) ? Object.keys(obj).filter((k) => backupItems(obj[k])) : [];
   if (!names.length) return toast("That file isn't a Randomizer backup");
   if (!confirm(`Replace your ${db.lists.length} lists with the ${names.length} lists in this backup?`)) return;
 
-  // Keep emoji and history for lists that have the same name.
+  // Keep emoji and history for lists that have the same name. Old-format
+  // backups have no descriptions, so those lists keep their current one too.
   const old = Object.fromEntries(db.lists.map((l) => [l.name, l]));
   db.lists = names.map((n) => {
-    const name = n.trim(), prev = old[name];
-    return { id: prev ? prev.id : uid(), name, emoji: prev ? prev.emoji : EMOJI[n] || EMOJI[name] || DEFAULT_EMOJI, items: clean(obj[n]) };
+    const name = n.trim(), prev = old[name], v = obj[n];
+    const list = { id: prev ? prev.id : uid(), name, emoji: prev ? prev.emoji : EMOJI[n] || EMOJI[name] || DEFAULT_EMOJI, items: clean(backupItems(v)) };
+    const description = Array.isArray(v) ? prev && prev.description : String(v.description || "").trim();
+    if (description) list.description = description;
+    return list;
   });
   const ids = new Set(db.lists.map((l) => l.id));
   for (const k of Object.keys(db.history)) if (!ids.has(k)) delete db.history[k];
