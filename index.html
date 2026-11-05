@@ -39,6 +39,8 @@
     --shadow: 0 1px 2px rgba(12, 18, 26, 0.04), 0 8px 24px rgba(12, 18, 26, 0.06);
     --lift: 0 12px 28px rgba(12, 18, 26, 0.16);
     --radius: 18px;
+    --gold: #A86F00;
+    --gold-hi: #E0A100;
     color-scheme: light dark;
   }
   /* ---------- Design tokens (dark) ---------- */
@@ -58,6 +60,8 @@
       --danger: #F87171;
       --shadow: none;
       --lift: 0 12px 32px rgba(0, 0, 0, 0.6);
+      --gold: #FFC933;
+      --gold-hi: #FFF3B8;
     }
   }
 
@@ -268,8 +272,9 @@
   .switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--muted); transition: transform 0.2s ease, background 0.2s ease; }
   .toggle[aria-checked="true"] .switch { background: var(--accent); border-color: transparent; }
   .toggle[aria-checked="true"] .switch::after { transform: translateX(14px); background: var(--accent-ink); }
-  /* Category on/off switch in Edit multiple */
-  .catsw { flex: none; display: grid; place-items: center; padding: 12px 4px; margin: -12px 0; background: none; border: 0; cursor: pointer; }
+  /* Eye: is this category visible? */
+  .eyebtn { flex: none; display: grid; place-items: center; color: var(--accent); }
+  .eyebtn.is-off { color: var(--muted); }
   .row.off .row-text { opacity: 0.45; }
   .group-hint { margin: 10px 4px 16px; font-size: 13px; }
 
@@ -295,14 +300,23 @@
   }
   .answer {
     margin: 0;
+    padding: 0;
+    background: none;
+    border: 0;
+    color: inherit;
+    font-family: inherit;
     font-weight: 700;
     letter-spacing: -0.025em;
     line-height: 1.08;
     text-wrap: balance;
     overflow-wrap: anywhere;
     text-shadow: var(--text-glow);
+    cursor: pointer;
     animation: pop 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: opacity 0.12s ease;
   }
+  .answer:active { opacity: 0.6; }
+  .copy-hint { margin: -12px 0 0; font-size: 13px; color: var(--muted); }
   .answer.s { font-size: clamp(42px, 13vw, 68px); }
   .answer.m { font-size: clamp(32px, 10vw, 50px); }
   .answer.l { font-size: clamp(26px, 7.5vw, 38px); }
@@ -391,9 +405,47 @@
   .lockbtn { color: var(--muted); }
   .combo-row .grip { margin-left: -4px; }
   .combo-row.locked .lockbtn { color: var(--accent); }
+  /* A rare option came up (e.g. Shiny): the row and the screen edges glow gold. */
+  .combo-row.gold { background: rgba(255, 196, 0, 0.12); box-shadow: inset 0 0 0 1.5px var(--gold), inset 0 0 22px rgba(255, 196, 0, 0.25); }
+  .combo-row.gold .combo-cat { color: var(--gold); }
+  .combo-row.gold .combo-val:not(.reel) {
+    color: transparent;
+    background: linear-gradient(100deg, var(--gold), var(--gold-hi), var(--gold)) 0 0 / 200% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    animation: gold-shine 2.4s linear infinite;
+  }
+  .combo-row.gold .pill-label { --h: 45 !important; }
+  @keyframes gold-shine { to { background-position: -200% 0; } }
+  .gold-glow { position: fixed; inset: 0; z-index: 9; pointer-events: none; box-shadow: inset 0 0 90px 14px rgba(255, 196, 0, 0.4); animation: gold-pulse 2.4s ease-in-out infinite; }
+  @keyframes gold-pulse { 50% { opacity: 0.55; } }
+  .gold-burst { position: fixed; inset: 0; z-index: 30; pointer-events: none; overflow: hidden; display: grid; place-items: center; }
+  .gold-burst i { position: absolute; left: 50%; top: 45%; font-style: normal; color: var(--gold); text-shadow: 0 0 10px rgba(255, 196, 0, 0.9); }
+  .gold-flash { position: absolute; inset: 0; opacity: 0; background: radial-gradient(circle at 50% 45%, rgba(255, 224, 120, 0.85), rgba(255, 196, 0, 0.35) 45%, transparent 75%); animation: gold-flash 1.4s ease-out; }
+  @keyframes gold-flash { 12% { opacity: 1; } }
+  .gold-rays {
+    position: absolute; left: 50%; top: 45%; width: 200vmax; height: 200vmax; margin: -100vmax 0 0 -100vmax; opacity: 0;
+    background: repeating-conic-gradient(rgba(255, 205, 60, 0.4) 0 10deg, transparent 10deg 20deg);
+    -webkit-mask: radial-gradient(closest-side, #000 8%, transparent 45%); mask: radial-gradient(closest-side, #000 8%, transparent 45%);
+    animation: gold-rays 3.4s ease-out;
+  }
+  @keyframes gold-rays { 15% { opacity: 1; } 70% { opacity: 0.7; } to { opacity: 0; transform: rotate(70deg); } }
+  .gold-title {
+    position: relative; margin: 0 0 10vh; padding: 0 16px; text-align: center; color: var(--gold);
+    font-size: clamp(38px, 12vw, 60px); font-weight: 800; letter-spacing: -0.02em; line-height: 1.1;
+    text-shadow: 0 2px 18px rgba(0, 0, 0, 0.55), 0 0 30px rgba(255, 196, 0, 0.9);
+    animation: gold-title 3.4s cubic-bezier(0.3, 1.5, 0.5, 1) both;
+  }
+  @keyframes gold-title { from { opacity: 0; transform: scale(0.3); } 16% { opacity: 1; transform: scale(1); } 80% { opacity: 1; transform: scale(1.04); } to { opacity: 0; transform: scale(1.1); } }
+
   .combo.reveal .combo-row { animation: row-in 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) both; animation-delay: calc(var(--k) * 70ms); }
   @keyframes row-in { from { opacity: 0; transform: scale(0.8); filter: blur(6px); } }
-  .combo-hint { margin: 0; min-height: 44px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--muted); }
+  .combo-count { flex: none; min-width: 24px; text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .opt-note { display: block; margin-top: 4px; font-size: 13px; font-weight: 400; line-height: 1.35; color: var(--muted); }
+  .item-main .item-in { padding-left: 0; padding-right: 0; }
+  .item-main:has(.opt-note) .item-in { height: 30px; margin-top: 8px; }
+  .item-main .opt-note { margin: 0 0 11px; }
+  .item-main .badges:has(+ .opt-note) { margin-bottom: 5px; }
+  .combo-hint { margin: 0; min-height: 28px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--muted); }
 
   /* Slot machine (Reels toggle on): a gold marquee frame with chasing bulbs,
      a color stripe per category and a reel window that spins. */
@@ -478,8 +530,7 @@
   .addbar.inline { position: static; margin: 12px 0 0; padding: 0; background: none; }
 
   /* ---------- Manage (edit lists) ---------- */
-  .move { display: flex; gap: 2px; flex: none; }
-  .move .iconbtn:disabled { opacity: 0.25; }
+  .row.off .emoji { opacity: 0.45; }
 
   /* ---------- Drag to reorder ---------- */
   .grip {
@@ -489,10 +540,6 @@
     touch-action: none; cursor: grab;
   }
   .row .grip { margin-right: -8px; }
-  /* Edit lists rows carry arrows + handle, so keep them compact to leave room for names. */
-  .row:has(.move) { gap: 10px; padding-right: 8px; }
-  .row:has(.move) .grip { width: 28px; margin-right: 0; }
-  .move .iconbtn.sm { width: 34px; }
   .item-row .grip { margin-left: -12px; }
   [data-sort] { position: relative; }
   [data-sort] > * { transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1); }
@@ -573,10 +620,181 @@ const DEFAULT_EMOJI = "🎲";
 const MULTI_EMOJI = "🧩";
 
 // The first Multiple: the same filters as randompokemon.com, one pick from each.
+// Abilities that are a Hidden Ability on at least one Pokémon (from PokéAPI), each with
+// what it does, in our own words.
+const HIDDEN_ABILITIES = {
+  "Adaptability": "Same-type moves get a 2× bonus instead of the usual 1.5×.",
+  "Aftermath": "If a contact move knocks it out, the attacker loses 1/4 of its max HP.",
+  "Analytic": "Moves hit 30% harder when it's the last to move that turn.",
+  "Anger Point": "Taking a critical hit maxes out its Attack.",
+  "Anticipation": "On entry, warns of foes' one-hit KO or super effective moves.",
+  "Aroma Veil": "Shields it and allies from infatuation, Taunt, Torment, Disable, Heal Block and Encore.",
+  "Battle Armor": "Can't take critical hits.",
+  "Big Pecks": "Foes can't lower its Defense.",
+  "Blaze": "Fire moves gain 50% power at 1/3 HP or below.",
+  "Bulletproof": "Immune to ball and bomb moves.",
+  "Chlorophyll": "Speed doubles in harsh sunlight.",
+  "Clear Body": "Foes can't lower any of its stats.",
+  "Cloud Nine": "Cancels the effects of weather.",
+  "Competitive": "Sp. Atk rises 2 stages whenever a foe lowers one of its stats.",
+  "Compound Eyes": "Its moves are 30% more accurate.",
+  "Contrary": "Stat boosts become drops, and drops become boosts.",
+  "Corrosion": "Can poison even Steel and Poison types.",
+  "Costar": "On entry, copies an ally's stat changes.",
+  "Cud Chew": "Eats a used Berry a second time at the end of the next turn.",
+  "Cursed Body": "A move that damages it has a 30% chance of being disabled for 4 turns.",
+  "Cute Charm": "Contact attackers of the opposite gender have a 30% chance of becoming infatuated.",
+  "Damp": "No Pokémon on the field can use explosive moves or Abilities.",
+  "Defiant": "Attack rises 2 stages whenever a foe lowers one of its stats.",
+  "Drizzle": "Brings 5 turns of rain on entry.",
+  "Drought": "Brings 5 turns of harsh sunlight on entry.",
+  "Dry Skin": "Healed by Water moves and rain; hurt more by Fire moves and harsh sunlight.",
+  "Early Bird": "Wakes from sleep twice as quickly.",
+  "Effect Spore": "Contact attackers have a 30% chance of poison, paralysis or sleep (Grass types are safe).",
+  "Electric Surge": "Sets 5 turns of Electric Terrain on entry.",
+  "Filter": "Super effective hits deal 25% less damage.",
+  "Flame Body": "Contact attackers have a 30% chance of a burn.",
+  "Flare Boost": "Special moves get stronger while it's burned.",
+  "Flash Fire": "Absorbs Fire moves without damage and powers up its own Fire moves.",
+  "Fluffy": "Half damage from contact moves, double from Fire moves.",
+  "Friend Guard": "Allies take 25% less damage.",
+  "Frisk": "On entry, reveals foes' held items.",
+  "Gale Wings": "Flying moves gain +1 priority while its HP is full.",
+  "Galvanize": "Normal moves turn Electric and gain 20% power.",
+  "Gluttony": "Eats pinch Berries at 1/2 HP instead of 1/4.",
+  "Gooey": "Contact attackers lose 1 stage of Speed.",
+  "Grass Pelt": "Defense is up 50% on Grassy Terrain.",
+  "Grassy Surge": "Sets 5 turns of Grassy Terrain on entry.",
+  "Guard Dog": "Intimidate raises its Attack instead, and it can't be forced out of battle.",
+  "Guts": "Attack is up 50% with a status condition, and burns don't cut its physical damage.",
+  "Harvest": "50% chance each turn to regrow a used Berry, guaranteed in harsh sunlight.",
+  "Healer": "50% chance each turn to cure an ally's status.",
+  "Heatproof": "Half damage from Fire moves and burns.",
+  "Heavy Metal": "Weighs twice as much.",
+  "Honey Gather": "May find Honey after a battle.",
+  "Huge Power": "Physical moves deal double power.",
+  "Hustle": "Attack is up 50%, but physical moves are 20% less accurate.",
+  "Hydration": "Cures its status each turn in rain.",
+  "Ice Body": "Restores 1/16 of its HP each turn in snow.",
+  "Ice Scales": "Special moves deal half damage to it.",
+  "Immunity": "Can't be poisoned.",
+  "Imposter": "On entry, becomes the Pokémon opposite, copying everything but its HP.",
+  "Infiltrator": "Its moves pass through Reflect, Light Screen, Aurora Veil, Safeguard and substitutes.",
+  "Inner Focus": "Never flinches, and Intimidate has no effect.",
+  "Insomnia": "Can't fall asleep or become drowsy.",
+  "Intimidate": "Lowers foes' Attack 1 stage on entry.",
+  "Iron Fist": "Punching moves gain 20% power.",
+  "Justified": "Attack rises 1 stage when a Dark move hits it.",
+  "Keen Eye": "Its accuracy can't be lowered, and it ignores foes' evasion changes.",
+  "Klutz": "Can't use held items.",
+  "Leaf Guard": "No status conditions in harsh sunlight.",
+  "Libero": "Becomes the type of the move it's about to use, once per entry.",
+  "Light Metal": "Weighs half as much.",
+  "Lightning Rod": "Pulls in Electric moves, taking no damage and raising Sp. Atk 1 stage.",
+  "Limber": "Can't be paralyzed.",
+  "Liquid Voice": "Sound moves become Water type.",
+  "Long Reach": "Its moves never count as contact.",
+  "Magic Bounce": "Reflects status moves back at the user.",
+  "Magic Guard": "Only direct attacks can hurt it.",
+  "Magician": "With no item, steals the held item of whatever it damages.",
+  "Marvel Scale": "Defense is up 50% with a status condition.",
+  "Minus": "Sp. Atk is up 50% beside an ally with Plus or Minus.",
+  "Mirror Armor": "Bounces stat drops back at whoever caused them.",
+  "Misty Surge": "Sets 5 turns of Misty Terrain on entry.",
+  "Mold Breaker": "Its moves ignore most of the target's Abilities.",
+  "Moody": "Each turn, one stat rises 2 stages and another falls 1.",
+  "Motor Drive": "Absorbs Electric moves without damage and raises Speed 1 stage.",
+  "Moxie": "Attack rises 1 stage after each knockout.",
+  "Multiscale": "Half damage while at full HP.",
+  "Natural Cure": "Status conditions clear when it switches out.",
+  "No Guard": "Moves by and against it always hit.",
+  "Oblivious": "Immune to infatuation, Taunt and Intimidate.",
+  "Overcoat": "Safe from sandstorm damage and powder moves.",
+  "Overgrow": "Grass moves gain 50% power at 1/3 HP or below.",
+  "Own Tempo": "Can't be confused, and Intimidate has no effect.",
+  "Perish Body": "After a contact hit, it and the attacker faint in 3 turns unless they switch out.",
+  "Pickpocket": "With no item, steals the item of a contact attacker.",
+  "Pickup": "With no item, collects an item another Pokémon used up that turn.",
+  "Pixilate": "Normal moves turn Fairy and gain 20% power.",
+  "Plus": "Sp. Atk is up 50% beside an ally with Plus or Minus.",
+  "Poison Heal": "Poison restores 1/8 of its HP each turn instead of hurting.",
+  "Poison Touch": "Its contact moves have a 30% chance of poisoning.",
+  "Power of Alchemy": "Takes on the Ability of an ally that faints.",
+  "Prankster": "Status moves gain +1 priority but fail against Dark types.",
+  "Pressure": "Moves aimed at it cost foes 1 extra PP.",
+  "Propeller Tail": "Its moves can't be redirected by other moves or Abilities.",
+  "Protean": "Changes to the type of the move it's about to use, once per entry.",
+  "Psychic Surge": "Sets 5 turns of Psychic Terrain on entry.",
+  "Quick Feet": "Speed is up 50% with a status condition, and paralysis doesn't slow it.",
+  "Rain Dish": "Restores 1/16 of its HP each turn in rain.",
+  "Rattled": "Speed rises 1 stage when hit by Dark, Ghost or Bug moves, or when Intimidated.",
+  "Reckless": "Recoil and crash moves gain 20% power.",
+  "Regenerator": "Restores 1/3 of its HP on switching out.",
+  "Rivalry": "Moves are 25% stronger against the same gender, 25% weaker against the opposite.",
+  "Rock Head": "No recoil damage from its own moves.",
+  "Rocky Payload": "Rock moves get stronger.",
+  "Rough Skin": "Contact attackers lose 1/8 of their max HP.",
+  "Run Away": "Can always flee from wild battles.",
+  "Sand Force": "Rock, Ground and Steel moves gain 30% power in a sandstorm.",
+  "Sand Rush": "Speed doubles in a sandstorm.",
+  "Sand Veil": "Evasion is up 25% in a sandstorm, and it takes no sandstorm damage.",
+  "Sap Sipper": "Absorbs Grass moves without damage and raises Attack 1 stage.",
+  "Scrappy": "Normal and Fighting moves can hit Ghost types, and Intimidate has no effect.",
+  "Serene Grace": "Its moves' extra effects trigger more often.",
+  "Shadow Tag": "Foes can't switch out.",
+  "Sharpness": "Slicing moves gain 50% power.",
+  "Shed Skin": "30% chance each turn to cure its own status.",
+  "Sheer Force": "Moves lose their extra effects but gain 30% power.",
+  "Shell Armor": "Immune to critical hits.",
+  "Simple": "Stat changes count double.",
+  "Skill Link": "Multi-hit moves always land the most hits.",
+  "Slow Start": "Attack and Speed are halved for its first 5 turns.",
+  "Slush Rush": "Speed doubles in snow.",
+  "Sniper": "Critical hits deal 2.25× damage instead of 1.5×.",
+  "Snow Cloak": "Evasion is up 25% in snow.",
+  "Snow Warning": "Brings 5 turns of snow on entry.",
+  "Solar Power": "Sp. Atk is up 50% in harsh sunlight, but it loses 1/8 of its HP each turn.",
+  "Soundproof": "Immune to sound moves.",
+  "Speed Boost": "Speed rises 1 stage at the end of each turn, except the turn it enters.",
+  "Stakeout": "Double power against targets that just switched in.",
+  "Stalwart": "Nothing can pull its moves away from their target.",
+  "Static": "Contact attackers have a 30% chance of paralysis.",
+  "Steadfast": "Speed rises 1 stage each time it flinches.",
+  "Steely Spirit": "Steel moves from it and allies gain 50% power.",
+  "Stench": "10% chance its damaging moves make the target flinch.",
+  "Sticky Hold": "Others can't steal or remove its held item.",
+  "Storm Drain": "Pulls in Water moves, taking no damage and raising Sp. Atk.",
+  "Sturdy": "Survives a would-be KO from full HP with 1 HP, and one-hit KO moves fail.",
+  "Super Luck": "Critical hits are more likely (+1 stage).",
+  "Swarm": "Bug moves gain 50% power at 1/3 HP or below.",
+  "Sweet Veil": "It and allies can't fall asleep or get drowsy.",
+  "Swift Swim": "Speed doubles in rain.",
+  "Symbiosis": "Hands its held item to an ally who just used theirs.",
+  "Tangled Feet": "Evasion doubles while it's confused.",
+  "Technician": "Moves of 60 power or less gain 50% power.",
+  "Telepathy": "Avoids its allies' attacks.",
+  "Thick Fat": "Half damage from Fire and Ice moves.",
+  "Tinted Lens": "Not very effective moves deal normal damage.",
+  "Torrent": "Water moves gain 50% power at 1/3 HP or below.",
+  "Toxic Boost": "Physical moves get stronger while it's poisoned.",
+  "Truant": "Has to rest the turn after using a move.",
+  "Unaware": "Ignores the other side's stat changes in attacks, except Speed.",
+  "Unburden": "Speed doubles once its held item is used or lost.",
+  "Unnerve": "Foes can't eat Berries.",
+  "Vital Spirit": "Stays awake: immune to sleep and drowsiness.",
+  "Volt Absorb": "Electric moves heal 1/4 of its HP instead of hurting.",
+  "Water Absorb": "Water moves heal 1/4 of its HP instead of hurting.",
+  "Water Veil": "Can't be burned.",
+  "Weak Armor": "Physical hits lower Defense 1 stage but raise Speed 2 stages.",
+  "White Smoke": "Other Pokémon can't lower its stats.",
+  "Wonder Skin": "Status moves aimed at it miss more often.",
+  "Zen Mode": "Changes form at half HP or below.",
+};
+
 const POKEMON = {
   name: "Random Pokémon",
   emoji: "⚡",
-  description: "Region, type, rarity, stage, form, nature and gender",
+  description: "Region, type, rarity, stage, form, nature, gender, habitat, egg group, hidden ability and shiny",
   cats: {
     "Region": ["Kanto", "Johto", "Hoenn", "Sinnoh", "Unova", "Kalos", "Alola", "Galar", "Hisui", "Paldea", "Kitakami", "Blueberry Academy"],
     "Type": ["Bug", "Dark", "Dragon", "Electric", "Fairy", "Fighting", "Fire", "Flying", "Ghost", "Grass", "Ground", "Ice", "Normal", "Poison", "Psychic", "Rock", "Steel", "Water"],
@@ -585,6 +803,89 @@ const POKEMON = {
     "Form": ["Regular form", "Alternate form", "Mega Evolution", "Gigantamax"],
     "Nature": ["Adamant", "Bashful", "Bold", "Brave", "Calm", "Careful", "Docile", "Gentle", "Hardy", "Hasty", "Impish", "Jolly", "Lax", "Lonely", "Mild", "Modest", "Naive", "Naughty", "Quiet", "Quirky", "Rash", "Relaxed", "Sassy", "Serious", "Timid"],
     "Gender": ["Male", "Female", "Genderless"],
+    "Habitat": ["Cave", "Forest", "Grassland", "Mountain", "Rare", "Rough Terrain", "Sea", "Urban", "Water's Edge"],
+    "Egg Group": ["Amorphous", "Bug", "Ditto", "Dragon", "Fairy", "Field", "Flying", "Grass", "Human-Like", "Mineral", "Monster", "Undiscovered", "Water 1", "Water 2", "Water 3"],
+    "Hidden Ability": Object.keys(HIDDEN_ABILITIES),
+  },
+};
+// Which options go together (see `fit`), worked out from PokéAPI's regional Pokédexes,
+// types, habitats and egg groups: an option is in a row if at least one real Pokémon has both.
+// Official habitats only exist for the first 386 Pokémon, which is what the Habitat rows reflect.
+// Every region has every type (except Dark in Kanto) and nearly every habitat, so those rows
+// are written as what's missing.
+const regionRows = (all, missing) => Object.fromEntries(POKEMON.cats.Region.map((r) => [r, all.filter((x) => !(missing[r] || []).includes(x))]));
+const POKEMON_FIT = {
+  "Hidden Ability": {
+    "Type": {
+      "Bug": ["Compound Eyes", "Contrary", "Damp", "Flame Body", "Friend Guard", "Frisk", "Hustle", "Ice Scales", "Infiltrator", "Iron Fist", "Keen Eye", "Light Metal", "Moxie", "No Guard", "Overcoat", "Prankster", "Rain Dish", "Rattled", "Rivalry", "Run Away", "Sharpness", "Shed Skin", "Sniper", "Speed Boost", "Stakeout", "Steadfast", "Swarm", "Sweet Veil", "Swift Swim", "Technician", "Telepathy", "Tinted Lens", "Truant", "Unburden", "Unnerve", "Water Absorb", "Weak Armor", "Wonder Skin"],
+      "Dark": ["Adaptability", "Anger Point", "Defiant", "Infiltrator", "Inner Focus", "Intimidate", "Justified", "Keen Eye", "Moxie", "Pickpocket", "Power of Alchemy", "Prankster", "Pressure", "Protean", "Quick Feet", "Rattled", "Rocky Payload", "Scrappy", "Sharpness", "Speed Boost", "Stakeout", "Thick Fat", "Tinted Lens", "Unnerve", "Water Absorb", "Weak Armor"],
+      "Dragon": ["Adaptability", "Bulletproof", "Cloud Nine", "Cursed Body", "Damp", "Gooey", "Harvest", "Hustle", "Ice Body", "Marvel Scale", "Mold Breaker", "Moxie", "Multiscale", "Overcoat", "Regenerator", "Rock Head", "Rough Skin", "Sand Rush", "Sheer Force", "Stalwart", "Sticky Hold", "Storm Drain", "Sturdy", "Telepathy", "Thick Fat", "Unnerve"],
+      "Electric": ["Aftermath", "Analytic", "Competitive", "Damp", "Defiant", "Electric Surge", "Galvanize", "Guts", "Inner Focus", "Iron Fist", "Klutz", "Lightning Rod", "Minus", "Motor Drive", "Plus", "Quick Feet", "Rattled", "Sand Rush", "Sand Veil", "Sap Sipper", "Slush Rush", "Solar Power", "Static", "Sturdy", "Swarm", "Technician", "Telepathy", "Vital Spirit", "Volt Absorb", "Water Absorb"],
+      "Fairy": ["Anticipation", "Aroma Veil", "Chlorophyll", "Contrary", "Friend Guard", "Frisk", "Klutz", "Liquid Voice", "Magic Bounce", "Magician", "Misty Surge", "Natural Cure", "Pickpocket", "Pixilate", "Plus", "Rain Dish", "Rattled", "Sap Sipper", "Sheer Force", "Snow Warning", "Sturdy", "Super Luck", "Sweet Veil", "Symbiosis", "Technician", "Telepathy", "Unaware", "Unburden"],
+      "Fighting": ["Anger Point", "Bulletproof", "Costar", "Cud Chew", "Cute Charm", "Defiant", "Guard Dog", "Inner Focus", "Intimidate", "Iron Fist", "Justified", "Leaf Guard", "Mold Breaker", "Moxie", "Overcoat", "Pickpocket", "Poison Touch", "Prankster", "Reckless", "Scrappy", "Sheer Force", "Speed Boost", "Steadfast", "Swift Swim", "Technician", "Telepathy", "Thick Fat", "Unburden", "Unnerve", "Vital Spirit"],
+      "Fire": ["Anger Point", "Blaze", "Cud Chew", "Drought", "Flame Body", "Flash Fire", "Frisk", "Gale Wings", "Guts", "Infiltrator", "Inner Focus", "Intimidate", "Iron Fist", "Justified", "Libero", "Magician", "Moody", "Moxie", "Oblivious", "Own Tempo", "Reckless", "Regenerator", "Rock Head", "Shell Armor", "Solar Power", "Speed Boost", "Swarm", "Thick Fat", "Unaware", "Unnerve", "Vital Spirit", "Weak Armor", "White Smoke", "Zen Mode"],
+      "Flying": ["Big Pecks", "Cloud Nine", "Competitive", "Contrary", "Costar", "Defiant", "Flame Body", "Flare Boost", "Friend Guard", "Frisk", "Gale Wings", "Guts", "Harvest", "Hustle", "Hydration", "Immunity", "Infiltrator", "Insomnia", "Iron Fist", "Long Reach", "Magic Bounce", "Mirror Armor", "Mold Breaker", "Motor Drive", "Moxie", "Multiscale", "Pickup", "Poison Heal", "Prankster", "Rain Dish", "Rattled", "Reckless", "Regenerator", "Rivalry", "Rocky Payload", "Scrappy", "Sheer Force", "Simple", "Sniper", "Snow Cloak", "Solar Power", "Static", "Steadfast", "Super Luck", "Tangled Feet", "Telepathy", "Tinted Lens", "Unnerve", "Water Veil", "Weak Armor"],
+      "Ghost": ["Cursed Body", "Damp", "Defiant", "Flare Boost", "Fluffy", "Frisk", "Harvest", "Heatproof", "Infiltrator", "Insomnia", "Long Reach", "Mold Breaker", "No Guard", "Perish Body", "Prankster", "Rock Head", "Sand Veil", "Telepathy", "Unaware", "Weak Armor"],
+      "Grass": ["Aftermath", "Anticipation", "Bulletproof", "Chlorophyll", "Contrary", "Damp", "Early Bird", "Effect Spore", "Gluttony", "Grass Pelt", "Grassy Surge", "Harvest", "Healer", "Heatproof", "Hustle", "Infiltrator", "Insomnia", "Klutz", "Leaf Guard", "Long Reach", "Moody", "Overcoat", "Overgrow", "Own Tempo", "Pickpocket", "Protean", "Quick Feet", "Rain Dish", "Regenerator", "Run Away", "Scrappy", "Serene Grace", "Shell Armor", "Soundproof", "Stench", "Sticky Hold", "Storm Drain", "Sweet Veil", "Technician", "Telepathy", "Thick Fat", "Unburden", "Water Absorb"],
+      "Ground": ["Anger Point", "Battle Armor", "Damp", "Huge Power", "Hydration", "Immunity", "Inner Focus", "Mold Breaker", "No Guard", "Overcoat", "Own Tempo", "Poison Heal", "Reckless", "Rough Skin", "Run Away", "Sand Force", "Sand Rush", "Sand Veil", "Sheer Force", "Shell Armor", "Thick Fat", "Unaware", "Unnerve", "Water Absorb", "Weak Armor"],
+      "Ice": ["Anger Point", "Cursed Body", "Dry Skin", "Hydration", "Ice Body", "Ice Scales", "Inner Focus", "Insomnia", "Moody", "Oblivious", "Overcoat", "Pickpocket", "Rattled", "Sheer Force", "Slush Rush", "Snow Cloak", "Snow Warning", "Soundproof", "Sturdy", "Swift Swim", "Thick Fat", "Weak Armor", "Zen Mode"],
+      "Normal": ["Adaptability", "Analytic", "Anticipation", "Big Pecks", "Bulletproof", "Cloud Nine", "Contrary", "Cute Charm", "Defiant", "Friend Guard", "Frisk", "Gale Wings", "Gluttony", "Guts", "Harvest", "Healer", "Honey Gather", "Huge Power", "Hustle", "Imposter", "Inner Focus", "Keen Eye", "Klutz", "Limber", "Moody", "Moxie", "Own Tempo", "Pickup", "Prankster", "Protean", "Psychic Surge", "Quick Feet", "Rattled", "Reckless", "Regenerator", "Rivalry", "Run Away", "Sap Sipper", "Scrappy", "Serene Grace", "Sheer Force", "Skill Link", "Sniper", "Solar Power", "Soundproof", "Symbiosis", "Tangled Feet", "Technician", "Thick Fat", "Tinted Lens", "Toxic Boost", "Unnerve", "Wonder Skin"],
+      "Poison": ["Adaptability", "Aftermath", "Chlorophyll", "Compound Eyes", "Corrosion", "Effect Spore", "Filter", "Frisk", "Gluttony", "Guard Dog", "Hustle", "Infiltrator", "Intimidate", "Keen Eye", "Klutz", "Leaf Guard", "Misty Surge", "Oblivious", "Pickpocket", "Poison Touch", "Power of Alchemy", "Prankster", "Rain Dish", "Regenerator", "Run Away", "Sheer Force", "Slow Start", "Sniper", "Speed Boost", "Stench", "Technician", "Unaware", "Unnerve", "Wonder Skin"],
+      "Psychic": ["Analytic", "Anticipation", "Competitive", "Dry Skin", "Frisk", "Gluttony", "Harvest", "Heavy Metal", "Hydration", "Ice Body", "Infiltrator", "Inner Focus", "Justified", "Light Metal", "Magic Bounce", "Magic Guard", "Magician", "Multiscale", "Own Tempo", "Prankster", "Psychic Surge", "Regenerator", "Sap Sipper", "Shadow Tag", "Sharpness", "Simple", "Speed Boost", "Symbiosis", "Technician", "Telepathy", "Tinted Lens", "Unnerve", "Weak Armor", "Wonder Skin", "Zen Mode"],
+      "Rock": ["Clear Body", "Contrary", "Corrosion", "Flash Fire", "Galvanize", "Heavy Metal", "No Guard", "Pickpocket", "Rattled", "Reckless", "Regenerator", "Rock Head", "Sand Force", "Sand Veil", "Sharpness", "Sheer Force", "Snow Warning", "Soundproof", "Steadfast", "Storm Drain", "Sturdy", "Swift Swim", "Unnerve", "Weak Armor"],
+      "Steel": ["Analytic", "Anticipation", "Clear Body", "Competitive", "Filter", "Flame Body", "Gooey", "Heavy Metal", "Justified", "Light Metal", "Magician", "Mirror Armor", "Mold Breaker", "Overcoat", "Pickpocket", "Pressure", "Sand Force", "Sand Veil", "Sheer Force", "Slow Start", "Slush Rush", "Soundproof", "Stalwart", "Steely Spirit", "Sturdy", "Telepathy", "Truant", "Unnerve", "Weak Armor"],
+      "Water": ["Adaptability", "Analytic", "Competitive", "Cud Chew", "Cute Charm", "Damp", "Drizzle", "Hydration", "Ice Body", "Inner Focus", "Intimidate", "Lightning Rod", "Liquid Voice", "Mold Breaker", "Moody", "Moxie", "Oblivious", "Overcoat", "Own Tempo", "Pickpocket", "Pressure", "Propeller Tail", "Protean", "Rain Dish", "Rattled", "Regenerator", "Sand Force", "Sand Rush", "Sand Veil", "Sap Sipper", "Sharpness", "Sheer Force", "Shell Armor", "Slush Rush", "Sniper", "Speed Boost", "Storm Drain", "Sturdy", "Swift Swim", "Telepathy", "Torrent", "Unaware", "Water Absorb", "Water Veil", "Weak Armor", "Wonder Skin"],
+    },
+  },
+  "Type": {
+    "Region": regionRows(POKEMON.cats.Type, { "Kanto": ["Dark"] }),
+  },
+  "Habitat": {
+    "Region": regionRows(POKEMON.cats.Habitat, {
+      "Unova": ["Rare"], "Alola": ["Rare"], "Paldea": ["Rare"], "Kitakami": ["Rare", "Sea"], "Blueberry Academy": ["Rare"],
+    }),
+    "Type": {
+      "Bug": ["Forest", "Grassland", "Mountain", "Water's Edge"],
+      "Dark": ["Cave", "Forest", "Grassland", "Mountain", "Rough Terrain", "Sea", "Urban", "Water's Edge"],
+      "Dragon": ["Forest", "Rare", "Rough Terrain", "Sea", "Water's Edge"],
+      "Electric": ["Forest", "Grassland", "Rare", "Rough Terrain", "Sea", "Urban"],
+      "Fairy": ["Cave", "Forest", "Grassland", "Mountain", "Urban", "Water's Edge"],
+      "Fighting": ["Forest", "Grassland", "Mountain", "Urban", "Water's Edge"],
+      "Fire": ["Grassland", "Mountain", "Rare", "Rough Terrain", "Urban"],
+      "Flying": ["Cave", "Forest", "Grassland", "Mountain", "Rare", "Rough Terrain", "Sea", "Water's Edge"],
+      "Ghost": ["Cave", "Forest", "Urban"],
+      "Grass": ["Forest", "Grassland", "Rough Terrain", "Sea", "Water's Edge"],
+      "Ground": ["Cave", "Forest", "Grassland", "Mountain", "Rough Terrain", "Water's Edge"],
+      "Ice": ["Cave", "Forest", "Mountain", "Rare", "Sea", "Urban"],
+      "Normal": ["Cave", "Forest", "Grassland", "Mountain", "Rough Terrain", "Urban", "Water's Edge"],
+      "Poison": ["Cave", "Forest", "Grassland", "Sea", "Urban"],
+      "Psychic": ["Cave", "Forest", "Grassland", "Mountain", "Rare", "Rough Terrain", "Sea", "Urban", "Water's Edge"],
+      "Rock": ["Cave", "Forest", "Mountain", "Rough Terrain", "Sea", "Water's Edge"],
+      "Steel": ["Cave", "Forest", "Grassland", "Mountain", "Rough Terrain"],
+      "Water": ["Grassland", "Sea", "Urban", "Water's Edge"],
+    },
+  },
+  "Egg Group": {
+    "Type": {
+      "Bug": ["Water 1", "Water 3", "Bug", "Fairy", "Grass", "Human-Like", "Mineral", "Undiscovered"],
+      "Dark": ["Monster", "Water 1", "Water 2", "Water 3", "Bug", "Flying", "Field", "Fairy", "Grass", "Human-Like", "Amorphous", "Dragon", "Undiscovered"],
+      "Dragon": ["Monster", "Water 1", "Water 2", "Bug", "Flying", "Field", "Grass", "Mineral", "Amorphous", "Dragon", "Undiscovered"],
+      "Electric": ["Monster", "Water 1", "Water 2", "Bug", "Flying", "Field", "Fairy", "Human-Like", "Mineral", "Amorphous", "Dragon", "Undiscovered"],
+      "Fairy": ["Water 1", "Bug", "Flying", "Field", "Fairy", "Grass", "Human-Like", "Mineral", "Amorphous", "Undiscovered"],
+      "Fighting": ["Water 1", "Water 3", "Bug", "Flying", "Field", "Fairy", "Grass", "Human-Like", "Mineral", "Amorphous", "Dragon", "Undiscovered"],
+      "Fire": ["Monster", "Bug", "Flying", "Field", "Fairy", "Grass", "Human-Like", "Mineral", "Amorphous", "Dragon", "Undiscovered"],
+      "Flying": ["Monster", "Water 1", "Water 2", "Water 3", "Bug", "Flying", "Field", "Fairy", "Grass", "Human-Like", "Mineral", "Amorphous", "Dragon", "Undiscovered"],
+      "Ghost": ["Water 1", "Water 2", "Water 3", "Flying", "Field", "Fairy", "Grass", "Human-Like", "Mineral", "Amorphous", "Dragon", "Undiscovered"],
+      "Grass": ["Monster", "Water 1", "Water 3", "Bug", "Flying", "Field", "Fairy", "Grass", "Human-Like", "Mineral", "Amorphous", "Dragon", "Undiscovered"],
+      "Ground": ["Monster", "Water 1", "Water 2", "Bug", "Field", "Grass", "Mineral", "Amorphous", "Dragon", "Undiscovered"],
+      "Ice": ["Monster", "Water 1", "Water 3", "Bug", "Field", "Fairy", "Grass", "Human-Like", "Mineral", "Amorphous", "Dragon", "Undiscovered"],
+      "Normal": ["Monster", "Water 1", "Flying", "Field", "Fairy", "Grass", "Human-Like", "Mineral", "Amorphous", "Ditto", "Dragon", "Undiscovered"],
+      "Poison": ["Monster", "Water 1", "Water 2", "Water 3", "Bug", "Flying", "Field", "Fairy", "Grass", "Human-Like", "Mineral", "Amorphous", "Dragon", "Undiscovered"],
+      "Psychic": ["Monster", "Water 1", "Water 2", "Water 3", "Bug", "Flying", "Field", "Fairy", "Grass", "Human-Like", "Mineral", "Amorphous", "Undiscovered"],
+      "Rock": ["Monster", "Water 1", "Water 2", "Water 3", "Bug", "Flying", "Field", "Fairy", "Mineral", "Amorphous", "Dragon", "Undiscovered"],
+      "Steel": ["Monster", "Water 1", "Bug", "Flying", "Field", "Fairy", "Grass", "Human-Like", "Mineral", "Dragon", "Undiscovered"],
+      "Water": ["Monster", "Water 1", "Water 2", "Water 3", "Bug", "Flying", "Field", "Fairy", "Grass", "Amorphous", "Dragon", "Undiscovered"],
+    },
   },
 };
 // Every country in the world: the 193 UN members plus Palestine and Vatican City.
@@ -630,11 +931,755 @@ const NATURE_FX = {
 const natureBadges = (names) => Object.fromEntries(names.filter((n) => POKEMON.cats.Nature.includes(n)).map((n) => [n,
   NATURE_FX[n] ? NATURE_FX[n].split(" ").map((s, i) => (i ? "−10% " : "+10% ") + s) : ["No effect"]]));
 
+// Shiny and Lucky are rare: "Yes" comes up 1 time in 100 and gets a golden celebration (see `rare`).
+const rareYes = () => ({ rare: { item: "Yes", odds: 100 }, badges: { Yes: ["1/100 chance"] } });
+const shinyCat = () => ({ id: uid(), name: "Shiny", items: ["No", "Yes"], ...rareYes() });
+
 const pokemonMulti = () => ({
   id: uid(), name: POKEMON.name, emoji: POKEMON.emoji, description: POKEMON.description, type: "multi",
-  cats: Object.entries(POKEMON.cats).map(([name, items]) =>
-    ({ id: uid(), name, items, ...(name === "Nature" && { badges: natureBadges(items) }) })),
+  cats: [...Object.entries(POKEMON.cats).map(([name, items]) =>
+    ({
+      id: uid(), name, items,
+      ...(name === "Nature" && { badges: natureBadges(items) }),
+      ...(name === "Hidden Ability" && { notes: { ...HIDDEN_ABILITIES } }),
+      ...(POKEMON_FIT[name] && { fit: structuredClone(POKEMON_FIT[name]) }),
+    })), shinyCat()],
 });
+
+// Palworld (v1.0.5): Pals, types, work and rarity from paldb.cc and PalCalc; where they live from
+// PinDrop's map data. The few Pals with no recorded spot in the wild count as "No wild spawn".
+// Partner Ability descriptions are in our own words; Passive Skill text is the effect, in short.
+const PAL_PARTNERS = {
+  "Abyssal Celebrity Chef": "Water mount. 5–25% faster per other Fire or Water Pal in your party.",
+  "Aegis Shield": "Rideable. Your shield recharges sooner (30–60%) and takes 65–80% less damage.",
+  "Aerial Marauder": "Flying mount. You deal 20–50% more to weak points.",
+  "Aerial Missile": "Flying mount with a rapid-fire missile launcher.",
+  "Amicable Holy Dragon": "Flying mount, faster in the air. Defeated Dark Pals drop 40–80% more items.",
+  "Amicable Water Dragon": "Flying mount, faster in the air. Your team takes 15–30% less Fire damage and can't be Burned.",
+  "Angry Shark": "Used on a target, its signature attack hits 1.1–2.5× harder. Your Attack is 10–20% higher in your party.",
+  "Antigravity": "Your spheres seek out Pals, and you can carry 300–600 more.",
+  "Aqua Spout": "Water Pals get 15–30% more Attack in your party. May drop Aquatic Pal Fluids on a Ranch.",
+  "Aurora Guide": "Ice Pals get 15–30% more Attack in your party. May drop Ice Organ on a Ranch.",
+  "Azure Sovereign": "Flying mount. Gains 4–8% Attack per other Dragon Pal in your party.",
+  "Balmy Weather": "Rideable. Pals on a Breeding Farm make eggs 20–50% faster.",
+  "Berry Picker": "May drop Red Berries on a Ranch. Every 5 minutes, feeds your hungriest Pal 100–200 Hunger.",
+  "Best Boy": "Your melee weapons deal 10–35% more damage.",
+  "Big Stretch": "Lowers gravity on you, so jumps and falls feel floaty.",
+  "Birds of a Feather": "Rideable. In fights together, 15–30% more likely to meet Pals with its Passive Skill (some excluded).",
+  "Bitter Pop": "May drop Caramel Cotton Candy on a Ranch. Base Pals get hungry 15–25% slower.",
+  "Black Ankylosaur": "Flying mount. While ridden, deals 1100–3300% more to ore and gets 150–300% more of it.",
+  "Black Fox Lord": "When used, your attacks turn Dark with 30–50% more Attack.",
+  "Black Hare": "Rideable. While ridden, your attacks turn Dark with 5–20% more Attack.",
+  "Black Steed": "Flying mount with Dark attacks and 10–40% more Attack. Builds up Blind by 2–6.",
+  "Blade of Uncontrolled Passion": "The Meat Cleaver gives 100–200% more items.",
+  "Blazing Black Magic": "Other base Pals get +1 Kindling.",
+  "Blessing of Chaos": "Rideable. Your battle Pal slowly loses Health but gets 40–80% more Attack.",
+  "Blessing of Purification": "Rideable. 2–6% more Attack and speed per other Neutral Pal. Heals your team 0.15–0.75% a second.",
+  "Blessing of the Flower Spirit": "Heals you 75–85% when used. Other base Pals get +1 Planting.",
+  "Blizzard Crash": "Rideable. Smashes with an Ice hammer while ridden.",
+  "Brandish Blade": "Used on a target, Iaigiri hits 1.1–2.5× harder.",
+  "Brave Sailor": "Defeated Fire Pals drop 40–80% more items.",
+  "Burning Future": "Burned enemies you hit explode, dealing 40–60% of your attack damage nearby.",
+  "Caffeine Inoculation": "Downs an energy drink for 100–900% more speed and Work Speed. May drop Venom Gland on a Ranch.",
+  "Candy Pop": "May drop Cotton Candy on a Ranch. Base Pals get hungry 10–20% slower.",
+  "Cast-Iron Shell": "Gives you a barrier after 5 melee hits within 5–9 seconds.",
+  "Cat Helper": "You can carry 100–200 more while it's in your party.",
+  "Celestial Darkness": "Flying mount. Neutral and Dark attacks are 15–30% stronger while ridden.",
+  "Cephalo-Princess": "Water Pals get 15–30% more Defense in your party.",
+  "Charging Shell": "Your attacks build up Electrify by 2–6 more.",
+  "Charming Fish": "Water mount. Talented Pals are easier to fish up.",
+  "Charming Spore": "Other base Pals get +1 Medicine Production.",
+  "Cheery Rifle": "Sprays nearby enemies with an assault rifle for a short time when used.",
+  "Chilled Whale Cruiser": "Rideable. Fishing starts with 5–14% more gauge, and overlap fills 5–14% faster.",
+  "Chillswitch": "Electrified enemies you hit shock those nearby for 40–60% of your attack damage.",
+  "Chipper Chimp Gunfire": "Sprays nearby enemies with a Fire assault rifle for a short time when used.",
+  "Cold Bomb": "Lets you throw it at an enemy, and it explodes with Ice damage.",
+  "Coldhearted King": "Rideable. Gains 5–14% Defense and speed per Melpaca in your party.",
+  "Coldsnap": "Flying mount with Ice attacks and 5–20% more Attack. 5–25% faster per other Ice Pal in your party.",
+  "Cool Body": "Rideable. Gives you Heat Resistance +2.",
+  "Corruption Laser": "Rideable. Fires a strong Dark laser while ridden.",
+  "Cozy Whale Cruiser": "Rideable. Fishing starts with 7–17% more gauge, and overlap fills 7–17% faster.",
+  "Crackle Booster": "Other base Pals get +1 Generating Electricity.",
+  "Cryo Instincts": "Other base Pals get +1 Cooling.",
+  "Dark Gleam Strike": "Used on a target, Jumping Claw hits 1.1–2.5× harder. Your melee weapons swing 15–30% faster.",
+  "Dark Knight of the Abyss": "Rideable with a double jump. Twin Spears brings a party Paladius in to fight beside you.",
+  "Dark Knowledge": "Dark Pals get 15–30% more Attack in your party.",
+  "Darkclaw Hunter": "Used on a target, Nightmare Claw hits 1.1–2.5× harder.",
+  "Darkflame Lion": "Rideable. Defeated Neutral Pals drop 40–80% more items.",
+  "Dark-Nester": "Flying mount. Your team deals 50–65% more to Blinded enemies.",
+  "Death-Cheating Feline": "Better capture rate when you get a back bonus.",
+  "Desert Empress": "Anubis works 20–40% faster at the base. Works 30–60% better at workbenches and workshops.",
+  "Dig Here!": "May dig up items on a Ranch.",
+  "Dig, Smokie! Dig!": "Sniffs out Chromite nearby when used. You get 100–200% more Chromite in fights together.",
+  "Direhowl Rider": "Rideable, and a bit quicker than most mounts.",
+  "Dragon Hunter": "Defeated Dragon Pals drop 40–80% more items.",
+  "Dragon Kaiser": "Rideable. Dragon hits on a weakness deal 25–40% more.",
+  "Dream Chaser": "Floats near you shooting Dark bullets that can't take a target below 1 Health.",
+  "Drill Crusher": "Spins along behind you when used, mining ore 800–2000% faster.",
+  "Eerie Nightstreaker": "Toggles Night Vision for you. May dig up Bone on a Ranch.",
+  "Egg Layer": "May lay an Egg on a Ranch.",
+  "Eggbomb Launcher": "Becomes an egg launcher you hold when used.",
+  "Electro-Massage Incubation": "Flying mount. Eggs at the base hatch 20–40% faster.",
+  "Ember Chamber": "Your weapons weigh 60–100% less. Fire hits on a weakness deal 25–40% more.",
+  "Entangling Tongue": "Your dodges create a whirlwind that deals Grass damage (Power 40–80).",
+  "Explosive Strength": "Hitting a weak point makes your next weak-point hit 30–60% stronger.",
+  "Father Winter's Threat": "You can Freeze Soaked enemies in one hit.",
+  "Ferocious Thunder Dragon": "Each bullet hit gives your battle Pal 1–5% Attack and Defense for 5 seconds, up to 30 times.",
+  "Fire Tackle": "Slides into an enemy in a burst of flame when used.",
+  "Fish Fillet": "Becomes a katana you hold (Attack 2600–3900). Knocked out if held too long or if Iaigiri is used.",
+  "Flame Wing": "Flying mount. While ridden, your attacks turn Fire with 5–20% more Attack.",
+  "Flameclaw Hunter": "Used on a target, Hellfire Claw hits 1.1–2.5× harder.",
+  "Floral Boost": "Crops at the base grow 50–70% faster.",
+  "Flower Dance": "Your dodges stay invincible 15–30% longer.",
+  "Fluffy": "Raises Sweepa's Attack and Defense in your party.",
+  "Fluffy Flutterer": "Better capture rate on Frozen Pals.",
+  "Fluffy Shield": "Turns into a shield you wear when used. May drop Wool on a Ranch.",
+  "Fluffy Wool": "Neutral Pals get 15–30% more Attack in your party. May drop Wool on a Ranch.",
+  "Flying Trapeze": "As your glider: rise slowly while gliding.",
+  "Forest Laser": "Rideable. Fires a strong Grass laser while ridden.",
+  "Fragrant Dragon": "Rideable. Dragon Pals get 15–30% more Defense in your party.",
+  "Fried Killamari": "As your glider: float gently for a long time.",
+  "Fried Squid": "As your glider: float gently for a long time.",
+  "Friend of Earth": "You get 50–65% more Defense while sprinting.",
+  "Frigid Deity": "Rideable. While ridden, your attacks turn Ice with 5–20% more Attack.",
+  "Frozen Gleam Strike": "Used on a target, Snow Claw hits 1.1–2.5× harder. Your melee weapons swing 15–30% faster.",
+  "Fullmetal Shell": "Gives you a barrier after 5 melee hits within 5–9 seconds.",
+  "Full-Power Gorilla Mode": "Goes into a rage for a short time when used, with 75–300% more Attack.",
+  "Full-Power Gorilla Pound": "You climb 50–100% faster.",
+  "Fuzzy Fairy": "Better capture rate on Ivy-Covered Pals.",
+  "Gaia Crusher": "Rideable. Chops wood 220–500% and mines 500–2000% faster while ridden.",
+  "Galeclaw Glider": "As your glider: glide fast and shoot with your right hand.",
+  "Gilded Shroud": "Neutral Pals get 15–30% more Defense in your party. May make High Quality Cloth on a Ranch.",
+  "Glaring Cat's Eye": "Rideable. Picking up a Pal Egg has a 50–75% chance of giving one extra.",
+  "Gloomhowl": "Rideable. Your team takes 15–30% less Dark damage and can't be Blinded.",
+  "Glorious Mist": "Rideable. Your attacks build up Soak by 2–6 more.",
+  "Goddess of the Tranquil Light": "Heals you and your party 85–95% when used.",
+  "Gold Digger": "May dig up Gold Coins on a Ranch.",
+  "Golden Harvest": "Enemies drop 100–200% more Gold Coins. On a Ranch, may drop High Quality Pal Oil or Gold Coins.",
+  "Golden Scorpion": "You get 5–10% more Defense. Defeated Electric Pals drop 40–80% more items.",
+  "Grass Dragon Affection": "Flying mount. While ridden, your attacks turn Grass with 5–20% more Attack.",
+  "Grassland Gymnast": "Gives you an extra jump and an extra air dash.",
+  "Grave Robber": "Your team takes 15–30% less Neutral damage. May dig up Bone on a Ranch.",
+  "Grenadier Panda": "Rideable, with a rapid-fire grenade launcher.",
+  "Grinning Death": "Hitting Poisoned enemies lowers their Attack by 40–80%.",
+  "Ground 'n' Pound": "Grass hits on a weakness deal 25–40% more. Works 200–400% better at weapon workbenches.",
+  "Grounded Archer": "Your bows deal 10–35% more damage.",
+  "Grounding Shell": "Your team takes 15–30% less Water damage and can't be Soaked.",
+  "Guardian of the Desert": "When used, your attacks turn Ground with 30–50% more Attack. Sometimes sidesteps attacks in battle.",
+  "Guardian of the Forest": "Rideable with a double jump. Chops wood 220–500% faster while ridden.",
+  "Guardian of the Golden Forest": "Rideable with a double jump. Other base Pals get +1 Lumbering.",
+  "Guardian of the Snowy Mountain": "Rideable. Other base Pals get +1 Transporting.",
+  "Guardian of the South": "Rideable. Your team takes 15–30% less Ground damage and can't go Muddy.",
+  "Happy Clover": "Other base Pals get +1 Gathering.",
+  "Happy-Go-Lucky Bunny": "Neutral Pals get 15–30% more Attack in your party. Other base Pals get +1 Handiwork.",
+  "Hard Head": "Rideable. Breaks Stone 500–2000% faster while ridden.",
+  "Harvest Goddess": "Heals you and your party 80–90% when used.",
+  "Heart Drain": "You and this Pal heal 5–9% of the damage you deal while fighting together.",
+  "Hellflame Lion": "Rideable. Defeated Grass Pals drop 40–80% more items.",
+  "Helper Bunny": "Stays near you and picks up items nearby.",
+  "Herbil Pulse": "Heals 30–60% of your max Health when you go down.",
+  "Hidden Dark Energy": "Dark Pals get 15–30% more Defense in your party.",
+  "Holy Knight of the Firmament": "Rideable with a triple jump. Spear Thrust brings Necromus in to fight beside you.",
+  "Homeward Prayer": "Teleports you to the nearest base when used. Not inside dungeons and similar areas.",
+  "Hug Me Please": "Your team deals 50–65% more to Ivy-Covered enemies.",
+  "Hug You So Much": "Your attacks build up Ivy-Covered by 2–6 more.",
+  "Huggy Fire": "Becomes a flamethrower you hold when used.",
+  "Huggy Frost": "Becomes a frost-spraying weapon you hold when used.",
+  "Hungry Missile": "Rideable, with a rapid-fire missile launcher.",
+  "Ice Crusher": "Rideable. Chops wood 220–500% and mines 500–2000% faster while ridden.",
+  "Ice Overload": "Rideable. Ice hits on a weakness deal 25–40% more.",
+  "Ice-Loving Beast": "Rideable. All ore weighs 35–65% less.",
+  "Icewing Dance": "Water mount. While ridden, your attacks turn Ice with 5–20% more Attack.",
+  "Icy Maw": "Food weighs 30–60% less. With another Ice Pal, it also rots 30–80% slower.",
+  "Icy Steed": "Flying mount with Ice attacks and 10–40% more Attack. Builds up Freeze by 2–6.",
+  "Icy Whispers": "May drop Ice Organ on a Ranch.",
+  "Indestructible Fortress": "Rideable. Your team takes 60–80% less explosive damage and can't be Stunned.",
+  "Invisible Eye": "Enemies are less likely to spot you.",
+  "Iron Guardian Mode": "Raises its Attack and Defense by 60–210% for a short time when used.",
+  "Jelliette Drop": "Fishing gives 55–95% more items. Waters 50–120% faster with Jellroy at the base.",
+  "Jellroy Drop": "Salvaging gives 55–95% more items. Waters 50–120% faster with Jelliette at the base.",
+  "Jolt Bomb": "Lets you throw it at an enemy, and it explodes with Electric damage.",
+  "Jolt Glider": "As your glider: no fall damage and longer fast gliding.",
+  "King of Fluff": "Rideable. Gains 12–24% Attack and Defense per Swee in your party.",
+  "King of Muscles": "Rideable. Gains 5–14% Defense and speed per Melpaca in your party.",
+  "Kuudere": "Reveals Pal Effigies nearby when used.",
+  "Lady of Dark Lightning": "Floats near you shooting Dark bolts that can't take a target below 1 Health.",
+  "Lady of Lightning": "Floats near you shooting Electric bolts that can't take a target below 1 Health.",
+  "Lantern Enchantment": "Your arrows explode on hit for an extra 15–30% of your attack damage.",
+  "Lava Spout": "Fire Pals get 15–30% more Attack in your party. May drop Flame Organ on a Ranch.",
+  "Leap Stance": "Inflates into a launch pad that throws you upward. Your Attack is 50–86% higher in the air.",
+  "Liberated Pterosaur": "Flying mount. 2–6% more Attack and speed per other Dragon or Dark Pal in your party.",
+  "Life Steal": "You and this Pal heal 5–9% of the damage you deal while fighting together.",
+  "Lifmunk Recoil": "Hops on your head and backs up your attacks with a submachine gun.",
+  "Light Dancer": "Rideable with a higher jump. 5–25% faster per other Neutral Pal in your party.",
+  "Lightning Shepherd": "Rideable with a double jump. 5–25% faster per other Electric Pal in your party.",
+  "Logging Assistance": "Cut wood 30–50% faster, and wood weighs 40–60% less.",
+  "Long-Sleeved Hurray": "Other party Pals' Partner Skills recharge 10–50% faster.",
+  "Lord Fox": "When used, your attacks turn Fire with 30–50% more Attack.",
+  "Love's First Blossom": "Rideable. Eggs you pick up have a 35–45% chance of being Alpha Pal Eggs.",
+  "Magical Twin Powers": "Other base Pals get +1 Watering.",
+  "Magma Kaiser": "Rideable. Each defeat gives your battle Pal 5–10% Attack and Defense for 20 seconds, up to 5 times.",
+  "Magma Overload": "Rideable. Gains 4–8% Attack per other Fire or Ground Pal in your party.",
+  "Magma Tears": "You and your party heal 0.1–0.5% Health a second out of combat. May drop Flame Organ on a Ranch.",
+  "Masonry Archelon": "Rideable. Other base Pals get +1 Mining.",
+  "Masquerade Dance": "Your party Pals get 40–80% more EXP.",
+  "Master Archer": "Your bows charge 15–30% faster.",
+  "Master of Darkness": "Water mount. 5–25% faster per other Dark or Water Pal in your party.",
+  "Master of Unlocking": "Opens treasure chests without a key in fights together. Chests that need a Work Suitability don't count.",
+  "Messenger of Death": "Rideable. Defeating an enemy cuts your party's Active Skill cooldowns by 30–60%.",
+  "Meteor Wings": "Flying mount. Partner Skills of Pals that use weapons deal 20–50% more.",
+  "Milk Maker": "May drop Milk on a Ranch.",
+  "Mining Assistance": "Mine 30–60% faster, and Stone weighs 80–100% less.",
+  "Missile Party": "Rideable, with a rapid-fire missile launcher.",
+  "Mist Stalwart": "Your attacks build up Poison by 2–6 more. Immunity to Poison and World Tree gas.",
+  "Modified DNA": "Flying mount, faster in the air. Dark attacks are 15–30% stronger while ridden.",
+  "Mother Nature's Menace": "When used, your attacks turn Grass with 30–50% more Attack.",
+  "Mysterious Scales": "Hits a target with Poison Fog when used. Other base Pals get +1 Farming.",
+  "Mystical Black Magic": "Defeated Neutral Pals drop 40–80% more items. 10–50% chance a thrown Pal Sphere isn't used up.",
+  "Night Dancer": "Rideable with a higher jump. 50–100% faster at night.",
+  "Nightmare Iris": "Used on a target, Nightmare Ray hits 1.1–2.5× harder.",
+  "Nightmare Stare": "Used on a target, Nightmare Bloom hits 1.1–2.5× harder.",
+  "Ore-Loving Beast": "Rideable. All ore weighs 30–60% less.",
+  "Pacapaca Wool": "Rideable. Raises Kingpaca's Defense and speed in your party. May drop Wool on a Ranch.",
+  "Passion of the Flower Spirit": "Heals you 80–90% when used. Your team takes 15–30% less Grass damage and can't get Ivy-Covered.",
+  "Peacock Pounce": "You reload 20–50% faster.",
+  "Pengullet Launcher": "You fire it from a rocket launcher. It explodes on impact and is knocked out.",
+  "Pengullet Lux Launcher": "You fire it from a rocket launcher. It explodes on impact and is knocked out.",
+  "Phantasmal Arcana": "Burned enemies you hit are ringed by flames that deal 15–30% of your attack damage on contact.",
+  "Phantom Venom": "Your team deals 50–65% more to Poisoned enemies.",
+  "Plasma Dash": "Rideable, with an Air Dash for extra speed.",
+  "Power Crystal": "Your team takes 15–30% less Dragon damage.",
+  "Power Stone": "Your team deals 50–65% more to Muddy enemies.",
+  "Prayer for Abundant Harvest": "Crops at the base give 18–35% more.",
+  "Princess Gaze": "Grass Pals get 15–30% more Attack in your party.",
+  "Purification of Gaia": "Defeated Ground Pals drop 40–80% more items. May drop seeds on a Ranch.",
+  "Purity's Full Bloom": "Rideable. Eggs you pick up have a 45–55% chance of being Alpha Pal Eggs.",
+  "Queen Bee Command": "Gains 12–24% Attack per Beegarde in your party.",
+  "Rampant Spores": "Rideable. May drop Mushroom or Cavern Mushroom on a Ranch.",
+  "Red Hare": "Rideable. While ridden, your attacks turn Fire with 5–20% more Attack.",
+  "Resentful Pterosaur": "Flying mount. 2–6% more Attack and speed per other Dragon or Fire Pal in your party.",
+  "Resonant Guardian": "Flying mount. Only one per base, where it patrols the sky and bombs intruders.",
+  "Resurrection": "Comes back after being knocked out in a fight, with its Hunger at 0.",
+  "Rider of the Snowy Mountain": "Rideable, 80–160% faster on snow, and slides fast downhill.",
+  "Roiling Spores": "Rideable. Base allies lose SAN 10–15% slower.",
+  "Sacred Barrier": "Rideable with a triple jump. Its barrier blocks every attack while ridden.",
+  "Samba Step": "Rideable, and 155–240% faster on grass.",
+  "Sand Sprint": "Rideable, and 50–100% faster on sand.",
+  "Sand Swimmer": "Rideable. Your attacks build up Muddy by 2–6 more.",
+  "Sandball Soccer": "Ground Pals get 15–30% more Defense in your party.",
+  "Sandstorm's Blessing": "Rideable. While ridden, your attacks turn Ground with 5–20% more Attack.",
+  "Scorching Predator": "Flying mount. Defeated Ice Pals drop 40–80% more items.",
+  "Scorpion Longwave": "When used, your attacks turn Electric with 30–50% more Attack.",
+  "Seared Fish Fillet": "Becomes a katana you hold (Attack 2900–4200). Knocked out if held too long or if Iaigiri is used.",
+  "Selfless Discipline": "Gains 2–6% Attack and Defense per other Grass Pal in your party.",
+  "Sentinel of the Great Sea": "Backs up your attacks with Water spears. Water mount that leaps high over water.",
+  "Shadow Stance": "Inflates into a launch pad that throws you upward. Dark hits on a weakness deal 25–40% more.",
+  "Shiny Hauler": "Sulfur and Coal weigh 80–100% less. Ground hits on a weakness deal 25–40% more.",
+  "Shocking Fish": "Water mount with Electric attacks and 5–20% more Attack. Talented Pals are easier to fish up.",
+  "Shot-Nyan Mode": "Blasts nearby enemies with a shotgun for a short time when used. Your shotguns deal 10–35% more.",
+  "Silk Shroud": "Used on a target, Blizzard Spike hits 1.1–2.5× harder. May make High Quality Cloth on a Ranch.",
+  "Sky Dragon Affection": "Flying mount. Dragon Pals get 15–30% more Attack in your party.",
+  "Snake's Sagacity": "Your attacks build up Blind by 2–6 more.",
+  "Snow Shepherd": "Rideable with a double jump. Ice Pals get 15–30% more Defense in your party.",
+  "Snowy Mountain Slider": "Rideable, 80–160% faster on snow. Slides downhill slowly at first, then very fast.",
+  "Soil Improver": "Ground Pals get 15–30% more Attack in your party. May drop High Quality Pal Oil on a Ranch.",
+  "Soothing Shower": "Heals 20–40% of your Health when you drop below 30%. 120-second cooldown.",
+  "Soul Binder": "Grass Pals get 15–30% more Defense in your party.",
+  "Soul Collector": "Defeated Pals drop 100–200% more Pal Souls when fighting together.",
+  "Sparkling Weasel": "Rideable. While ridden, your attacks turn Fire with 5–20% more Attack.",
+  "Spikey Carrier": "Ore weighs 80–100% less.",
+  "Spore Stalwart": "Ivy-Covered enemies you hit explode for 40–60% of your attack damage. Immunity to World Tree spores.",
+  "Stage Combat": "Your attacks build up Burn by 2–6 more.",
+  "Static Electricity": "Electric Pals get 15–30% more Attack in your party. May drop Electric Organ on a Ranch.",
+  "Steel Guardian Mode": "Raises its Attack and Defense by 50–200% for a short time when used.",
+  "Steel Scorpion": "You get 5–10% more Defense. Defeated Electric Pals drop 40–80% more items.",
+  "Sticky Princess": "In the fishing game, the capture gauge falls 12–35% slower when the bars don't overlap.",
+  "Stone-Chaser Archelon": "Rideable. Your weapons and armor wear out 80–100% slower.",
+  "Stormbringer Lava Dragon": "Rideable. Blocks lava damage. Your team deals 50–65% more to Burned enemies.",
+  "Stormbringer Sea Dragon": "Water mount. Your team deals 50–65% more to Soaked enemies.",
+  "Stormcloud": "Rideable with a double jump. Defeated Water Pals drop 40–80% more items.",
+  "Surfing Slam": "Rides its own belly into an enemy when used.",
+  "Swift Deity": "Rideable. Electric hits on a weakness deal 25–40% more.",
+  "Swift Swimmer": "Water mount. May drop Leather on a Ranch.",
+  "Tarantriss’ Web": "Rideable with a double jump. Shoots webs to swing around at high speed.",
+  "Thunder Dragon": "Rideable. Electric Pals get 15–30% more Defense in your party.",
+  "Thunderous": "Flying mount with Electric attacks and 5–20% more Attack. 5–25% faster per other Electric Pal in your party.",
+  "Tidal Predator": "Flying mount. Defeated Fire Pals drop 40–80% more items.",
+  "Tiny Spark": "Fire Pals get 15–30% more Defense in your party. May drop Flame Organ on a Ranch.",
+  "Too Cool to be Seen": "You and this Pal turn invisible to enemies for 10–20 seconds when used.",
+  "Travel Companion": "Flying mount.",
+  "Trick-Loving Fluffle": "Below 50% Health: a Fire blast goes off around you (Power 100–200) and your Attack is 30–50% higher.",
+  "Ultrasonic Sensor": "Finds dungeons, treasure chests and scrap nearby when used.",
+  "Unknown Intruder": "Rideable. Your energy weapons deal 10–35% more damage.",
+  "Unknown Invader": "The last bullet of a full-auto weapon deals 100–160% more.",
+  "Untainted Maiden": "Your Attack is 30–80% higher when every party Pal is a different species.",
+  "Unyielding Storm Commander": "Water hits on a weakness deal 25–40% more, for you and your Pals.",
+  "Venom Picker": "May drop Venom Gland on a Ranch. Every 5 minutes, feeds your hungriest Pal 100–200 Hunger.",
+  "Void Blade": "Used on a target, Iaigiri hits 1.1–2.5× harder. Your melee weapons deal 30–65% more out of combat.",
+  "Void-Dweller": "You deal 50–100% more to enemies not yet in combat.",
+  "Warm Body": "Rideable. Gives you Cold Resistance +2.",
+  "Water Gun": "When used, your attacks turn Water with 30–50% more Attack.",
+  "Waterwing Dance": "Water mount. While ridden, your attacks turn Water with 5–20% more Attack.",
+  "Wind and Clouds": "Rideable with a double jump.",
+  "Wings of Death": "Flying mount. While ridden, your attacks turn Dark with 5–20% more Attack.",
+  "Wings of Flame": "Flying mount. 5–25% faster per other Fire Pal in your party.",
+  "Wings of Thunder": "Flying mount. While ridden, your attacks turn Electric with 5–20% more Attack.",
+  "Wings of Water": "Flying mount. 5–25% faster per other Water Pal in your party.",
+  "Winter Trapeze": "As your glider: rise slowly while gliding.",
+  "Witch's Icy Veil": "When used, your attacks turn Ice with 30–50% more Attack.",
+  "Wolf of the Sun": "Rideable. Your team takes 15–30% less Ice damage and can't be Frozen.",
+  "Worker Bee": "Raises Elizabee's Attack in your party. May drop Honey on a Ranch.",
+  "Wriggling Weasel": "Rideable. While ridden, your attacks turn Dragon with 5–20% more Attack.",
+  "Yellow Tank": "Rideable, with a rapid-fire minigun.",
+  "Yokozuna's Presence": "Rideable. Your team takes 15–30% less Electric damage and can't be Electrified.",
+  "Zephyr Glider": "As your glider: no fall damage and longer fast gliding.",
+};
+const PAL_PASSIVES = {
+  "Abnormal": "Neutral damage taken −10%",
+  "Ace Swimmer": "Speed on water +40%",
+  "Aggressive": "Attack +10%, Defense −10%",
+  "Artisan": "Work Speed +50%",
+  "Babysitter": "On a Breeding Farm: eggs made and hatched 30% faster",
+  "Blood of the Dragon": "Dragon damage +10%",
+  "Botanical Barrier": "Grass damage taken −10%",
+  "Bottomless Stomach": "Gets hungry 15% faster",
+  "Brave": "Attack +10%",
+  "Brittle": "Defense −20%",
+  "Burly Body": "Defense +20%, can't flinch",
+  "Capacitor": "Electric damage +10%",
+  "Celestial Emperor": "Neutral damage +30%",
+  "Cheery": "Dark damage taken −10%",
+  "Clumsy": "Work Speed −10%",
+  "Coldblooded": "Ice damage +10%",
+  "Conceited": "Work Speed +10%, Defense −10%",
+  "Coward": "Attack −10%",
+  "Dainty Eater": "Gets hungry 10% slower",
+  "Demon God": "Attack +30%, Defense +5%",
+  "Demon’s Hand": "Work Speed +90%, loses SAN 15% faster, World Tree resources stay when it comes near",
+  "Destructive": "Loses SAN 15% faster",
+  "Diamond Body": "Defense +30%, can't flinch or be knocked back",
+  "Diet Lover": "Gets hungry 15% slower",
+  "Dimensional Leap": "Speed +50%, gets hungry 15% faster, World Tree resources stay when it comes near",
+  "Divine Dragon": "Dragon damage +30%",
+  "Downtrodden": "Defense −10%",
+  "Dragonkiller": "Dragon damage taken −10%",
+  "Earth Emperor": "Ground damage +30%",
+  "Earthquake Resistant": "Ground damage taken −10%",
+  "Easygoing": "Active Skills recharge 15% slower",
+  "Eternal Engine": "Max Stamina +75% (mounts only)",
+  "Eternal Flame": "Fire and Electric damage +30%",
+  "Farmhand": "Farming +1",
+  "Ferocious": "Attack +20%",
+  "Fine Furs": "Its items sell for 3% more",
+  "Fit as a Fiddle": "Max Stamina +25% (mounts only)",
+  "Flame Emperor": "Fire damage +30%",
+  "Fragrant Foliage": "Grass damage +10%",
+  "Glutton": "Gets hungry 10% faster",
+  "God of Destruction": "Attack +40%, Defense +20%, Max Health −50%, World Tree resources stay when it comes near",
+  "Hard Skin": "Defense +10%",
+  "Healing Coach": "Your Health regenerates 5% faster",
+  "Heart of the Immovable King": "Loses SAN 20% slower",
+  "Heated Body": "Ice damage taken −10%",
+  "Heavily Armored": "No explosion damage",
+  "Heavyweight": "Defense +20%, can't be knocked back",
+  "Hermit Sage": "Loses SAN 50% slower, Work Speed −20%, World Tree resources stay when it comes near",
+  "Hooligan": "Attack +15%, Work Speed −10%",
+  "Hydromaniac": "Water damage +10%",
+  "Ice Emperor": "Ice damage +30%",
+  "Idiosyncratic": "You and it regenerate Health 50% faster, Defense +25%, no Poison or Burn damage",
+  "Immortality": "Heals 5% of damage dealt, regenerates Health 100% faster, Attack +15%",
+  "Impatient": "Active Skills recharge 15% faster",
+  "Infinite Stamina": "Max Stamina +50% (mounts only)",
+  "Insomnia": "Keeps working through the night without sleep",
+  "Insulated Body": "Electric damage taken −10%",
+  "Invader": "Dark and Dragon damage +30%",
+  "King of the Waves": "Speed on water +50%",
+  "Lavish Hospitality": "Drops +100%",
+  "Legend": "Attack, Defense and speed +20%",
+  "Lightfooted": "One extra jump while ridden",
+  "Logging Foreman": "You chop wood 25% faster",
+  "Lord of Lightning": "Electric damage +30%",
+  "Lord of the Sea": "Water damage +30%",
+  "Lord of the Underworld": "Dark damage +30%",
+  "Lucky": "Attack and Defense +15%, Work Speed +20%",
+  "Lunker": "Water and Ice damage +20%, Defense +20%",
+  "Masochist": "Defense +15%, Attack −15%",
+  "Mastery of Fasting": "Gets hungry 20% slower",
+  "Mercy Hit": "Its hits can't take a target below 1 Health",
+  "Mine Foreman": "You mine 25% faster",
+  "Motivational Leader": "You work 25% faster",
+  "Musclehead": "Attack +30%, Work Speed −50%",
+  "Night Owl": "Naps through the day because it's nocturnal",
+  "Nimble": "Speed +10%",
+  "Noble": "Its items sell for 5% more",
+  "Otherworldly Cells": "Attack +10%, Fire and Electric damage taken −15%",
+  "Pacifist": "Attack −20%",
+  "Philanthropist": "Breeds twice as fast on a Breeding Farm",
+  "Positive Thinker": "Loses SAN 10% slower",
+  "Power of Gaia": "Ground damage +10%",
+  "Pyromaniac": "Fire damage +10%",
+  "Ranch Master": "Farming +2",
+  "Reload Master": "You reload 4% faster",
+  "Remarkable Craftsmanship": "Work Speed +75%",
+  "Runner": "Speed +20%",
+  "Sadist": "Attack +15%, Defense −15%",
+  "Sanctified Meat Shield": "Defense +50%, Attack −30%, World Tree resources stay when it comes near",
+  "Savior": "Neutral and Grass damage +30%",
+  "Serenity": "Active Skills recharge 30% faster, Attack +10%",
+  "Serious": "Work Speed +20%",
+  "Service-Minded": "Drops +50%",
+  "Shabby": "Its items sell for 10% less",
+  "Sickly": "Max Stamina −25% (mounts only)",
+  "Siren of the Void": "Dark and Ice damage +30%",
+  "Sky Strider": "Two extra jumps while ridden",
+  "Slacker": "Work Speed −30%",
+  "Sleek Stroke": "Speed on water +30%",
+  "Spirit Emperor": "Grass damage +30%",
+  "Spirit of Zen": "Neutral damage +10%",
+  "Stronghold Strategist": "Your Defense +10%",
+  "Suntan Lover": "Fire damage taken −10%",
+  "Swift": "Speed +30%",
+  "Twin-Edged Holy Blade": "Attack +50%, Defense −30%, World Tree resources stay when it comes near",
+  "Unstable": "Loses SAN 10% faster",
+  "Vampiric": "Heals 5% of damage dealt, keeps working through the night",
+  "Vanguard": "Your Attack +10%",
+  "Veil of Darkness": "Dark damage +10%",
+  "Waterproof": "Water damage taken −10%",
+  "Wellness Watcher": "You use 5% less Stamina",
+  "Whopper": "Water and Ice damage +5%, Defense +5%",
+  "Work Slave": "Work Speed +30%, Attack −30%",
+  "Workaholic": "Loses SAN 15% slower",
+  "World Tree's Bounty": "Gets hungry 50% slower, Health −20%, World Tree resources stay when it comes near",
+};
+// Pal: [types, rarity, size, activity, partner ability, work suitability, regions]
+const PALS = {
+  "Lamball": [["Neutral"], "Common", "XS", "Daytime", "Fluffy Shield", ["Handiwork", "Transporting", "Farming"], ["Sea Breeze Archipelago", "Marsh Island", "Eastern Wild Island", "Windswept Hills"]],
+  "Cattiva": [["Neutral"], "Common", "XS", "Daytime", "Cat Helper", ["Handiwork", "Gathering", "Mining", "Transporting"], ["Sea Breeze Archipelago", "Isle of Silence", "Windswept Hills", "Twilight Dunes", "Mt. Obsidian", "Astral Mountains", "Feybreak"]],
+  "Chikipi": [["Neutral"], "Common", "XS", "Daytime", "Egg Layer", ["Gathering", "Farming"], ["Marsh Island", "Eastern Wild Island", "Windswept Hills", "Mt. Obsidian"]],
+  "Lifmunk": [["Grass"], "Common", "XS", "Daytime", "Lifmunk Recoil", ["Planting", "Handiwork", "Gathering", "Lumbering", "Medicine Production"], ["Sea Breeze Archipelago", "Marsh Island", "Windswept Hills", "Bamboo Grove", "Astral Mountains"]],
+  "Fuack": [["Water"], "Common", "XS", "Daytime", "Surfing Slam", ["Watering", "Handiwork", "Transporting"], ["Sea Breeze Archipelago", "Marsh Island", "Isle of Silence", "Windswept Hills", "Bamboo Grove", "Verdant Brook", "Mt. Obsidian"]],
+  "Fuack Ignis": [["Water", "Fire"], "Common", "XS", "Daytime", "Fire Tackle", ["Kindling", "Watering", "Handiwork", "Transporting"], ["Mt. Obsidian", "Feybreak"]],
+  "Vixy": [["Neutral"], "Common", "XS", "Daytime", "Dig Here!", ["Gathering", "Farming"], ["Sea Breeze Archipelago", "Windswept Hills", "Twilight Dunes"]],
+  "Celaray": [["Water"], "Common", "M", "Daytime", "Zephyr Glider", ["Watering", "Transporting"], ["Sea Breeze Archipelago", "Marsh Island", "Isle of Silence", "Windswept Hills", "Bamboo Grove", "Mt. Obsidian"]],
+  "Celaray Lux": [["Water", "Electric"], "Common", "M", "Daytime", "Jolt Glider", ["Watering", "Generating Electricity", "Transporting"], ["Twilight Dunes", "Outlying Isles"]],
+  "Cremis": [["Neutral"], "Common", "XS", "Daytime", "Fluffy Wool", ["Gathering", "Farming"], ["Sea Breeze Archipelago", "Marsh Island", "Isle of Silence", "Windswept Hills", "Twilight Dunes", "Astral Mountains"]],
+  "Croajiro": [["Water"], "Common", "XS", "Daytime", "Leap Stance", ["Watering", "Handiwork", "Gathering", "Transporting"], ["Sea Breeze Archipelago", "Windswept Hills", "Verdant Brook", "Sakurajima"]],
+  "Croajiro Noct": [["Water", "Dark"], "Rare", "XS", "Nocturnal", "Shadow Stance", ["Watering", "Handiwork", "Gathering", "Transporting"], ["Feybreak"]],
+  "Herbil": [["Grass", "Neutral"], "Common", "XS", "Daytime", "Herbil Pulse", ["Planting", "Gathering", "Transporting"], ["Twilight Dunes", "Bamboo Grove", "Outlying Isles"]],
+  "Teafant": [["Water"], "Common", "M", "Daytime", "Soothing Shower", ["Watering"], ["Sea Breeze Archipelago", "Eastern Wild Island", "Isle of Silence", "Windswept Hills", "Astral Mountains"]],
+  "Gumoss": [["Grass", "Ground"], "Common", "XS", "Daytime", "Logging Assistance", ["Planting"], ["Sea Breeze Archipelago", "Windswept Hills"]],
+  "Pupperai": [["Ground"], "Common", "XS", "Daytime", "Best Boy", ["Gathering", "Lumbering", "Transporting"], ["Windswept Hills"]],
+  "Clovee": [["Grass", "Neutral"], "Common", "XS", "Daytime", "Happy Clover", ["Planting", "Gathering"], ["Windswept Hills"]],
+  "Jolthog": [["Electric"], "Common", "XS", "Daytime", "Jolt Bomb", ["Generating Electricity"], ["Windswept Hills", "Twilight Dunes"]],
+  "Jolthog Cryst": [["Ice"], "Common", "XS", "Daytime", "Cold Bomb", ["Cooling"], ["Bamboo Grove", "Verdant Brook", "Outlying Isles"]],
+  "Depresso": [["Dark"], "Common", "XS", "Nocturnal", "Caffeine Inoculation", ["Handiwork", "Mining", "Transporting", "Farming"], ["Sea Breeze Archipelago", "Marsh Island", "Eastern Wild Island", "Windswept Hills", "Bamboo Grove", "Verdant Brook", "Mt. Obsidian", "Sakurajima", "Outlying Isles"]],
+  "Pengullet": [["Water", "Ice"], "Common", "XS", "Daytime", "Pengullet Launcher", ["Watering", "Handiwork", "Cooling", "Transporting"], ["Sea Breeze Archipelago", "Marsh Island", "Eastern Wild Island", "Isle of Silence", "Windswept Hills", "Twilight Dunes", "Mt. Obsidian", "Astral Mountains"]],
+  "Pengullet Lux": [["Water", "Electric"], "Common", "XS", "Daytime", "Pengullet Lux Launcher", ["Watering", "Generating Electricity", "Handiwork", "Transporting"], ["Twilight Dunes", "Verdant Brook", "Outlying Isles"]],
+  "Penking": [["Water", "Ice"], "Rare", "M", "Daytime", "Brave Sailor", ["Watering", "Handiwork", "Mining", "Cooling", "Transporting"], ["Windswept Hills", "Verdant Brook", "Astral Mountains", "Outlying Isles"]],
+  "Penking Lux": [["Water", "Electric"], "Rare", "M", "Daytime", "Unyielding Storm Commander", ["Watering", "Generating Electricity", "Handiwork", "Mining", "Transporting"], ["Sakurajima"]],
+  "Hoocrates": [["Dark"], "Common", "XS", "Nocturnal", "Dark Knowledge", ["Gathering"], ["Sea Breeze Archipelago", "Windswept Hills", "Bamboo Grove", "Astral Mountains"]],
+  "Melpaca": [["Neutral"], "Common", "M", "Daytime", "Pacapaca Wool", ["Farming"], ["Sea Breeze Archipelago", "Marsh Island", "Eastern Wild Island", "Windswept Hills"]],
+  "Kingpaca": [["Neutral"], "Epic", "XL", "Daytime", "King of Muscles", ["Gathering"], ["Windswept Hills", "World Tree"]],
+  "Kingpaca Cryst": [["Ice"], "Epic", "XL", "Daytime", "Coldhearted King", ["Gathering", "Cooling"], ["Sakurajima"]],
+  "Daedream": [["Dark"], "Common", "XS", "Nocturnal", "Dream Chaser", ["Handiwork", "Gathering", "Transporting"], ["Sea Breeze Archipelago", "Windswept Hills"]],
+  "Tanzee": [["Grass"], "Common", "XS", "Daytime", "Cheery Rifle", ["Planting", "Handiwork", "Gathering", "Lumbering", "Transporting"], ["Sea Breeze Archipelago", "Isle of Silence", "Windswept Hills", "Astral Mountains"]],
+  "Tanzee Ignis": [["Fire"], "Common", "XS", "Daytime", "Chipper Chimp Gunfire", ["Kindling", "Handiwork", "Lumbering", "Transporting"], ["Windswept Hills"]],
+  "Nox": [["Dark"], "Rare", "XS", "Nocturnal", "Kuudere", ["Gathering"], ["Isle of Silence", "Windswept Hills", "Astral Mountains", "Feybreak"]],
+  "Flambelle": [["Fire"], "Common", "XS", "Daytime", "Magma Tears", ["Kindling", "Handiwork", "Transporting", "Farming"], ["Eastern Wild Island", "Isle of Silence", "Verdant Brook", "Mt. Obsidian"]],
+  "Rooby": [["Fire"], "Common", "S", "Daytime", "Tiny Spark", ["Kindling", "Farming"], ["Sea Breeze Archipelago", "Marsh Island", "Windswept Hills", "Verdant Brook", "Astral Mountains"]],
+  "Mau": [["Dark"], "Common", "XS", "Nocturnal", "Gold Digger", ["Gathering", "Farming"], ["Twilight Dunes", "Mt. Obsidian", "Feybreak"]],
+  "Mau Cryst": [["Ice"], "Common", "XS", "Daytime", "Icy Whispers", ["Cooling", "Farming"], ["Astral Mountains", "Outlying Isles"]],
+  "Rushoar": [["Ground"], "Common", "S", "Daytime", "Hard Head", ["Mining"], ["Sea Breeze Archipelago", "Marsh Island", "Windswept Hills"]],
+  "Foxparks": [["Fire"], "Common", "XS", "Daytime", "Huggy Fire", ["Kindling"], ["Windswept Hills"]],
+  "Foxparks Cryst": [["Ice"], "Common", "XS", "Daytime", "Huggy Frost", ["Cooling"], ["Isle of Silence", "Astral Mountains"]],
+  "Killamari": [["Dark", "Water"], "Common", "XS", "Nocturnal", "Fried Squid", ["Watering", "Gathering", "Transporting"], ["Verdant Brook", "Feybreak"]],
+  "Killamari Primo": [["Neutral", "Water"], "Common", "XS", "Daytime", "Fried Killamari", ["Watering", "Gathering", "Transporting"], ["Twilight Dunes", "Mt. Obsidian"]],
+  "Fuddler": [["Ground"], "Common", "XS", "Daytime", "Mining Assistance", ["Handiwork", "Mining", "Transporting"], ["Windswept Hills", "Twilight Dunes", "Mt. Obsidian", "Feybreak"]],
+  "Eikthyrdeer": [["Neutral"], "Rare", "L", "Daytime", "Guardian of the Forest", ["Lumbering"], ["Sea Breeze Archipelago", "Marsh Island", "Windswept Hills", "World Tree"]],
+  "Eikthyrdeer Terra": [["Ground"], "Rare", "L", "Daytime", "Guardian of the Golden Forest", ["Lumbering"], ["Windswept Hills", "World Tree"]],
+  "Direhowl": [["Neutral"], "Common", "S", "Daytime", "Direhowl Rider", ["Gathering"], ["Sea Breeze Archipelago", "Marsh Island", "Twilight Dunes", "Bamboo Grove"]],
+  "Caprity": [["Grass"], "Common", "S", "Daytime", "Berry Picker", ["Planting", "Farming"], ["Isle of Silence", "Windswept Hills", "Verdant Brook", "Astral Mountains"]],
+  "Caprity Noct": [["Dark"], "Common", "S", "Nocturnal", "Venom Picker", ["Planting", "Farming"], ["Sea Breeze Archipelago", "Feybreak"]],
+  "Swee": [["Ice"], "Common", "XS", "Daytime", "Fluffy", ["Gathering", "Cooling"], ["Twilight Dunes", "Bamboo Grove", "Verdant Brook", "Astral Mountains"]],
+  "Sweepa": [["Ice"], "Rare", "L", "Daytime", "King of Fluff", ["Gathering", "Cooling"], ["Sea Breeze Archipelago", "Twilight Dunes", "Bamboo Grove", "Astral Mountains"]],
+  "Turtacle": [["Water"], "Common", "M", "Daytime", "Spikey Carrier", ["Watering", "Mining", "Transporting"], ["Sea Breeze Archipelago", "Windswept Hills", "Twilight Dunes", "Verdant Brook"]],
+  "Turtacle Terra": [["Water", "Ground"], "Common", "M", "Daytime", "Shiny Hauler", ["Watering", "Mining", "Transporting"], ["Twilight Dunes", "Sakurajima", "Outlying Isles"]],
+  "Hangyu": [["Ground"], "Common", "XS", "Daytime", "Flying Trapeze", ["Handiwork", "Gathering", "Transporting"], ["Twilight Dunes", "Bamboo Grove", "Mt. Obsidian"]],
+  "Hangyu Cryst": [["Ice"], "Common", "XS", "Daytime", "Winter Trapeze", ["Handiwork", "Gathering", "Cooling", "Transporting"], ["Twilight Dunes", "Astral Mountains"]],
+  "Woolipop": [["Neutral"], "Common", "S", "Daytime", "Candy Pop", ["Farming"], ["Sea Breeze Archipelago", "Bamboo Grove", "Mt. Obsidian"]],
+  "Woolipop Terra": [["Ground"], "Common", "S", "Daytime", "Bitter Pop", ["Farming"], ["Outlying Isles"]],
+  "Mozzarina": [["Neutral"], "Common", "S", "Daytime", "Milk Maker", ["Farming"], ["Marsh Island", "Windswept Hills"]],
+  "Azurobe": [["Water", "Dragon"], "Rare", "L", "Daytime", "Waterwing Dance", ["Watering"], ["Bamboo Grove", "Verdant Brook", "Outlying Isles", "World Tree"]],
+  "Azurobe Cryst": [["Ice", "Dragon"], "Epic", "L", "Daytime", "Icewing Dance", ["Cooling"], ["Feybreak", "Outlying Isles", "World Tree"]],
+  "Sparkit": [["Electric"], "Common", "XS", "Daytime", "Static Electricity", ["Generating Electricity", "Handiwork", "Transporting", "Farming"], ["Sea Breeze Archipelago", "Windswept Hills", "Mt. Obsidian"]],
+  "Kelpsea": [["Water"], "Common", "XS", "Daytime", "Aqua Spout", ["Watering", "Farming"], ["Sea Breeze Archipelago", "Marsh Island", "Windswept Hills", "Twilight Dunes", "Bamboo Grove"]],
+  "Kelpsea Ignis": [["Fire"], "Common", "XS", "Daytime", "Lava Spout", ["Kindling", "Farming"], ["Mt. Obsidian", "Feybreak"]],
+  "Ribbuny": [["Neutral"], "Common", "XS", "Daytime", "Happy-Go-Lucky Bunny", ["Handiwork", "Gathering", "Transporting"], ["Eastern Wild Island", "Isle of Silence", "Verdant Brook", "Astral Mountains", "Feybreak"]],
+  "Ribbuny Botan": [["Grass"], "Common", "XS", "Daytime", "Ground 'n' Pound", ["Planting", "Handiwork", "Gathering", "Transporting"], ["Bamboo Grove", "Verdant Brook", "Mt. Obsidian"]],
+  "Jelliette": [["Water"], "Common", "S", "Daytime", "Jelliette Drop", ["Watering", "Handiwork", "Transporting"], ["Windswept Hills", "Feybreak"]],
+  "Jellroy": [["Water", "Dark"], "Common", "S", "Nocturnal", "Jellroy Drop", ["Watering", "Handiwork", "Medicine Production", "Transporting"], ["Windswept Hills", "Feybreak"]],
+  "Amione": [["Water"], "Common", "XS", "Daytime", "Magical Twin Powers", ["Watering", "Handiwork", "Transporting"], ["Windswept Hills", "Outlying Isles"]],
+  "Gloopie": [["Water", "Dark"], "Rare", "S", "Nocturnal", "Sticky Princess", ["Watering", "Handiwork", "Transporting"], ["Sakurajima", "Feybreak"]],
+  "Gloopie Primo": [["Water", "Neutral"], "Rare", "S", "Daytime", "Cephalo-Princess", ["Watering", "Handiwork", "Transporting"], ["Outlying Isles", "World Tree"]],
+  "Galeclaw": [["Neutral"], "Common", "M", "Daytime", "Galeclaw Glider", ["Gathering"], ["Twilight Dunes", "Bamboo Grove", "Verdant Brook", "Mt. Obsidian"]],
+  "Wispaw": [["Dark"], "Rare", "S", "Nocturnal", "Death-Cheating Feline", ["Handiwork", "Lumbering", "Medicine Production", "Transporting"], ["Marsh Island", "Windswept Hills", "World Tree"]],
+  "Nitewing": [["Neutral"], "Common", "M", "Daytime", "Travel Companion", ["Gathering"], ["Sea Breeze Archipelago", "Marsh Island", "Windswept Hills", "Twilight Dunes", "Bamboo Grove"]],
+  "Tombat": [["Dark"], "Rare", "M", "Nocturnal", "Ultrasonic Sensor", ["Gathering", "Mining", "Transporting"], ["Sea Breeze Archipelago", "Marsh Island", "Windswept Hills", "Outlying Isles"]],
+  "Tocotoco": [["Neutral"], "Common", "S", "Daytime", "Eggbomb Launcher", ["Gathering"], ["Twilight Dunes", "Verdant Brook", "Sakurajima", "Outlying Isles"]],
+  "Univolt": [["Electric"], "Rare", "M", "Daytime", "Swift Deity", ["Generating Electricity", "Lumbering"], ["Sea Breeze Archipelago", "Bamboo Grove", "World Tree"]],
+  "Univolt Cryst": [["Ice"], "Rare", "M", "Daytime", "Frigid Deity", ["Lumbering", "Cooling"], ["World Tree"]],
+  "Gobfin": [["Water"], "Common", "S", "Daytime", "Angry Shark", ["Watering", "Handiwork", "Transporting"], ["Bamboo Grove", "Verdant Brook", "Mt. Obsidian", "Outlying Isles"]],
+  "Gobfin Ignis": [["Fire"], "Common", "S", "Daytime", "Angry Shark", ["Kindling", "Handiwork", "Transporting"], ["Mt. Obsidian", "Outlying Isles"]],
+  "Loupmoon": [["Dark"], "Common", "M", "Nocturnal", "Dark Gleam Strike", ["Handiwork"], ["Bamboo Grove", "Verdant Brook"]],
+  "Loupmoon Cryst": [["Ice"], "Common", "M", "Daytime", "Frozen Gleam Strike", ["Handiwork", "Cooling"], ["Astral Mountains", "Feybreak"]],
+  "Cawgnito": [["Dark"], "Common", "M", "Nocturnal", "Eerie Nightstreaker", ["Lumbering", "Farming"], ["Eastern Wild Island", "Windswept Hills", "Twilight Dunes", "Bamboo Grove", "Mt. Obsidian"]],
+  "Arsox": [["Fire"], "Common", "M", "Daytime", "Warm Body", ["Kindling", "Lumbering"], ["Marsh Island", "Windswept Hills", "Bamboo Grove", "Verdant Brook", "Mt. Obsidian", "Astral Mountains"]],
+  "Muffly": [["Ice"], "Common", "XS", "Daytime", "Fluffy Flutterer", ["Cooling", "Transporting"], ["Windswept Hills", "Verdant Brook", "Outlying Isles"]],
+  "Bristla": [["Grass"], "Common", "S", "Daytime", "Princess Gaze", ["Planting", "Handiwork", "Gathering", "Medicine Production", "Transporting"], ["Windswept Hills", "Verdant Brook"]],
+  "Cinnamoth": [["Grass"], "Common", "M", "Daytime", "Mysterious Scales", ["Planting", "Gathering", "Medicine Production"], ["Windswept Hills", "Verdant Brook"]],
+  "Puffolt": [["Electric"], "Common", "XS", "Daytime", "Crackle Booster", ["Generating Electricity", "Transporting"], ["Bamboo Grove", "Verdant Brook", "Outlying Isles"]],
+  "Elphidran": [["Dragon"], "Rare", "L", "Daytime", "Amicable Holy Dragon", ["Lumbering"], ["Windswept Hills", "Verdant Brook", "World Tree"]],
+  "Elphidran Aqua": [["Dragon", "Water"], "Epic", "L", "Daytime", "Amicable Water Dragon", ["Watering", "Lumbering"], ["Verdant Brook", "Sakurajima", "World Tree"]],
+  "Vanwyrm": [["Fire", "Dark"], "Rare", "L", "Nocturnal", "Aerial Marauder", ["Kindling", "Transporting"], ["Twilight Dunes", "Mt. Obsidian", "Feybreak", "Outlying Isles"]],
+  "Vanwyrm Cryst": [["Ice", "Dark"], "Rare", "L", "Nocturnal", "Aerial Marauder", ["Cooling", "Transporting"], ["Verdant Brook", "Astral Mountains", "Feybreak"]],
+  "Felbat": [["Dark"], "Rare", "M", "Nocturnal", "Life Steal", ["Medicine Production"], ["Feybreak"]],
+  "Vaelet": [["Grass"], "Epic", "M", "Daytime", "Purification of Gaia", ["Planting", "Handiwork", "Gathering", "Medicine Production", "Transporting", "Farming"], ["Windswept Hills", "Verdant Brook", "Sakurajima"]],
+  "Beegarde": [["Grass"], "Common", "M", "Daytime", "Worker Bee", ["Planting", "Handiwork", "Gathering", "Lumbering", "Medicine Production", "Transporting", "Farming"], ["Verdant Brook"]],
+  "Elizabee": [["Grass"], "Epic", "L", "Daytime", "Queen Bee Command", ["Planting", "Handiwork", "Gathering", "Lumbering", "Medicine Production"], ["Verdant Brook"]],
+  "Lovander": [["Dark"], "Rare", "L", "Nocturnal", "Heart Drain", ["Handiwork", "Mining", "Medicine Production", "Transporting"], ["Twilight Dunes"]],
+  "Grintale": [["Neutral"], "Rare", "M", "Daytime", "Glaring Cat's Eye", ["Gathering"], ["Marsh Island", "Windswept Hills", "Verdant Brook", "Sakurajima"]],
+  "Tarantriss": [["Dark"], "Common", "S", "Nocturnal", "Tarantriss’ Web", ["Handiwork", "Gathering", "Medicine Production", "Transporting"], ["Verdant Brook", "Mt. Obsidian"]],
+  "Polapup": [["Ice", "Water"], "Rare", "S", "Daytime", "Rider of the Snowy Mountain", ["Watering", "Cooling"], ["Verdant Brook", "Feybreak", "Outlying Isles"]],
+  "Polapup Terra": [["Ice", "Ground"], "Rare", "S", "Daytime", "Snowy Mountain Slider", ["Mining", "Cooling"], ["Outlying Isles"]],
+  "Leezpunk": [["Dark"], "Common", "S", "Nocturnal", "Too Cool to be Seen", ["Handiwork", "Gathering", "Transporting"], ["Windswept Hills", "Twilight Dunes", "Mt. Obsidian", "Feybreak", "Outlying Isles"]],
+  "Leezpunk Ignis": [["Fire"], "Common", "S", "Daytime", "Too Cool to be Seen", ["Kindling", "Handiwork", "Gathering", "Transporting"], ["Mt. Obsidian", "Outlying Isles"]],
+  "Gorirat": [["Neutral"], "Rare", "S", "Daytime", "Full-Power Gorilla Mode", ["Handiwork", "Lumbering", "Transporting"], ["Verdant Brook", "World Tree"]],
+  "Gorirat Terra": [["Ground"], "Rare", "S", "Daytime", "Full-Power Gorilla Pound", ["Handiwork", "Mining", "Transporting"], ["Twilight Dunes", "World Tree"]],
+  "Surfent": [["Water"], "Common", "M", "Daytime", "Swift Swimmer", ["Watering", "Farming"], ["Twilight Dunes", "Bamboo Grove", "Verdant Brook"]],
+  "Surfent Terra": [["Ground"], "Rare", "M", "Daytime", "Sand Swimmer", ["Gathering"], ["Twilight Dunes", "Verdant Brook", "Feybreak"]],
+  "Robinquill": [["Grass"], "Rare", "M", "Daytime", "Grounded Archer", ["Planting", "Handiwork", "Gathering", "Lumbering", "Medicine Production", "Transporting"], ["Verdant Brook"]],
+  "Robinquill Terra": [["Grass", "Ground"], "Rare", "M", "Daytime", "Master Archer", ["Handiwork", "Gathering", "Lumbering", "Medicine Production", "Transporting"], ["Twilight Dunes", "Verdant Brook", "Outlying Isles"]],
+  "Flopie": [["Grass"], "Common", "XS", "Daytime", "Helper Bunny", ["Planting", "Handiwork", "Gathering", "Medicine Production", "Transporting"], ["Verdant Brook"]],
+  "Wixen": [["Fire"], "Rare", "M", "Daytime", "Lord Fox", ["Kindling", "Handiwork", "Transporting"], ["Twilight Dunes", "Verdant Brook", "Mt. Obsidian", "Outlying Isles"]],
+  "Wixen Noct": [["Fire", "Dark"], "Rare", "M", "Nocturnal", "Black Fox Lord", ["Kindling", "Handiwork", "Transporting"], ["Sakurajima"]],
+  "Katress": [["Dark"], "Rare", "M", "Nocturnal", "Mystical Black Magic", ["Handiwork", "Medicine Production", "Transporting"], ["Verdant Brook", "Mt. Obsidian", "Feybreak"]],
+  "Katress Ignis": [["Dark", "Fire"], "Rare", "M", "Nocturnal", "Blazing Black Magic", ["Kindling", "Handiwork", "Medicine Production", "Transporting"], ["Feybreak"]],
+  "Helzephyr": [["Dark"], "Rare", "L", "Nocturnal", "Wings of Death", ["Transporting"], ["Twilight Dunes", "Verdant Brook", "Feybreak", "World Tree"]],
+  "Helzephyr Lux": [["Dark", "Electric"], "Epic", "L", "Nocturnal", "Wings of Thunder", ["Generating Electricity", "Transporting"], ["Sakurajima", "World Tree"]],
+  "Elgrove": [["Grass"], "Rare", "L", "Daytime", "Mother Nature's Menace", ["Planting", "Gathering", "Lumbering", "Mining", "Transporting"], ["Windswept Hills", "Bamboo Grove", "Verdant Brook", "World Tree"]],
+  "Elgrove Cryst": [["Ice"], "Rare", "L", "Daytime", "Father Winter's Threat", ["Lumbering", "Mining", "Cooling", "Transporting"], ["World Tree"]],
+  "Lunaris": [["Neutral"], "Rare", "M", "Daytime", "Antigravity", ["Handiwork", "Gathering", "Transporting"], ["Windswept Hills", "Verdant Brook", "Astral Mountains"]],
+  "Fenglope": [["Neutral"], "Common", "S", "Daytime", "Wind and Clouds", ["Lumbering"], ["Twilight Dunes", "Mt. Obsidian", "World Tree"]],
+  "Fenglope Lux": [["Electric"], "Common", "S", "Daytime", "Stormcloud", ["Generating Electricity", "Lumbering"], ["Feybreak", "World Tree"]],
+  "Dinossom": [["Grass", "Dragon"], "Rare", "L", "Daytime", "Fragrant Dragon", ["Planting", "Lumbering"], ["Sea Breeze Archipelago", "Marsh Island", "Eastern Wild Island"]],
+  "Dinossom Lux": [["Electric", "Dragon"], "Rare", "L", "Daytime", "Thunder Dragon", ["Generating Electricity", "Lumbering"], ["Twilight Dunes", "Verdant Brook"]],
+  "Bushi": [["Fire"], "Rare", "M", "Daytime", "Brandish Blade", ["Kindling", "Handiwork", "Gathering", "Lumbering", "Transporting"], ["Twilight Dunes", "Bamboo Grove", "Mt. Obsidian", "Astral Mountains"]],
+  "Bushi Noct": [["Fire", "Dark"], "Rare", "M", "Nocturnal", "Void Blade", ["Kindling", "Handiwork", "Gathering", "Lumbering", "Transporting"], ["Feybreak"]],
+  "Munchill": [["Ice", "Water"], "Common", "S", "Daytime", "Icy Maw", ["Watering", "Cooling", "Transporting"], ["Feybreak", "Outlying Isles"]],
+  "Mammorest": [["Grass", "Ground"], "Epic", "XL", "Daytime", "Gaia Crusher", ["Planting", "Lumbering", "Mining"], ["Windswept Hills", "Bamboo Grove", "Astral Mountains", "World Tree"]],
+  "Mammorest Cryst": [["Ice", "Ground"], "Epic", "XL", "Daytime", "Ice Crusher", ["Lumbering", "Mining", "Cooling"], ["Astral Mountains", "World Tree"]],
+  "Finsider": [["Water"], "Common", "S", "Daytime", "Water Gun", ["Watering", "Transporting"], ["Twilight Dunes", "Outlying Isles"]],
+  "Finsider Ignis": [["Water", "Fire"], "Common", "S", "Daytime", "Ember Chamber", ["Kindling", "Watering", "Transporting"], ["Feybreak", "Outlying Isles"]],
+  "Petallia": [["Grass"], "Epic", "M", "Daytime", "Blessing of the Flower Spirit", ["Planting", "Handiwork", "Gathering", "Medicine Production", "Transporting"], ["Verdant Brook", "Sakurajima"]],
+  "Petallia Ignis": [["Grass", "Fire"], "Epic", "M", "Daytime", "Passion of the Flower Spirit", ["Kindling", "Handiwork", "Gathering", "Medicine Production", "Transporting"], ["World Tree"]],
+  "Leafan": [["Grass"], "Rare", "S", "Daytime", "Selfless Discipline", ["Planting", "Handiwork", "Gathering", "Transporting"], ["Verdant Brook", "Outlying Isles"]],
+  "Incineram": [["Fire", "Dark"], "Common", "M", "Nocturnal", "Flameclaw Hunter", ["Kindling", "Handiwork", "Mining", "Transporting"], ["Windswept Hills", "Verdant Brook", "Mt. Obsidian"]],
+  "Incineram Noct": [["Dark"], "Rare", "M", "Nocturnal", "Darkclaw Hunter", ["Handiwork", "Mining", "Transporting"], ["Windswept Hills", "Mt. Obsidian", "Feybreak", "Outlying Isles"]],
+  "Dazzi": [["Electric"], "Common", "XS", "Daytime", "Lady of Lightning", ["Generating Electricity", "Handiwork", "Transporting"], ["Twilight Dunes", "Astral Mountains"]],
+  "Dazzi Noct": [["Dark", "Electric"], "Common", "XS", "Nocturnal", "Lady of Dark Lightning", ["Generating Electricity", "Handiwork", "Medicine Production", "Transporting"], ["Feybreak", "Outlying Isles"]],
+  "Pyrin": [["Fire"], "Rare", "L", "Daytime", "Red Hare", ["Kindling", "Lumbering"], ["Mt. Obsidian", "Feybreak", "Outlying Isles", "World Tree"]],
+  "Pyrin Noct": [["Fire", "Dark"], "Rare", "L", "Nocturnal", "Black Hare", ["Kindling", "Lumbering"], ["Mt. Obsidian", "Outlying Isles", "World Tree"]],
+  "Relaxaurus": [["Dragon", "Water"], "Epic", "XL", "Daytime", "Hungry Missile", ["Watering", "Transporting"], ["Bamboo Grove", "Verdant Brook", "Mt. Obsidian", "Feybreak", "World Tree"]],
+  "Relaxaurus Lux": [["Dragon", "Electric"], "Epic", "XL", "Daytime", "Missile Party", ["Generating Electricity", "Transporting"], ["Feybreak", "Outlying Isles", "World Tree"]],
+  "Foxcicle": [["Ice"], "Rare", "S", "Daytime", "Aurora Guide", ["Cooling", "Farming"], ["Windswept Hills", "Verdant Brook", "Astral Mountains"]],
+  "Beakon": [["Electric"], "Rare", "L", "Daytime", "Thunderous", ["Generating Electricity", "Gathering", "Transporting"], ["Twilight Dunes", "Verdant Brook", "World Tree"]],
+  "Beakon Cryst": [["Ice"], "Rare", "L", "Daytime", "Coldsnap", ["Gathering", "Cooling", "Transporting"], ["World Tree"]],
+  "Ghangler": [["Dark", "Water"], "Rare", "M", "Nocturnal", "Master of Darkness", ["Watering", "Transporting"], ["Sakurajima", "Feybreak"]],
+  "Ghangler Ignis": [["Fire", "Water"], "Rare", "M", "Daytime", "Abyssal Celebrity Chef", ["Kindling", "Watering", "Transporting"], ["Feybreak", "Outlying Isles"]],
+  "Rayhound": [["Electric"], "Rare", "M", "Daytime", "Lightning Shepherd", ["Generating Electricity"], ["Mt. Obsidian", "Astral Mountains", "Feybreak"]],
+  "Rayhound Cryst": [["Ice"], "Rare", "M", "Daytime", "Snow Shepherd", ["Cooling"], ["Astral Mountains", "World Tree"]],
+  "Menasting": [["Dark", "Ground"], "Epic", "L", "Nocturnal", "Steel Scorpion", ["Lumbering", "Mining"], ["Twilight Dunes", "Verdant Brook", "Outlying Isles"]],
+  "Menasting Terra": [["Ground"], "Epic", "L", "Daytime", "Golden Scorpion", ["Lumbering", "Mining"], ["Twilight Dunes", "Sakurajima"]],
+  "Needoll": [["Grass"], "Common", "XS", "Daytime", "Hug Me Please", ["Planting", "Gathering", "Transporting"], ["Twilight Dunes", "Verdant Brook", "Outlying Isles"]],
+  "Needoll Noct": [["Dark", "Grass"], "Common", "XS", "Nocturnal", "Hug You So Much", ["Planting", "Gathering", "Transporting"], ["Twilight Dunes", "Verdant Brook"]],
+  "Reindrix": [["Ice"], "Common", "M", "Daytime", "Cool Body", ["Lumbering", "Cooling"], ["Verdant Brook", "Astral Mountains", "World Tree"]],
+  "Mossanda": [["Grass"], "Rare", "L", "Daytime", "Grenadier Panda", ["Planting", "Handiwork", "Lumbering", "Transporting"], ["Verdant Brook", "World Tree"]],
+  "Mossanda Lux": [["Electric"], "Rare", "L", "Daytime", "Grenadier Panda", ["Generating Electricity", "Handiwork", "Lumbering", "Transporting"], ["Eastern Wild Island", "World Tree"]],
+  "Chillet": [["Ice", "Dragon"], "Common", "M", "Daytime", "Wriggling Weasel", ["Gathering", "Cooling"], ["Windswept Hills", "Astral Mountains", "World Tree"]],
+  "Chillet Ignis": [["Fire", "Dragon"], "Rare", "M", "Daytime", "Sparkling Weasel", ["Kindling", "Gathering"], ["Sakurajima", "World Tree"]],
+  "Ragnahawk": [["Fire"], "Rare", "L", "Daytime", "Flame Wing", ["Kindling", "Transporting"], ["Mt. Obsidian", "Feybreak", "Outlying Isles", "World Tree"]],
+  "Moldron": [["Fire", "Ground"], "Rare", "L", "Daytime", "Magma Overload", ["Kindling", "Mining"], ["Mt. Obsidian", "Feybreak", "World Tree"]],
+  "Moldron Cryst": [["Ice", "Ground"], "Epic", "L", "Daytime", "Ice Overload", ["Mining", "Cooling"], ["No wild spawn"]],
+  "Palumba": [["Grass"], "Rare", "M", "Daytime", "Samba Step", ["Planting", "Gathering", "Mining"], ["Twilight Dunes", "Outlying Isles"]],
+  "Digtoise": [["Ground"], "Rare", "M", "Daytime", "Drill Crusher", ["Mining"], ["Windswept Hills", "Twilight Dunes", "Outlying Isles"]],
+  "Broncherry": [["Grass"], "Epic", "XL", "Daytime", "Love's First Blossom", ["Planting"], ["Sea Breeze Archipelago", "Marsh Island", "Eastern Wild Island", "Bamboo Grove", "Verdant Brook", "World Tree"]],
+  "Broncherry Aqua": [["Grass", "Water"], "Epic", "XL", "Daytime", "Purity's Full Bloom", ["Watering"], ["Verdant Brook", "World Tree"]],
+  "Dumud": [["Ground", "Water"], "Common", "M", "Daytime", "Soil Improver", ["Watering", "Mining", "Transporting", "Farming"], ["Windswept Hills", "Twilight Dunes", "Bamboo Grove", "Mt. Obsidian", "Astral Mountains", "Outlying Isles"]],
+  "Dumud Gild": [["Ground", "Water"], "Rare", "M", "Daytime", "Golden Harvest", ["Watering", "Mining", "Transporting", "Farming"], ["Mt. Obsidian", "Sakurajima"]],
+  "Braloha": [["Grass", "Ground"], "Epic", "XL", "Daytime", "Balmy Weather", ["Planting", "Gathering", "Mining"], ["Sea Breeze Archipelago", "Isle of Silence", "Astral Mountains", "World Tree"]],
+  "Kitsun": [["Fire"], "Rare", "M", "Daytime", "Wolf of the Sun", ["Kindling"], ["Verdant Brook", "Mt. Obsidian"]],
+  "Kitsun Noct": [["Dark"], "Rare", "M", "Nocturnal", "Gloomhowl", ["Kindling"], ["Feybreak"]],
+  "Blazehowl": [["Fire"], "Rare", "L", "Daytime", "Hellflame Lion", ["Kindling", "Lumbering"], ["Bamboo Grove", "Mt. Obsidian", "Feybreak", "World Tree"]],
+  "Blazehowl Noct": [["Fire", "Dark"], "Epic", "L", "Nocturnal", "Darkflame Lion", ["Kindling", "Lumbering"], ["Mt. Obsidian", "Feybreak", "Outlying Isles", "World Tree"]],
+  "Warsect": [["Ground", "Grass"], "Epic", "L", "Daytime", "Cast-Iron Shell", ["Planting", "Handiwork", "Lumbering", "Transporting"], ["Verdant Brook", "World Tree"]],
+  "Warsect Terra": [["Ground"], "Epic", "L", "Daytime", "Fullmetal Shell", ["Handiwork", "Mining", "Transporting"], ["Feybreak"]],
+  "Frostplume": [["Ice"], "Common", "M", "Daytime", "Peacock Pounce", ["Gathering", "Cooling"], ["Outlying Isles"]],
+  "Majex": [["Dark", "Fire"], "Rare", "M", "Nocturnal", "Phantasmal Arcana", ["Kindling", "Handiwork", "Medicine Production", "Transporting"], ["Mt. Obsidian", "World Tree"]],
+  "Sibelyx": [["Ice"], "Rare", "L", "Daytime", "Silk Shroud", ["Medicine Production", "Cooling", "Farming"], ["Verdant Brook", "Astral Mountains"]],
+  "Sibelyx Primo": [["Neutral"], "Epic", "L", "Daytime", "Gilded Shroud", ["Medicine Production", "Farming"], ["World Tree"]],
+  "Maraith": [["Dark"], "Rare", "M", "Nocturnal", "Messenger of Death", ["Gathering", "Mining"], ["Astral Mountains"]],
+  "Shroomer": [["Grass"], "Common", "S", "Daytime", "Rampant Spores", ["Planting", "Handiwork", "Gathering", "Lumbering", "Farming"], ["Isle of Silence", "Sakurajima"]],
+  "Shroomer Noct": [["Grass", "Dark"], "Rare", "S", "Nocturnal", "Roiling Spores", ["Planting", "Handiwork", "Gathering", "Lumbering"], ["Sakurajima", "Feybreak"]],
+  "Icelyn": [["Ice"], "Common", "S", "Daytime", "Witch's Icy Veil", ["Handiwork", "Medicine Production", "Cooling", "Transporting"], ["Astral Mountains"]],
+  "Gildra": [["Dark", "Ground"], "Rare", "M", "Nocturnal", "Resurrection", ["Handiwork", "Medicine Production", "Transporting"], ["Twilight Dunes", "Verdant Brook", "World Tree"]],
+  "Jormuntide": [["Dragon", "Water"], "Epic", "XL", "Daytime", "Stormbringer Sea Dragon", ["Watering"], ["Verdant Brook", "World Tree"]],
+  "Jormuntide Ignis": [["Dragon", "Fire"], "Epic", "XL", "Daytime", "Stormbringer Lava Dragon", ["Kindling"], ["Feybreak", "Outlying Isles", "World Tree"]],
+  "Suzaku": [["Fire"], "Epic", "XL", "Daytime", "Wings of Flame", ["Kindling"], ["Twilight Dunes", "World Tree"]],
+  "Suzaku Aqua": [["Water"], "Epic", "XL", "Daytime", "Wings of Water", ["Watering"], ["Outlying Isles", "World Tree"]],
+  "Dazemu": [["Ground"], "Rare", "S", "Daytime", "Sand Sprint", ["Gathering"], ["Twilight Dunes", "Sakurajima"]],
+  "Quivern": [["Dragon"], "Rare", "L", "Daytime", "Sky Dragon Affection", ["Handiwork", "Gathering", "Mining", "Transporting"], ["Astral Mountains", "Outlying Isles", "World Tree"]],
+  "Quivern Botan": [["Dragon", "Grass"], "Epic", "L", "Daytime", "Grass Dragon Affection", ["Planting", "Handiwork", "Gathering", "Mining", "Transporting"], ["Sakurajima", "World Tree"]],
+  "Lullu": [["Grass"], "Common", "S", "Daytime", "Floral Boost", ["Planting", "Handiwork", "Gathering", "Medicine Production"], ["Sakurajima"]],
+  "Kikit": [["Ground"], "Common", "XS", "Daytime", "Sandball Soccer", ["Mining"], ["Sakurajima"]],
+  "Yakumo": [["Neutral"], "Common", "XS", "Daytime", "Birds of a Feather", ["Gathering"], ["Sakurajima"]],
+  "Skutlass": [["Water"], "Rare", "M", "Daytime", "Fish Fillet", ["Watering", "Gathering", "Lumbering"], ["Twilight Dunes", "Outlying Isles"]],
+  "Skutlass Ignis": [["Water", "Fire"], "Rare", "M", "Daytime", "Seared Fish Fillet", ["Kindling", "Watering", "Gathering", "Lumbering"], ["Feybreak", "Outlying Isles", "World Tree"]],
+  "Reptyro": [["Fire", "Ground"], "Rare", "L", "Daytime", "Ore-Loving Beast", ["Kindling", "Mining"], ["Mt. Obsidian"]],
+  "Reptyro Cryst": [["Ice", "Ground"], "Rare", "L", "Daytime", "Ice-Loving Beast", ["Mining", "Cooling"], ["Feybreak"]],
+  "Starryon": [["Dark"], "Rare", "M", "Nocturnal", "Night Dancer", ["Gathering"], ["Feybreak", "World Tree"]],
+  "Starryon Primo": [["Neutral"], "Epic", "M", "Daytime", "Light Dancer", ["Gathering"], ["World Tree"]],
+  "Pierdon": [["Ground"], "Rare", "M", "Daytime", "Power Stone", ["Mining"], ["Outlying Isles"]],
+  "Pierdon Cryst": [["Ice"], "Rare", "M", "Daytime", "Power Crystal", ["Mining", "Cooling"], ["Outlying Isles"]],
+  "Cryolinx": [["Ice"], "Rare", "L", "Daytime", "Dragon Hunter", ["Handiwork", "Lumbering", "Cooling", "Transporting"], ["Astral Mountains", "Outlying Isles"]],
+  "Cryolinx Terra": [["Ground"], "Rare", "L", "Daytime", "Explosive Strength", ["Handiwork", "Lumbering", "Mining", "Transporting"], ["Feybreak"]],
+  "Snugloo": [["Ice"], "Common", "S", "Daytime", "Invisible Eye", ["Handiwork", "Mining", "Cooling", "Transporting"], ["Verdant Brook"]],
+  "Wumpo": [["Ice"], "Rare", "L", "Daytime", "Guardian of the Snowy Mountain", ["Handiwork", "Lumbering", "Cooling", "Transporting"], ["Astral Mountains", "World Tree"]],
+  "Wumpo Botan": [["Grass"], "Epic", "L", "Daytime", "Guardian of the South", ["Planting", "Handiwork", "Lumbering", "Transporting"], ["Verdant Brook", "Sakurajima", "World Tree"]],
+  "Sootseer": [["Dark", "Fire"], "Rare", "M", "Nocturnal", "Grave Robber", ["Kindling", "Handiwork", "Gathering", "Mining", "Farming"], ["Sakurajima", "Feybreak"]],
+  "Carnibora": [["Grass"], "Rare", "M", "Daytime", "Entangling Tongue", ["Planting", "Handiwork", "Gathering", "Transporting"], ["Twilight Dunes"]],
+  "Blazamut": [["Fire"], "Epic", "XL", "Daytime", "Magma Kaiser", ["Kindling", "Mining"], ["Mt. Obsidian", "Outlying Isles", "World Tree"]],
+  "Blazamut Ryu": [["Dragon", "Fire"], "Epic", "XL", "Daytime", "Dragon Kaiser", ["Kindling", "Mining"], ["No wild spawn"]],
+  "Dualith": [["Ground", "Grass"], "Epic", "XL", "Daytime", "Forest Laser", ["Planting", "Gathering", "Lumbering", "Mining", "Transporting"], ["Astral Mountains", "Outlying Isles", "World Tree"]],
+  "Dualith Noct": [["Ground", "Dark"], "Epic", "XL", "Nocturnal", "Corruption Laser", ["Planting", "Gathering", "Lumbering", "Mining", "Transporting"], ["Feybreak", "World Tree"]],
+  "Anubis": [["Ground"], "Epic", "M", "Daytime", "Guardian of the Desert", ["Handiwork", "Mining", "Transporting"], ["Twilight Dunes", "Feybreak", "World Tree"]],
+  "Sekhmet": [["Ground"], "Rare", "M", "Daytime", "Desert Empress", ["Handiwork", "Mining", "Transporting"], ["Twilight Dunes", "Verdant Brook", "Feybreak", "World Tree"]],
+  "Prixter": [["Dark", "Ground"], "Rare", "S", "Nocturnal", "Phantom Venom", ["Gathering", "Lumbering", "Medicine Production"], ["Sakurajima"]],
+  "Prixter Lux": [["Electric", "Ground"], "Rare", "S", "Daytime", "Scorpion Longwave", ["Generating Electricity", "Gathering", "Lumbering", "Medicine Production"], ["Feybreak"]],
+  "Tetroise": [["Ground"], "Epic", "XL", "Daytime", "Masonry Archelon", ["Mining"], ["Twilight Dunes", "Verdant Brook", "World Tree"]],
+  "Tetroise Primo": [["Neutral"], "Epic", "XL", "Daytime", "Stone-Chaser Archelon", ["Mining"], ["Feybreak", "World Tree"]],
+  "Nyafia": [["Dark"], "Common", "M", "Nocturnal", "Shot-Nyan Mode", ["Handiwork", "Gathering", "Lumbering", "Transporting"], ["Feybreak"]],
+  "Mimog": [["Neutral"], "Rare", "XS", "Daytime", "Master of Unlocking", ["Gathering", "Transporting"], ["Twilight Dunes", "Bamboo Grove", "Feybreak", "World Tree"]],
+  "Xenovader": [["Dark"], "Rare", "S", "Nocturnal", "Unknown Invader", ["Lumbering", "Transporting"], ["Feybreak"]],
+  "Xenogard": [["Dragon"], "Epic", "L", "Daytime", "Unknown Intruder", ["Mining"], ["No wild spawn"]],
+  "Prunelia": [["Grass", "Dark"], "Rare", "S", "Nocturnal", "Prayer for Abundant Harvest", ["Planting", "Handiwork", "Gathering", "Medicine Production", "Transporting"], ["Feybreak"]],
+  "Nitemary": [["Dark"], "Rare", "S", "Nocturnal", "Soul Collector", ["Handiwork", "Transporting"], ["Feybreak"]],
+  "Nitemary Botan": [["Grass"], "Rare", "S", "Daytime", "Soul Binder", ["Planting", "Handiwork", "Transporting"], ["Outlying Isles"]],
+  "Smokie": [["Dark"], "Common", "XS", "Nocturnal", "Dig, Smokie! Dig!", ["Gathering"], ["Feybreak"]],
+  "Smokie Cryst": [["Dark", "Ice"], "Common", "XS", "Nocturnal", "Cryo Instincts", ["Gathering", "Cooling"], ["Feybreak"]],
+  "Omascul": [["Dark"], "Common", "S", "Nocturnal", "Masquerade Dance", ["Gathering"], ["Feybreak"]],
+  "Whalaska": [["Ice", "Water"], "Epic", "XL", "Daytime", "Chilled Whale Cruiser", ["Watering", "Cooling"], ["Feybreak", "Outlying Isles", "World Tree"]],
+  "Whalaska Ignis": [["Ice", "Fire"], "Epic", "XL", "Daytime", "Cozy Whale Cruiser", ["Kindling", "Cooling"], ["World Tree"]],
+  "Verdash": [["Grass"], "Epic", "M", "Daytime", "Grassland Gymnast", ["Planting", "Handiwork", "Gathering", "Lumbering", "Transporting"], ["Verdant Brook", "Sakurajima"]],
+  "Splatterina": [["Dark"], "Common", "M", "Nocturnal", "Blade of Uncontrolled Passion", ["Handiwork", "Lumbering", "Medicine Production", "Transporting"], ["Feybreak", "World Tree"]],
+  "Gildane": [["Ground"], "Epic", "L", "Daytime", "Sandstorm's Blessing", ["Gathering"], ["Feybreak"]],
+  "Dogen": [["Neutral"], "Rare", "S", "Daytime", "Homeward Prayer", ["Handiwork", "Gathering", "Lumbering", "Medicine Production", "Transporting"], ["Sakurajima"]],
+  "Bulldosu": [["Ground"], "Common", "M", "Daytime", "Yokozuna's Presence", ["Mining", "Transporting"], ["Sakurajima"]],
+  "Celesdir": [["Neutral"], "Rare", "M", "Daytime", "Blessing of Purification", ["Gathering", "Lumbering"], ["Feybreak", "World Tree"]],
+  "Celesdir Noct": [["Dark"], "Rare", "M", "Nocturnal", "Blessing of Chaos", ["Gathering", "Lumbering"], ["No wild spawn"]],
+  "Astegon": [["Dragon", "Dark"], "Epic", "XL", "Nocturnal", "Black Ankylosaur", ["Handiwork", "Mining"], ["Mt. Obsidian", "World Tree"]],
+  "Knocklem": [["Ground"], "Epic", "L", "Daytime", "Steel Guardian Mode", ["Gathering", "Mining", "Transporting"], ["Twilight Dunes", "Mt. Obsidian", "Feybreak", "World Tree"]],
+  "Knocklem Ignis": [["Fire"], "Epic", "L", "Daytime", "Iron Guardian Mode", ["Kindling", "Mining", "Transporting"], ["Feybreak", "World Tree"]],
+  "Silvegis": [["Dragon"], "Epic", "L", "Daytime", "Aegis Shield", ["Lumbering"], ["Feybreak", "World Tree"]],
+  "Azurmane": [["Electric"], "Rare", "L", "Daytime", "Plasma Dash", ["Generating Electricity"], ["Feybreak", "World Tree"]],
+  "Valentail": [["Neutral"], "Common", "S", "Daytime", "Big Stretch", ["Gathering"], ["Outlying Isles"]],
+  "Snock": [["Electric"], "Common", "S", "Daytime", "Charging Shell", ["Generating Electricity"], ["Outlying Isles"]],
+  "Snock Terra": [["Electric", "Ground"], "Common", "S", "Daytime", "Grounding Shell", ["Generating Electricity"], ["World Tree"]],
+  "Souffline": [["Grass"], "Common", "S", "Daytime", "Fuzzy Fairy", ["Planting", "Transporting"], ["Outlying Isles"]],
+  "Lapiron": [["Ground"], "Common", "S", "Daytime", "Friend of Earth", ["Handiwork", "Gathering", "Mining", "Transporting"], ["Outlying Isles"]],
+  "Hoodle": [["Dark"], "Common", "XS", "Nocturnal", "Void-Dweller", ["Handiwork", "Transporting"], ["Outlying Isles"]],
+  "Slowatt": [["Electric"], "Common", "S", "Daytime", "Chillswitch", ["Generating Electricity"], ["Outlying Isles"]],
+  "Bakemi": [["Dark"], "Common", "S", "Nocturnal", "Grinning Death", ["Handiwork", "Medicine Production", "Transporting"], ["Outlying Isles"]],
+  "Solmora": [["Water"], "Common", "M", "Daytime", "Charming Fish", ["Watering"], ["Outlying Isles"]],
+  "Solmora Lux": [["Water", "Electric"], "Rare", "M", "Daytime", "Shocking Fish", ["Watering", "Generating Electricity"], ["Outlying Isles", "World Tree"]],
+  "Lapure": [["Neutral"], "Common", "M", "Daytime", "Long-Sleeved Hurray", ["Handiwork", "Gathering"], ["Outlying Isles"]],
+  "Eidrolon": [["Dragon", "Dark"], "Rare", "L", "Nocturnal", "Liberated Pterosaur", ["Transporting"], ["Outlying Isles", "World Tree"]],
+  "Eidrolon Ignis": [["Dragon", "Fire"], "Epic", "L", "Daytime", "Resentful Pterosaur", ["Kindling", "Transporting"], ["World Tree"]],
+  "Dynamoff": [["Electric"], "Rare", "M", "Daytime", "Electro-Massage Incubation", ["Generating Electricity", "Gathering", "Transporting"], ["Outlying Isles"]],
+  "Tropicaw": [["Grass"], "Rare", "M", "Daytime", "Flower Dance", ["Planting", "Gathering"], ["Outlying Isles"]],
+  "Flaracle": [["Fire"], "Rare", "M", "Daytime", "Burning Future", ["Kindling", "Handiwork", "Transporting"], ["Outlying Isles", "World Tree"]],
+  "Ophydia": [["Grass", "Water"], "Epic", "L", "Daytime", "Glorious Mist", ["Watering", "Planting"], ["Outlying Isles", "World Tree"]],
+  "Dupin": [["Fire"], "Rare", "M", "Daytime", "Trick-Loving Fluffle", ["Kindling", "Handiwork", "Medicine Production", "Transporting"], ["Outlying Isles", "World Tree"]],
+  "Roujay": [["Dark"], "Rare", "M", "Nocturnal", "Dark-Nester", ["Gathering", "Transporting"], ["World Tree"]],
+  "Venusa": [["Dark"], "Rare", "S", "Nocturnal", "Snake's Sagacity", ["Handiwork", "Gathering", "Medicine Production", "Transporting"], ["World Tree"]],
+  "Mycora": [["Grass"], "Rare", "M", "Daytime", "Charming Spore", ["Planting", "Handiwork", "Gathering", "Medicine Production"], ["World Tree"]],
+  "Loomen": [["Dark", "Fire"], "Rare", "M", "Nocturnal", "Lantern Enchantment", ["Kindling", "Handiwork", "Medicine Production"], ["World Tree"]],
+  "Wistella": [["Dark"], "Common", "S", "Nocturnal", "Hidden Dark Energy", ["Handiwork", "Medicine Production", "Transporting"], ["Outlying Isles", "World Tree"]],
+  "Solenne": [["Dark", "Neutral"], "Rare", "M", "Nocturnal", "Untainted Maiden", ["Handiwork", "Gathering", "Transporting"], ["World Tree"]],
+  "Renjishi": [["Fire"], "Rare", "L", "Daytime", "Stage Combat", ["Kindling", "Handiwork", "Gathering", "Transporting"], ["World Tree"]],
+  "Aegidron": [["Dragon", "Ground"], "Epic", "XL", "Daytime", "Indestructible Fortress", ["Mining"], ["No wild spawn"]],
+  "Grizzbolt": [["Electric"], "Epic", "L", "Daytime", "Yellow Tank", ["Generating Electricity", "Handiwork", "Lumbering", "Transporting"], ["Windswept Hills", "World Tree"]],
+  "Lyleen": [["Grass"], "Epic", "L", "Daytime", "Harvest Goddess", ["Planting", "Handiwork", "Gathering", "Medicine Production"], ["Twilight Dunes", "Sakurajima", "World Tree"]],
+  "Lyleen Noct": [["Dark"], "Epic", "L", "Nocturnal", "Goddess of the Tranquil Light", ["Handiwork", "Gathering", "Medicine Production"], ["Sakurajima", "World Tree"]],
+  "Orserk": [["Dragon", "Electric"], "Epic", "L", "Daytime", "Ferocious Thunder Dragon", ["Generating Electricity", "Handiwork", "Transporting"], ["Twilight Dunes", "World Tree"]],
+  "Faleris": [["Fire"], "Epic", "L", "Daytime", "Scorching Predator", ["Kindling", "Transporting"], ["Twilight Dunes", "World Tree"]],
+  "Faleris Aqua": [["Water"], "Epic", "L", "Daytime", "Tidal Predator", ["Watering", "Transporting"], ["Feybreak", "Outlying Isles", "World Tree"]],
+  "Shadowbeak": [["Dark"], "Epic", "L", "Nocturnal", "Modified DNA", ["Gathering"], ["Twilight Dunes", "World Tree"]],
+  "Selyne": [["Dark", "Neutral"], "Epic", "L", "Nocturnal", "Celestial Darkness", ["Handiwork", "Medicine Production", "Transporting"], ["No wild spawn"]],
+  "Bastigor": [["Ice"], "Epic", "M", "Daytime", "Blizzard Crash", ["Lumbering", "Mining", "Cooling"], ["World Tree"]],
+  "Shaolong": [["Dragon", "Water"], "Epic", "XL", "Daytime", "Azure Sovereign", ["Watering", "Gathering"], ["World Tree"]],
+  "Silvance": [["Grass"], "Epic", "L", "Daytime", "Spore Stalwart", ["Planting", "Handiwork", "Gathering", "Medicine Production", "Transporting"], ["No wild spawn"]],
+  "Dandilord": [["Grass", "Dark"], "Epic", "M", "Nocturnal", "Mist Stalwart", ["Planting", "Handiwork", "Gathering", "Medicine Production", "Transporting"], ["No wild spawn"]],
+  "Bellanoir": [["Dark"], "Legendary", "M", "Nocturnal", "Nightmare Iris", ["Handiwork", "Medicine Production", "Transporting"], ["No wild spawn"]],
+  "Bellanoir Libero": [["Dark"], "Legendary", "M", "Nocturnal", "Nightmare Stare", ["Handiwork", "Medicine Production", "Transporting"], ["No wild spawn"]],
+  "Xenolord": [["Dark", "Dragon"], "Epic", "L", "Nocturnal", "Meteor Wings", ["Gathering"], ["No wild spawn"]],
+  "Hartalis": [["Neutral"], "Epic", "L", "Daytime", "Sacred Barrier", ["Gathering", "Lumbering"], ["No wild spawn"]],
+  "Paladius": [["Neutral"], "Legendary", "L", "Daytime", "Holy Knight of the Firmament", ["Lumbering", "Mining"], ["Twilight Dunes"]],
+  "Necromus": [["Dark"], "Legendary", "L", "Nocturnal", "Dark Knight of the Abyss", ["Lumbering", "Mining"], ["Twilight Dunes"]],
+  "Frostallion": [["Ice"], "Legendary", "L", "Daytime", "Icy Steed", ["Cooling"], ["Astral Mountains"]],
+  "Frostallion Noct": [["Dark"], "Legendary", "L", "Nocturnal", "Black Steed", ["Gathering"], ["Twilight Dunes"]],
+  "Neptilius": [["Water"], "Legendary", "XL", "Daytime", "Sentinel of the Great Sea", ["Watering"], ["Outlying Isles"]],
+  "Jetragon": [["Dragon"], "Legendary", "XL", "Daytime", "Aerial Missile", ["Gathering"], ["Outlying Isles"]],
+  "Panthalus": [["Water"], "Epic", "XL", "Daytime", "Resonant Guardian", ["None"], ["No wild spawn"]],
+};
+const PALWORLD = {
+  name: "Random Pal",
+  emoji: "🐾",
+  description: "Pal, region, type, rarity, size, activity, gender, work suitability, partner ability, passive skills and lucky",
+};
+// One column of PALS as a table: each Pal → its options.
+const palRows = (col) => Object.fromEntries(Object.entries(PALS).map(([n, p]) => [n, [p[col]].flat()]));
+// Two columns as a table: each option of `from` → the options of `col` that at least one real Pal has with it.
+const palPairs = (from, col) => {
+  const t = {};
+  Object.values(PALS).forEach((p) => [p[from]].flat().forEach((k) => { t[k] = [...new Set([...(t[k] || []), ...[p[col]].flat()])]; }));
+  return t;
+};
+// A Pal holds up to 4 Passive Skills, never the same one twice (see `unique`).
+const palPassiveCats = () => [1, 2, 3, 4].map((n) => ({
+  id: uid(), name: `Passive Skill ${n}`, items: Object.keys(PAL_PASSIVES), notes: { ...PAL_PASSIVES }, unique: "passive",
+}));
+// Every other category follows the Pal, so a roll describes a real one. With Pal hidden,
+// Type still follows Region, and Work Suitability and Partner Ability still follow Type.
+const palworldMulti = () => {
+  const options = (col) => [...new Set(Object.values(PALS).flatMap((p) => p[col]))];
+  const cat = (name, items, col, more) => ({ id: uid(), name, items, ...(col != null && { fit: { Pal: palRows(col), ...more } }) });
+  return {
+    id: uid(), name: PALWORLD.name, emoji: PALWORLD.emoji, description: PALWORLD.description, type: "multi", created: Date.now(),
+    cats: [
+      cat("Pal", Object.keys(PALS)),
+      cat("Region", options(6), 6),
+      cat("Type", ["Neutral", "Fire", "Water", "Grass", "Electric", "Ice", "Ground", "Dark", "Dragon"], 0, { Region: palPairs(6, 0) }),
+      cat("Rarity", ["Common", "Rare", "Epic", "Legendary"], 1),
+      cat("Size", ["XS", "S", "M", "L", "XL"], 2),
+      cat("Activity", ["Daytime", "Nocturnal"], 3),
+      cat("Gender", ["Male", "Female"]),
+      cat("Work Suitability", options(5), 5, { Type: palPairs(0, 5) }),
+      { ...cat("Partner Ability", Object.keys(PAL_PARTNERS), 4, { Type: palPairs(0, 4) }), notes: { ...PAL_PARTNERS } },
+      ...palPassiveCats(),
+      { ...cat("Lucky", ["No", "Yes"]), ...rareYes() },
+    ],
+  };
+};
 
 /* =========================================================
    2. Saving (everything lives on this phone only)
@@ -672,6 +1717,22 @@ function load() {
     }
     d.seededCountries = true;
   }
+  // The Palworld Multiple, right after the Pokémon one.
+  if (!d.seededPalworld) {
+    if (!d.lists.some((l) => l.name === PALWORLD.name)) d.lists.splice(d.lists.findIndex((l) => l.name === POKEMON.name) + 1, 0, palworldMulti());
+    d.seededPalworld = true;
+  }
+  // Once: the Palworld Multiple rolls 4 Passive Skills (it started with 1).
+  if (!d.palPassives) {
+    const m = d.lists.find((l) => l.type === "multi" && l.name === PALWORLD.name);
+    const i = m ? m.cats.findIndex((c) => c.name === "Passive Skill") : -1;
+    if (i >= 0) {
+      Object.assign(m.cats[i], { name: "Passive Skill 1", unique: "passive" });
+      m.cats.splice(i + 1, 0, ...palPassiveCats().slice(1));
+      m.description = m.description.replace("passive skill and", "passive skills and");
+    }
+    d.palPassives = true;
+  }
   // Once: give a Multiple's "Nature" category the stat effects of each nature.
   if (!d.natureBadges) {
     d.lists.forEach((l) => l.type === "multi" && l.cats.forEach((c) => {
@@ -682,6 +1743,36 @@ function load() {
     }));
     d.natureBadges = true;
   }
+  // Once: give the Pokémon Multiple Habitat, Egg Group, Hidden Ability and Shiny (last, so
+  // its reel stops last), and tie Type, Habitat and Egg Group to what they depend on.
+  if (!d.pokemonCats) {
+    const m = d.lists.find((l) => l.type === "multi" && /pok[eé]mon/i.test(l.name));
+    if (m) {
+      const named = (name) => m.cats.find((c) => c.name.trim().toLowerCase() === name.toLowerCase());
+      const shiny = named("Shiny");
+      if (!shiny) m.cats.push(shinyCat());
+      else if (shiny.rare && shiny.rare.odds === 4096) Object.assign(shiny, rareYes()); // first tried at 1/4,096
+      for (const name of ["Habitat", "Egg Group", "Hidden Ability"]) {
+        if (!named(name)) m.cats.splice(m.cats.indexOf(named("Shiny")), 0, { id: uid(), name, items: [...POKEMON.cats[name]] });
+      }
+      for (const name in POKEMON_FIT) {
+        const c = named(name);
+        if (c) c.fit = structuredClone(POKEMON_FIT[name]);
+      }
+      if (/^Region, type, rarity, stage, form, nature(,| and) gender(, habitat)?(, egg group)?( and shiny)?$/.test(m.description)) m.description = POKEMON.description;
+    }
+    d.pokemonCats = true;
+  }
+  // Once: Hidden Ability is the abilities and what they do (it started as Yes/No), following Type.
+  if (!d.hiddenAbilityFit) {
+    d.lists.forEach((l) => l.type === "multi" && l.cats.forEach((c) => {
+      if (!/^hidden abilit(y|ies)$/i.test(c.name.trim())) return;
+      if (c.items.join() === "No,Yes") c.items = [...POKEMON.cats["Hidden Ability"]];
+      if (!c.notes) c.notes = { ...HIDDEN_ABILITIES };
+      if (!c.fit) c.fit = structuredClone(POKEMON_FIT["Hidden Ability"]);
+    }));
+    d.hiddenAbilityFit = true;
+  }
   // Lists made before "Date created" existed count as created in their current order.
   const base = Date.now() - d.lists.length * 1000;
   d.lists.forEach((l, i) => { if (!l.created) l.created = base + i * 1000; });
@@ -691,7 +1782,9 @@ function load() {
 }
 
 let db = load();
+let fitMentions = new WeakMap(); // see `inFit`; edits always end in a save, which clears it
 function save() {
+  fitMentions = new WeakMap();
   try { localStorage.setItem(KEY, JSON.stringify(db)); }
   catch (e) { toast("Couldn't save on this device"); }
 }
@@ -703,7 +1796,11 @@ const findList = (id) => db.lists.find((l) => l.id === id);
 // category: { type: "multi", cats: [{ id, name, link?, items }] }.
 // `link` points at one of your normal lists: its options are used too (kept in
 // sync), and `items` are extra options only this category has.
+// `rare` { item, odds }: that option comes up 1 time in `odds`, and is celebrated.
+// `fit` { "Other category": { "its option": ["options of this one that go with it"] } }.
+// `notes` { "option": "what it means" }: shown with the option.
 const isMulti = (l) => l.type === "multi";
+const isRare = (c, v) => !!c.rare && c.rare.item === v;
 const linkedList = (c) => {
   const l = c.link && findList(c.link);
   return l && !isMulti(l) ? l : null;
@@ -746,16 +1843,28 @@ function record(list) {
   save();
 }
 
+// One option from a category: a rare option has its own odds, the rest share what's left.
+function pickOption(c, o) {
+  const rare = c.rare && o.includes(c.rare.item) ? c.rare : null;
+  if (!rare) return o[rand(o.length)];
+  const rest = o.filter((x) => x !== rare.item);
+  return !rest.length || rand(rare.odds) === 0 ? rare.item : rest[rand(rest.length)];
+}
+
 // Multiple: re-pick every category except the locked ones. With `keepValid`
 // (a category changed while editing) only the missing or outdated ones are
 // picked, without the reels.
 function rollCombo(list, keepValid) {
-  const before = cur.picks, picks = {};
-  for (const c of liveCats(list)) {
-    const o = catOptions(c), old = before[c.id];
-    if ((keepValid || cur.locks.has(c.id)) && o.includes(old)) picks[c.id] = old;
-    else { picks[c.id] = o[rand(o.length)]; cur.locks.delete(c.id); }
-  }
+  const before = cur.picks, live = liveCats(list);
+  const kept = live.filter((c) => (keepValid || cur.locks.has(c.id)) && catOptions(c).includes(before[c.id]));
+  const todo = fitOrder(live.filter((c) => !kept.includes(c)));
+  let picks, tries = 0;
+  // Each pick follows the ones before it; locks can leave a dead end, so try again if so.
+  do {
+    picks = Object.fromEntries(kept.map((c) => [c.id, before[c.id]]));
+    for (const c of todo) picks[c.id] = pickOption(c, fitOptions(list, c, catOptions(c), picks));
+  } while (++tries < 30 && !live.every((c) => fits(list, c, picks[c.id], picks)));
+  todo.forEach((c) => cur.locks.delete(c.id));
   cur.before = before;
   cur.picks = picks;
   cur.spin = !keepValid && !!db.wheel;
@@ -763,6 +1872,73 @@ function rollCombo(list, keepValid) {
 }
 // Categories in play: switched on (`off` is set in Edit) and with something to pick.
 const liveCats = (list) => list.cats.filter((c) => !c.off && catOptions(c).length);
+// Does `v` of `other`'s table go with `pick`? A pick with no row, or an option the
+// table never mentions (one you added yourself), goes with anything.
+const inFit = (table, pick, v) => {
+  if (!table[pick] || table[pick].includes(v)) return true;
+  if (!fitMentions.has(table)) fitMentions.set(table, new Set(Object.values(table).flat()));
+  return !fitMentions.get(table).has(v);
+};
+// Does option `v` of category `c` go with the picks so far (both ways round)?
+const fits = (list, c, v, picks) =>
+  list.cats.every((d) => {
+    if (d === c || picks[d.id] == null) return true;
+    if (c.unique && c.unique === d.unique && picks[d.id] === v) return false; // e.g. the same Passive Skill twice
+    const mine = c.fit && c.fit[d.name], theirs = d.fit && d.fit[c.name];
+    return (!mine || inFit(mine, picks[d.id], v)) && (!theirs || inFit(theirs, v, picks[d.id]));
+  });
+const fitOptions = (list, c, o, picks) => {
+  const good = o.filter((v) => fits(list, c, v, picks));
+  return good.length ? good : o;
+};
+// What Pick by hand offers: options that go with the locked results, and that leave every
+// other category something to land on (e.g. no two locks that no single Type fits).
+function fitChoices(list, c, locked) {
+  const others = liveCats(list).filter((d) => d !== c && locked[d.id] == null);
+  const good = catOptions(c).filter((v) => {
+    const p = { ...locked, [c.id]: v };
+    return fits(list, c, v, locked) && others.every((d) => catOptions(d).some((x) => fits(list, d, x, p)));
+  });
+  return good.length ? good : catOptions(c);
+}
+// Categories in picking order: each one after the categories its `fit` depends on.
+function fitOrder(cats) {
+  const order = [];
+  let left = cats;
+  while (left.length) {
+    const ready = left.filter((c) => !Object.keys(c.fit || {}).some((n) => left.some((x) => x !== c && x.name === n)));
+    const next = ready.length ? ready : left;
+    order.push(...next);
+    left = left.filter((c) => !next.includes(c));
+  }
+  return order;
+}
+function renameInFit(list, c, old, v) {
+  Object.values(c.fit || {}).forEach((t) => Object.values(t).forEach((r) => {
+    if (r.includes(old)) r[r.indexOf(old)] = v;
+  }));
+  list.cats.forEach((d) => {
+    const t = d.fit && d.fit[c.name];
+    if (t && t[old] && v !== old) { t[v] = t[old]; delete t[old]; }
+  });
+}
+// After a pick by hand: re-pick unlocked categories that no longer go with it. Returns their names.
+function refit(list) {
+  const before = { ...cur.picks }, live = fitOrder(liveCats(list));
+  const free = live.filter((c) => !cur.locks.has(c.id));
+  // Follow what's locked and what this one depends on; unlocked followers adapt after it.
+  const repick = (c) => {
+    const follower = (id) => { const d = list.cats.find((x) => x.id === id); return d.fit && d.fit[c.name]; };
+    const fixed = Object.fromEntries(Object.entries(cur.picks).filter(([id]) => cur.locks.has(id) || !follower(id)));
+    cur.picks[c.id] = pickOption(c, fitOptions(list, c, catOptions(c), fixed));
+  };
+  const allFit = () => live.every((c) => fits(list, c, cur.picks[c.id], cur.picks));
+  free.forEach((c) => fits(list, c, cur.picks[c.id], cur.picks) || repick(c));
+  // Locks can leave a dead end (e.g. a Region with no fitting Type): re-pick everything related.
+  const related = free.filter((c) => c.fit || live.some((d) => d.fit && d.fit[c.name]));
+  for (let tries = 0; tries < 30 && !allFit(); tries++) related.forEach(repick);
+  return free.filter((c) => cur.picks[c.id] !== before[c.id]).map((c) => c.name);
+}
 const comboStale = (list) => {
   const live = liveCats(list);
   return live.length !== Object.keys(cur.picks).length || live.some((c) => !catOptions(c).includes(cur.picks[c.id]));
@@ -852,7 +2028,40 @@ const sfx = {
     [1046.5, 1318.5, 1568].forEach((f) => tone(f, 0.27, 0.8, "triangle", 0.1));
     [2093, 2637, 3136, 4186].forEach((f, i) => tone(f, 0.35 + i * 0.06, 0.12, "sine", 0.05));
   },
+  rare: () => {
+    // A glittering run up to a long, warm chord, with more sparkle over it.
+    [1318.5, 1568, 2093, 2637, 3136].forEach((f, i) => tone(f, i * 0.07, 0.35, "sine", 0.09));
+    [523.25, 659.25, 783.99, 1046.5].forEach((f) => tone(f, 0.4, 1.4, "triangle", 0.1));
+    [2093, 2637, 3136, 4186, 5274].forEach((f, i) => tone(f, 0.55 + i * 0.09, 0.25, "sine", 0.05));
+  },
 };
+
+// A rare option came up: golden flash and rays, its name, and sparkles flying out.
+function goldBurst(c) {
+  const box = document.createElement("div");
+  box.className = "gold-burst";
+  box.setAttribute("role", "status");
+  box.innerHTML = `<div class="gold-flash"></div><div class="gold-rays"></div><p class="gold-title">✨ ${esc(c.name)}! ✨</p>`;
+  if (!reducedMotion()) {
+    for (let k = 0; k < 70; k++) {
+      const p = document.createElement("i");
+      p.textContent = "✦";
+      p.style.fontSize = 10 + Math.random() * 18 + "px";
+      box.append(p);
+      const a = Math.random() * Math.PI * 2, v = 90 + Math.random() * 300;
+      const dx = Math.cos(a) * v, dy = Math.sin(a) * v;
+      p.animate([
+        { transform: "translate(-50%, -50%) scale(0.2)", opacity: 0 },
+        { transform: `translate(${dx}px, ${dy}px) scale(1)`, opacity: 1, offset: 0.35 },
+        { transform: `translate(${dx * 1.2}px, ${dy + 160}px) scale(0.5) rotate(180deg)`, opacity: 0 },
+      ], { duration: 1800 + Math.random() * 1400, delay: Math.random() * 500, easing: "cubic-bezier(0.2, 0.7, 0.4, 1)", fill: "both" });
+    }
+  }
+  document.body.append(box);
+  setTimeout(() => box.remove(), 3700);
+  sfx.rare();
+  if (navigator.vibrate) navigator.vibrate([30, 50, 30, 50, 120]);
+}
 
 // Confetti bursting out of the wheel's center.
 function confetti(from) {
@@ -1000,9 +2209,16 @@ function slotSpin(list, reels) {
   Promise.all(runs.map((r) => r.anim.finished)).then(() => {
     if (!done()) return;
     box.classList.replace("spinning", "won");
-    sfx.win();
+    const hits = reels.filter((c) => isRare(c, me.picks[c.id]));
+    if (hits.length) {
+      hits.forEach((c) => $(`.combo-row[data-cat="${c.id}"]`).classList.add("gold"));
+      goldBurst(hits[0]);
+      me.goldShown = true; // the screen after the reels only keeps the glow
+    } else {
+      sfx.win();
+      if (navigator.vibrate) navigator.vibrate([20, 40, 20]);
+    }
     confetti(box);
-    if (navigator.vibrate) navigator.vibrate([20, 40, 20]);
     box.animate([{ transform: "scale(1)" }, { transform: "scale(1.05)" }, { transform: "scale(1)" }], { duration: 500, easing: "cubic-bezier(0.3, 1.5, 0.5, 1)" });
     setTimeout(() => {
       if (!done()) return;
@@ -1058,9 +2274,9 @@ const I = {
   edit: ic("M12 20h9|M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"),
   reroll: ic("M21 12a9 9 0 1 1-2.6-6.4L21 8|M21 3v5h-5", 20, 2.4),
   hand: ic("M8 6h13|M8 12h13|M8 18h13|M3 6h.01|M3 12h.01|M3 18h.01", 18),
+  eye: ic("M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z|M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z", 18),
+  eyeOff: ic("M3 3l18 18|M10.6 5.2A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.1|M6.6 6.6C3.7 8.5 2 12 2 12s3.5 7 10 7c1.9 0 3.5-.6 4.9-1.4|M9.9 9.9a3 3 0 0 0 4.2 4.2", 18),
   chev: ic("M9 18l6-6-6-6", 18),
-  up: ic("M18 15l-6-6-6 6", 20),
-  down: ic("M6 9l6 6 6-6", 20),
   x: ic("M18 6L6 18|M6 6l12 12", 18),
   check: ic("M20 6L9 17l-5-5", 20, 2.4),
   lists: ic("M12 20h9|M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z", 20),
@@ -1085,7 +2301,7 @@ I.sort = ic("M7 4v16|M3 8l4-4 4 4|M17 20V4|M13 16l4 4 4-4", 18);
 // colored pills. Each label always gets the same color, picked from its name.
 const labelHue = (s) => [...s.toLowerCase()].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 360, 7);
 const labelPill = (s) => `<span class="pill-label" style="--h:${labelHue(s)}">${esc(s)}</span>`;
-const allLabels = () => [...new Set(db.lists.flatMap((l) => l.labels || []))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
+const allLabels = (lists = db.lists) => [...new Set(lists.flatMap((l) => l.labels || []))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
 const labelsField = (l) => `
   <div class="label">Labels</div>
   <button class="input labels-in" data-act="labelSheet" aria-label="Edit labels">
@@ -1102,6 +2318,8 @@ const badgesOf = (owner, item) => (owner && owner.badges && owner.badges[item]) 
 // A category's option can also carry badges from its linked list.
 const optionBadges = (list, cat, item) =>
   cat ? [...new Set([...badgesOf(cat, item), ...badgesOf(linkedList(cat), item)])] : badgesOf(list, item);
+// An option's description, if it has one.
+const optionNote = (owner, item) => (owner && owner.notes && owner.notes[item] ? `<span class="opt-note">${esc(owner.notes[item])}</span>` : "");
 const badgeHue = (s) => (/^\+/.test(s) ? 140 : /^[−-]/.test(s) ? 0 : labelHue(s));
 const badgePills = (arr, cls = "") => arr.length
   ? `<span class="badges ${cls}">${arr.map((b) => `<span class="pill-label" style="--h:${badgeHue(b)}">${esc(b)}</span>`).join("")}</span>`
@@ -1151,7 +2369,7 @@ const SORTS = { custom: "My order", az: "A–Z", new: "Newest", old: "Oldest" };
 // The lists Home shows: filtered by the chosen label and search text, then sorted.
 function homeLists() {
   const v = db.view, q = homeQuery.trim().toLowerCase();
-  let ls = db.lists.filter((l) =>
+  let ls = db.lists.filter((l) => !l.off &&
     (!v.label || (l.labels || []).includes(v.label)) &&
     (!q || [l.name, l.description || "", ...(l.labels || [])].some((s) => s.toLowerCase().includes(q))));
   if (v.sort === "az") ls = [...ls].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base", numeric: true }));
@@ -1182,11 +2400,13 @@ function fillHomeList() {
   }).join("");
   box.innerHTML = ls.length
     ? `<div class="group"${sortable ? ' data-sort="lists"' : ""}>${rows}</div>`
+    : db.lists.every((l) => l.off)
+    ? `<div class="no-match"><p class="hint">All lists are hidden.</p><button class="pill" data-act="openManage">Edit lists</button></div>`
     : `<div class="no-match"><p class="hint">No lists match${homeQuery.trim() ? ` “${esc(homeQuery.trim())}”` : ""}.</p><button class="pill" data-act="clearFilters">Clear search and filter</button></div>`;
 }
 
 function renderHome() {
-  const labels = allLabels();
+  const labels = allLabels(db.lists.filter((l) => !l.off));
   if (db.view.label && !labels.includes(db.view.label)) db.view.label = null; // that label is gone
   const chips = labels.length ? `
     <div class="chips-row" role="toolbar" aria-label="Filter by label">
@@ -1244,8 +2464,9 @@ function renderResult(list) {
   } else if (spinning) {
     stage = wheelSVG(list.items);
   } else {
-    stage = `<p class="answer ${size(cur.item)}${cur.reveal ? " reveal" : ""}">${esc(cur.item)}</p>` +
-      badgePills(badgesOf(list, cur.item), `answer-badges${cur.reveal ? " reveal" : ""}`);
+    stage = `<button class="answer ${size(cur.item)}${cur.reveal ? " reveal" : ""}" data-act="copyResult">${esc(cur.item)}</button>` +
+      badgePills(badgesOf(list, cur.item), `answer-badges${cur.reveal ? " reveal" : ""}`) +
+      `<p class="copy-hint">Tap to copy</p>`;
     cur.reveal = false;
   }
 
@@ -1273,29 +2494,34 @@ function renderResult(list) {
 // yourself; the lock keeps it when you reroll (until you leave this screen).
 function renderCombo(list) {
   if (!cur || cur.id !== list.id) {
-    cur = { id: list.id, picks: {}, locks: new Set(), rec: false };
+    cur = { id: list.id, picks: {}, locks: new Set(), hidden: new Set(), rec: false };
     rollCombo(list);
   } else if (comboStale(list)) {
     rollCombo(list, true); // a category changed while editing
   }
 
   const live = liveCats(list);
-  const reels = live.filter((c) => !cur.locks.has(c.id) && catOptions(c).length > 1);
+  // Hidden categories (until you leave this screen) still roll, so linked ones stay right.
+  const shown = live.filter((c) => !cur.hidden.has(c.id));
+  const reels = shown.filter((c) => !cur.locks.has(c.id) && catOptions(c).length > 1);
   if (cur.spin && (!reels.length || reducedMotion())) cur.spin = false;
   const spinning = cur.spin;
   const off = spinning ? 'aria-disabled="true"' : "";
+  // Rare options on show (one still on its reel hasn't landed yet).
+  const gold = shown.filter((c) => isRare(c, cur.picks[c.id]) && !(spinning && reels.includes(c)));
 
-  const rows = live.map((c, k) => {
+  const rows = shown.map((c, k) => {
     const locked = cur.locks.has(c.id);
     const val = spinning && reels.includes(c)
       ? `<span class="combo-val reel" data-cat="${c.id}"><span class="strip"><span>${esc(cur.picks[c.id])}</span></span></span>`
-      : `<span class="combo-val">${esc(cur.picks[c.id])}</span>${badgePills(optionBadges(list, c, cur.picks[c.id]))}`;
+      : `<span class="combo-val">${esc(cur.picks[c.id])}</span>${badgePills(optionBadges(list, c, cur.picks[c.id]))}${optionNote(c, cur.picks[c.id])}`;
     return `
-      <div class="combo-row${locked ? " locked" : ""}" data-cat="${c.id}" style="--k:${k};--c:${WHEEL_COLORS[k % WHEEL_COLORS.length]}">
+      <div class="combo-row${locked ? " locked" : ""}${gold.includes(c) ? " gold" : ""}" data-cat="${c.id}" style="--k:${k};--c:${WHEEL_COLORS[k % WHEEL_COLORS.length]}">
         <button class="combo-main" data-act="pickCat" data-cat="${c.id}" ${off}>
           <span class="combo-cat">${esc(c.name)}</span>
           ${val}
         </button>
+        <span class="combo-count" title="${catOptions(c).length} options" aria-label="${catOptions(c).length} options">${catOptions(c).length}</span>
         <button class="iconbtn lockbtn" data-act="lock" data-cat="${c.id}" aria-pressed="${locked}" aria-label="${locked ? "Unlock" : "Lock"} ${esc(c.name)}" ${off}>${locked ? I.lock : I.unlock}</button>
         ${spinning ? "" : grip}
       </div>`;
@@ -1305,12 +2531,17 @@ function renderCombo(list) {
   if (!live.length) {
     const allOff = list.cats.some((c) => c.off && catOptions(c).length);
     stage = allOff ? `
-      <p class="empty-title">All categories are off</p>
-      <p class="empty-text">Turn one on in Edit to include it in the roll.</p>
+      <p class="empty-title">All categories are hidden</p>
+      <p class="empty-text">Show one in Edit to include it in the roll.</p>
       <button class="btn primary sm" data-act="edit">Edit categories</button>` : `
       <p class="empty-title">Nothing to pick yet</p>
       <p class="empty-text">Add a category with a few options.</p>
       <button class="btn primary sm" data-act="edit">Add categories</button>`;
+  } else if (!shown.length) {
+    stage = `
+      <p class="empty-title">All categories are hidden</p>
+      <p class="empty-text">They're still rolling. Show one to see its result.</p>
+      <button class="btn primary sm" data-act="hideSheet">Show categories</button>`;
   } else {
     // Drag a row (handle, or press and hold) to change the category order.
     const combo = `<div class="group combo${cur.reveal ? " reveal" : ""}"${spinning ? "" : ' data-sort="combo"'}>${rows}</div>`;
@@ -1331,13 +2562,17 @@ function renderCombo(list) {
       ${live.length ? `
       <div class="actions">
         <p class="combo-hint">Tap a result to choose it yourself</p>
+        <button class="linkbtn" data-act="hideSheet" ${off}>${I.eye} ${cur.hidden.size ? `Show or hide · ${live.length - shown.length} hidden` : "Show or hide categories"}</button>
         <div class="btn-row">
           <button class="btn toggle" data-act="wheel" role="switch" aria-checked="${!!db.wheel}"><span class="switch" aria-hidden="true"></span> Reels</button>
           <button class="btn primary" data-act="reroll" ${off}>${I.reroll} Reroll</button>
         </div>
       </div>` : ""}
+      ${gold.length ? `<div class="gold-glow"></div>` : ""}
     </main>`;
-  if (spinning) slotSpin(list, reels);
+  if (spinning) return slotSpin(list, reels);
+  if (gold.length && !cur.goldShown) goldBurst(gold[0]);
+  cur.goldShown = gold.length > 0;
 }
 
 function renderEdit(list) {
@@ -1377,6 +2612,7 @@ function itemRow(owner, it, i, noun) {
       <div class="item-main">
         <input class="item-in" data-field="item" data-i="${i}" value="${esc(it)}" enterkeyhint="done" aria-label="${noun} ${i + 1}">
         ${badgePills(b)}
+        ${optionNote(owner, it)}
       </div>
       <button class="iconbtn sm${b.length ? " has-badges" : ""}" data-act="badgeSheet" data-i="${i}" aria-label="Badges for ${esc(it)}">${I.tag}</button>
       <button class="iconbtn sm" data-act="delItem" data-i="${i}" aria-label="Delete ${esc(it)}">${I.x}</button>
@@ -1387,15 +2623,16 @@ function itemRow(owner, it, i, noun) {
 function renderMultiEdit(list) {
   const rows = list.cats.map((c) => {
     const l = linkedList(c), n = catOptions(c).length;
-    const from = l ? `<span>&nbsp;· </span><span class="ellip">${icon(l)} ${esc(l.name)}${c.items.length ? ` + ${c.items.length}` : ""}</span>` : "";
+    const follows = Object.keys(c.fit || {}).filter((name) => list.cats.some((x) => x.name === name));
+    const from = l ? `<span>&nbsp;· </span><span class="ellip">${icon(l)} ${esc(l.name)}${c.items.length ? ` + ${c.items.length}` : ""}</span>`
+      : follows.length ? `<span>&nbsp;· </span><span class="ellip">Follows ${esc(follows.join(", "))}</span>` : "";
     return `
       <div class="row${c.off ? " off" : ""}" data-act="openCat" data-cat="${c.id}" role="button" tabindex="0">
         <span class="row-text">
           <div class="row-name">${esc(c.name)}</div>
-          <div class="row-sub sub-from"><span>${c.off ? "Off · " : ""}${n} option${n === 1 ? "" : "s"}</span>${from}</div>
+          <div class="row-sub sub-from"><span>${c.off ? "Hidden · " : ""}${n} option${n === 1 ? "" : "s"}</span>${from}</div>
         </span>
-        <button class="toggle catsw" data-act="catActive" data-cat="${c.id}" role="switch" aria-checked="${!c.off}" aria-label="Include ${esc(c.name)} in the roll"><span class="switch" aria-hidden="true"></span></button>
-        <span class="chev">${I.chev}</span>
+        <button class="iconbtn sm eyebtn${c.off ? " is-off" : ""}" data-act="catActive" data-cat="${c.id}" aria-pressed="${!c.off}" aria-label="Include ${esc(c.name)} in the roll">${c.off ? I.eyeOff : I.eye}</button>
         ${grip}
       </div>`;
   }).join("");
@@ -1417,7 +2654,7 @@ function renderMultiEdit(list) {
       ${list.cats.length
         ? `<div class="group" data-sort="cats">${rows}</div>`
         : `<p class="hint">No categories yet. Each category gives one result per roll.</p>`}
-      ${list.cats.length ? `<p class="hint group-hint">Switch a category off to leave it out of the roll.</p>` : ""}
+      ${list.cats.length ? `<p class="hint group-hint">Tap the eye to hide a category and leave it out of the roll.</p>` : ""}
       <button class="btn ghost" data-act="addCat">+ Add category</button>
       <button class="dangerbtn" data-act="deleteList">Delete this multiple</button>
     </main>`;
@@ -1467,10 +2704,10 @@ function renderCatEdit(list, cat) {
 
 function renderManage() {
   const n = db.lists.length;
-  const rows = db.lists.map((l, i) => {
-    const count = isMulti(l) ? `${l.cats.length} categories` : `${l.items.length} items`;
+  const rows = db.lists.map((l) => {
+    const count = `${l.off ? "Hidden · " : ""}${isMulti(l) ? `${l.cats.length} categories` : `${l.items.length} items`}`;
     return `
-    <div class="row" data-act="openEdit" data-id="${l.id}" role="button" tabindex="0">
+    <div class="row${l.off ? " off" : ""}" data-act="openEdit" data-id="${l.id}" role="button" tabindex="0">
       ${emojiBox(l)}
       <span class="row-text">
         <div class="row-name">${esc(l.name)}</div>
@@ -1478,10 +2715,7 @@ function renderManage() {
           ? `<div class="row-sub sub-split"><span class="ellip">${esc(l.description)}</span><span>&nbsp;· ${count}</span></div>`
           : `<div class="row-sub">${count} · tap to edit</div>`}
       </span>
-      <span class="move">
-        <button class="iconbtn sm" data-act="up" data-i="${i}" aria-label="Move up" ${i === 0 ? "disabled" : ""}>${I.up}</button>
-        <button class="iconbtn sm" data-act="down" data-i="${i}" aria-label="Move down" ${i === n - 1 ? "disabled" : ""}>${I.down}</button>
-      </span>
+      <button class="iconbtn sm eyebtn${l.off ? " is-off" : ""}" data-act="listActive" data-id="${l.id}" aria-pressed="${!l.off}" aria-label="Show ${esc(l.name)} on Home">${l.off ? I.eyeOff : I.eye}</button>
       ${grip}
     </div>`;
   }).join("");
@@ -1492,7 +2726,7 @@ function renderManage() {
         <h1>Edit lists</h1>
         <button class="pill" data-act="done">Done</button>
       </header>
-      <p class="hint">Tap a list to edit its name, description and items. Drag a list, or use the arrows, to reorder.</p>
+      <p class="hint">Tap a list to edit its name, description and items. Drag a list to reorder. Tap the eye to hide it from Home.</p>
       ${n ? `<div class="group" data-sort="lists">${rows}</div>` : ""}
       <button class="btn ghost" data-act="newPick">+ New list</button>
     </main>`;
@@ -1534,7 +2768,7 @@ function renderSheet(again) {
       <h2 class="sheet-title">Menu</h2>
       <div class="group">
         <button class="row" data-act="menuNew"><span class="menu-icon">${I.plus}</span><span class="row-text"><div class="row-name">Add a list</div><div class="row-sub">New list or Multiple</div></span></button>
-        <button class="row" data-act="manage"><span class="menu-icon">${I.lists}</span><span class="row-text"><div class="row-name">Edit lists</div><div class="row-sub">Add, rename, reorder, delete</div></span></button>
+        <button class="row" data-act="manage"><span class="menu-icon">${I.lists}</span><span class="row-text"><div class="row-name">Edit lists</div><div class="row-sub">Add, rename, reorder, hide, delete</div></span></button>
         <button class="row" data-act="export"><span class="menu-icon">${I.download}</span><span class="row-text"><div class="row-name">Back up</div><div class="row-sub">Save a backup file to Downloads</div></span></button>
         <button class="row" data-act="import"><span class="menu-icon">${I.upload}</span><span class="row-text"><div class="row-name">Restore from backup</div><div class="row-sub">Replace lists with a backup file</div></span></button>
       </div>
@@ -1594,6 +2828,15 @@ function renderSheet(again) {
         <button class="btn primary sm" type="submit">Add</button>
       </form>
       ${all.length ? `<div class="label sheet-label">Used in this ${route().view === "cat" ? "category" : "list"} · tap to add or remove</div><div class="group">${rows}</div>` : ""}`;
+  } else if (kind === "hide") {
+    const list = cur && findList(cur.id);
+    if (!list || !isMulti(list)) { el.hidden = true; return; }
+    const rows = liveCats(list).map((c) => `
+        <button class="row compact${cur.hidden.has(c.id) ? " off" : ""}" data-act="toggleHide" data-cat="${c.id}" aria-pressed="${!cur.hidden.has(c.id)}">
+          <span class="row-text"><div class="row-name">${esc(c.name)}</div></span>
+          <span class="eyebtn${cur.hidden.has(c.id) ? " is-off" : ""}" aria-hidden="true">${cur.hidden.has(c.id) ? I.eyeOff : I.eye}</span>
+        </button>`).join("");
+    body = `<h2 class="sheet-title">Show or hide</h2><p class="hint">Hidden categories still roll, you just don't see them. They come back when you leave this screen.</p><div class="group">${rows}</div>`;
   } else if (kind === "sort") {
     const on = db.view.sort || "custom";
     const rows = [["custom", "My order", "Drag lists to arrange them"], ["az", "Name A–Z", ""], ["new", "Newest first", "By date created"], ["old", "Oldest first", "By date created"]]
@@ -1625,12 +2868,17 @@ function renderSheet(again) {
   } else if (kind === "pickCat") {
     const list = cur && findList(cur.id), c = list && isMulti(list) && list.cats.find((x) => x.id === cur.pickCat);
     if (!c) { el.hidden = true; return; }
-    const rows = catOptions(c).map((it, i) => `
+    // Only what goes with your locked results; anything unlocked changes to match instead.
+    const o = catOptions(c);
+    const locked = Object.fromEntries(Object.entries(cur.picks).filter(([id]) => cur.locks.has(id) && id !== c.id));
+    const shown = fitChoices(list, c, locked);
+    const rows = o.map((it, i) => !shown.includes(it) ? "" : `
         <button class="row compact" data-act="chooseCat" data-i="${i}">
-          <span class="row-text"><div class="row-name">${esc(it)}</div>${badgePills(optionBadges(list, c, it))}</span>
+          <span class="row-text"><div class="row-name">${esc(it)}</div>${badgePills(optionBadges(list, c, it))}${optionNote(c, it)}</span>
           ${it === cur.picks[c.id] ? `<span class="check">${I.check}</span>` : ""}
         </button>`).join("");
-    body = `<h2 class="sheet-title">${esc(c.name)}</h2><p class="hint">Your choice stays locked when you reroll.</p><div class="group">${rows}</div>`;
+    const note = shown.length < o.length ? " Only options that go with your locked results are shown." : "";
+    body = `<h2 class="sheet-title">${esc(c.name)}</h2><p class="hint">Your choice stays locked when you reroll.${note}</p><div class="group">${rows}</div>`;
   } else if (kind === "link") {
     const c = currentCat();
     if (!c) { el.hidden = true; return; }
@@ -1691,6 +2939,7 @@ const actions = {
   edit: () => go("/edit/" + route().id),
   closeSheet,
 
+  copyResult: () => copyText(cur.item),
   reroll: () => {
     const list = currentList();
     if (isMulti(list)) {
@@ -1708,6 +2957,16 @@ const actions = {
     cur.locks.has(id) ? cur.locks.delete(id) : cur.locks.add(id);
     render();
   },
+  hideSheet: () => {
+    if (!cur.spin) openSheet("hide");
+  },
+  toggleHide: (el) => {
+    const id = el.dataset.cat;
+    cur.hidden.has(id) ? cur.hidden.delete(id) : cur.hidden.add(id);
+    cur.goldShown = cur.goldShown || liveCats(findList(cur.id)).some((c) => isRare(c, cur.picks[c.id])); // showing it again isn't news
+    render();
+    renderSheet(true);
+  },
   pickCat: (el) => {
     if (cur.spin) return;
     cur.pickCat = el.dataset.cat;
@@ -1717,8 +2976,10 @@ const actions = {
     const list = findList(cur.id), c = list.cats.find((x) => x.id === cur.pickCat);
     cur.picks[c.id] = catOptions(c)[+el.dataset.i];
     cur.locks.add(c.id); // choosing by hand also locks it
+    const changed = refit(list);
     record(list);
     closeSheet();
+    if (changed.length) toast(`${changed.join(", ")} changed to match`);
   },
   wheel: (el) => {
     db.wheel = !db.wheel;
@@ -1739,8 +3000,14 @@ const actions = {
     history.replaceState({ d: depth() }, "", "#/manage");
     render();
   },
-  up: (el) => move(+el.dataset.i, -1),
-  down: (el) => move(+el.dataset.i, 1),
+  openManage: () => go("/manage"),
+  listActive: (el) => {
+    // Hidden lists stay out of Home and its search; they're only here in Edit lists.
+    const l = findList(el.dataset.id);
+    if (l.off) delete l.off; else l.off = true;
+    save();
+    render();
+  },
   labelSheet: () => openSheet("labels"),
   toggleLabel: (el) => {
     const list = currentList(), s = el.dataset.v;
@@ -1805,8 +3072,12 @@ const actions = {
     name.select();
   },
   delItem: (el) => {
-    const items = editItems(), [gone] = items.splice(+el.dataset.i, 1);
-    if (!items.includes(gone)) setBadges(editOwner(), gone, []);
+    const items = editItems(), owner = editOwner(), [gone] = items.splice(+el.dataset.i, 1);
+    if (!items.includes(gone)) {
+      setBadges(owner, gone, []);
+      if (isRare(owner, gone)) delete owner.rare;
+      if (owner.notes) delete owner.notes[gone];
+    }
     save();
     render();
   },
@@ -1889,14 +3160,6 @@ async function removeList(list) {
   return true;
 }
 
-function move(i, dir) {
-  const j = i + dir;
-  if (j < 0 || j >= db.lists.length) return;
-  [db.lists[i], db.lists[j]] = [db.lists[j], db.lists[i]];
-  save();
-  render();
-}
-
 document.addEventListener("click", (e) => {
   const el = e.target.closest("[data-act]");
   if (el && !el.disabled && actions[el.dataset.act]) actions[el.dataset.act](el, e);
@@ -1939,8 +3202,13 @@ document.addEventListener("change", (e) => {
     e.target.value = v;
     autoGrow(e.target);
   } else if (f === "catName") {
-    currentCat().name = v || "Category";
-    e.target.value = currentCat().name;
+    const c = currentCat(), old = c.name;
+    c.name = v || "Category";
+    e.target.value = c.name;
+    // Categories that follow this one keep following it.
+    currentList().cats.forEach((d) => {
+      if (d.fit && d.fit[old] && c.name !== old) { d.fit[c.name] = d.fit[old]; delete d.fit[old]; }
+    });
   } else if (f === "item") {
     const i = +e.target.dataset.i, items = editItems(), owner = editOwner(), old = items[i];
     const b = badgesOf(owner, old);
@@ -1948,9 +3216,16 @@ document.addEventListener("change", (e) => {
       items[i] = v;
       e.target.value = v;
       if (b.length && v !== old) { setBadges(owner, old, []); setBadges(owner, v, b); } // badges follow the rename
+      if (isRare(owner, old)) owner.rare.item = v; // so do its odds
+      if (owner.notes && owner.notes[old] && v !== old) { owner.notes[v] = owner.notes[old]; delete owner.notes[old]; } // and its description
+      if (route().view === "cat") renameInFit(currentList(), owner, old, v); // and what it goes with
     } else {
       items.splice(i, 1);
-      if (!items.includes(old)) setBadges(owner, old, []);
+      if (!items.includes(old)) {
+        setBadges(owner, old, []);
+        if (isRare(owner, old)) delete owner.rare;
+        if (owner.notes) delete owner.notes[old];
+      }
       save();
       return render();
     }
@@ -2033,7 +3308,7 @@ document.addEventListener("pointerdown", (e) => {
   const row = e.target.closest("[data-sort] > *");
   if (!row) return;
   if (e.target.closest(".grip")) { e.preventDefault(); startDrag(row, e.pointerId, e.clientX, e.clientY); return; }
-  if (!["lists", "cats", "combo"].includes(row.parentElement.dataset.sort) || e.target.closest(".move")) return;
+  if (!["lists", "cats", "combo"].includes(row.parentElement.dataset.sort) || e.target.closest(".eyebtn")) return;
   const h = { row, id: e.pointerId, x: e.clientX, y: e.clientY };
   h.timer = setTimeout(() => { hold = null; startDrag(h.row, h.id, h.x, h.y); }, HOLD_MS);
   hold = h;
@@ -2122,18 +3397,25 @@ function autoScroll() {
 }
 
 function endDrag() {
-  const { group, from, to, trash } = drag;
+  const { group, row, from, to, trash } = drag;
   drag = null;
   document.body.classList.remove("is-dragging");
   suppressClickUntil = performance.now() + 400;
   if (trash) {
     // Dropped on the trash: put the row back, then ask before deleting.
-    const list = db.lists[from];
+    const list = findList(row.dataset.id);
     render();
     removeList(list).then((gone) => gone && render());
     return;
   }
-  if (to !== from && group.dataset.sort === "combo") {
+  if (to !== from && group.dataset.sort === "lists") {
+    // Home leaves hidden lists out, so move by id and leave those where they are.
+    const ids = [...group.children].map((r) => r.dataset.id);
+    ids.splice(to, 0, ...ids.splice(from, 1));
+    let k = 0;
+    db.lists = db.lists.map((l) => (ids.includes(l.id) ? findList(ids[k++]) : l));
+    save();
+  } else if (to !== from && group.dataset.sort === "combo") {
     // Result screen rows skip empty categories, so move by id and leave those where they are.
     const list = currentList(), ids = [...group.children].map((r) => r.dataset.cat);
     ids.splice(to, 0, ...ids.splice(from, 1));
@@ -2143,7 +3425,7 @@ function endDrag() {
     save();
   } else if (to !== from) {
     const s = group.dataset.sort;
-    const arr = s === "lists" ? db.lists : s === "cats" ? currentList().cats : editItems();
+    const arr = s === "cats" ? currentList().cats : editItems();
     arr.splice(to, 0, ...arr.splice(from, 1));
     save();
   }
@@ -2184,12 +3466,28 @@ $("#imgFile").addEventListener("change", async (e) => {
    Same format as the old app: { "List name": [items] }.
    A list with a description, labels, option badges or image is saved as
    { "List name": { description, labels, badges, image, items } }, where badges = { "option": ["badge"] }.
-   A Multiple: { "Name": { type: "multi", description, labels, image, categories: [{ name, off, link, items, badges }] } },
+   A Multiple: { "Name": { type: "multi", description, labels, image, categories: [{ name, off, link, items, badges, rare, fit, notes }] } },
    where `link` is the name of the linked list.
    ========================================================= */
 const backupItems = (v) => (Array.isArray(v) ? v : v && Array.isArray(v.items) ? v.items : null);
 const backupMulti = (v) => v && v.type === "multi" && Array.isArray(v.categories);
 const isImage = (s) => typeof s === "string" && s.startsWith("data:image/");
+// Option descriptions from a file: { "option": "text" }, anything else dropped.
+function cleanNotes(n) {
+  if (!n || typeof n !== "object" || Array.isArray(n)) return null;
+  const out = Object.fromEntries(Object.entries(n).filter(([k, v]) => k.trim() && typeof v === "string" && v.trim()));
+  return Object.keys(out).length ? out : null;
+}
+// Related options from a file: { "category": { "option": ["option", …] } }, anything else dropped.
+function cleanFit(f) {
+  if (!f || typeof f !== "object" || Array.isArray(f)) return null;
+  const out = {};
+  for (const [name, table] of Object.entries(f)) {
+    const t = cleanBadges(table);
+    if (t) out[name] = t;
+  }
+  return Object.keys(out).length ? out : null;
+}
 // Option badges from a file: { "option": ["badge", …] }, anything else dropped.
 function cleanBadges(b) {
   if (!b || typeof b !== "object" || Array.isArray(b)) return null;
@@ -2205,6 +3503,7 @@ function exportBackup() {
   const obj = {};
   db.lists.forEach((l) => {
     const extra = {
+      ...(l.off && { off: true }),
       ...(l.description && { description: l.description }),
       ...(l.labels && { labels: l.labels }),
       ...(l.badges && { badges: l.badges }),
@@ -2215,7 +3514,7 @@ function exportBackup() {
         type: "multi", ...extra,
         categories: l.cats.map((c) => {
           const k = linkedList(c);
-          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }) };
+          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }), ...(c.rare && { rare: c.rare }), ...(c.fit && { fit: c.fit }), ...(c.notes && { notes: c.notes }), ...(c.unique && { unique: c.unique }) };
         }),
       };
     } else {
@@ -2256,6 +3555,10 @@ $("#file").addEventListener("change", async (e) => {
         name: String(c.name || "").trim() || "Category",
         items: clean(Array.isArray(c.items) ? c.items : []),
         ...(c.off === true && { off: true }),
+        ...(c.rare && typeof c.rare.item === "string" && Number.isInteger(c.rare.odds) && c.rare.odds > 0 && { rare: { item: c.rare.item, odds: c.rare.odds } }),
+        ...(cleanFit(c.fit) && { fit: cleanFit(c.fit) }),
+        ...(cleanNotes(c.notes) && { notes: cleanNotes(c.notes) }),
+        ...(typeof c.unique === "string" && { unique: c.unique }),
         ...(cleanBadges(c.badges) && { badges: cleanBadges(c.badges) }),
         ...(c.link && { linkName: String(c.link).trim() }), // turned into an id below
       }));
@@ -2270,6 +3573,7 @@ $("#file").addEventListener("change", async (e) => {
     if (labels && labels.length) list.labels = labels;
     const badges = multi ? null : Array.isArray(v) ? prev && prev.badges : cleanBadges(v.badges);
     if (badges) list.badges = badges;
+    if (Array.isArray(v) ? prev && prev.off : v.off === true) list.off = true;
     list.created = prev ? prev.created : Date.now() + i; // keeps the backup's order for "Date created"
     return list;
   });
@@ -2289,6 +3593,23 @@ $("#file").addEventListener("change", async (e) => {
 /* =========================================================
    8. Little helpers + start
    ========================================================= */
+async function copyText(s) {
+  try {
+    await navigator.clipboard.writeText(s);
+  } catch {
+    // No clipboard access (older browsers, or not on https): copy through a hidden field.
+    const t = document.createElement("textarea");
+    t.value = s;
+    t.style.cssText = "position:fixed;opacity:0";
+    document.body.append(t);
+    t.select();
+    const ok = document.execCommand("copy");
+    t.remove();
+    if (!ok) return toast("Couldn't copy");
+  }
+  toast("Copied");
+}
+
 let toastTimer;
 function toast(msg) {
   const t = $("#toast");
