@@ -918,6 +918,31 @@ const COUNTRIES = {
     "Yemen",
     "Zambia", "Zimbabwe"],
 };
+// Each country's continent, shown as its option badge. Countries on two continents go by
+// where they're usually counted: Russia and Cyprus in Europe, Egypt in Africa, Türkiye,
+// Kazakhstan and the Caucasus in Asia.
+const CONTINENTS = {
+  Africa: ["Algeria", "Angola", "Benin", "Botswana", "Burkina Faso", "Burundi", "Cabo Verde", "Cameroon", "Central African Republic", "Chad", "Comoros", "Congo",
+    "Côte d'Ivoire", "Democratic Republic of the Congo", "Djibouti", "Egypt", "Equatorial Guinea", "Eritrea", "Eswatini", "Ethiopia", "Gabon", "Gambia", "Ghana",
+    "Guinea", "Guinea-Bissau", "Kenya", "Lesotho", "Liberia", "Libya", "Madagascar", "Malawi", "Mali", "Mauritania", "Mauritius", "Morocco", "Mozambique", "Namibia",
+    "Niger", "Nigeria", "Rwanda", "São Tomé and Príncipe", "Senegal", "Seychelles", "Sierra Leone", "Somalia", "South Africa", "South Sudan", "Sudan", "Tanzania",
+    "Togo", "Tunisia", "Uganda", "Zambia", "Zimbabwe"],
+  Asia: ["Afghanistan", "Armenia", "Azerbaijan", "Bahrain", "Bangladesh", "Bhutan", "Brunei", "Cambodia", "China", "Georgia", "India", "Indonesia", "Iran", "Iraq",
+    "Israel", "Japan", "Jordan", "Kazakhstan", "Kuwait", "Kyrgyzstan", "Laos", "Lebanon", "Malaysia", "Maldives", "Mongolia", "Myanmar", "Nepal", "North Korea",
+    "Oman", "Pakistan", "Palestine", "Philippines", "Qatar", "Saudi Arabia", "Singapore", "South Korea", "Sri Lanka", "Syria", "Tajikistan", "Thailand",
+    "Timor-Leste", "Türkiye", "Turkmenistan", "United Arab Emirates", "Uzbekistan", "Vietnam", "Yemen"],
+  Europe: ["Albania", "Andorra", "Austria", "Belarus", "Belgium", "Bosnia and Herzegovina", "Bulgaria", "Croatia", "Cyprus", "Czechia", "Denmark", "Estonia",
+    "Finland", "France", "Germany", "Greece", "Hungary", "Iceland", "Ireland", "Italy", "Latvia", "Liechtenstein", "Lithuania", "Luxembourg", "Malta", "Moldova",
+    "Monaco", "Montenegro", "Netherlands", "North Macedonia", "Norway", "Poland", "Portugal", "Romania", "Russia", "San Marino", "Serbia", "Slovakia", "Slovenia",
+    "Spain", "Sweden", "Switzerland", "Ukraine", "United Kingdom", "Vatican City"],
+  "North America": ["Antigua and Barbuda", "Bahamas", "Barbados", "Belize", "Canada", "Costa Rica", "Cuba", "Dominica", "Dominican Republic", "El Salvador",
+    "Grenada", "Guatemala", "Haiti", "Honduras", "Jamaica", "Mexico", "Nicaragua", "Panama", "Saint Kitts and Nevis", "Saint Lucia",
+    "Saint Vincent and the Grenadines", "Trinidad and Tobago", "United States"],
+  "South America": ["Argentina", "Bolivia", "Brazil", "Chile", "Colombia", "Ecuador", "Guyana", "Paraguay", "Peru", "Suriname", "Uruguay", "Venezuela"],
+  Oceania: ["Australia", "Fiji", "Kiribati", "Marshall Islands", "Micronesia", "Nauru", "New Zealand", "Palau", "Papua New Guinea", "Samoa", "Solomon Islands",
+    "Tonga", "Tuvalu", "Vanuatu"],
+};
+const continentBadges = () => Object.fromEntries(Object.entries(CONTINENTS).flatMap(([k, names]) => names.map((n) => [n, [k]])));
 
 // What each nature does: the stat it raises, then the one it lowers (by 10%).
 // The other five natures (Bashful, Docile, Hardy, Quirky, Serious) change nothing.
@@ -1644,7 +1669,7 @@ const PALS = {
 const PALWORLD = {
   name: "Random Pal",
   emoji: "🐾",
-  description: "Pal, region, type, rarity, size, activity, gender, work suitability, partner ability, passive skills and lucky",
+  description: "Pal, region, type, rarity, size, activity, gender, work suitability, partner ability, passive skills, alpha, IV and lucky",
 };
 // One column of PALS as a table: each Pal → its options.
 const palRows = (col) => Object.fromEntries(Object.entries(PALS).map(([n, p]) => [n, [p[col]].flat()]));
@@ -1654,9 +1679,404 @@ const palPairs = (from, col) => {
   Object.values(PALS).forEach((p) => [p[from]].flat().forEach((k) => { t[k] = [...new Set([...(t[k] || []), ...[p[col]].flat()])]; }));
   return t;
 };
-// A Pal holds up to 4 Passive Skills, never the same one twice (see `unique`).
+// Each Pal's Work Suitability levels (PalCalc data v28).
+const PAL_WORK = {
+  "Lamball": { "Handiwork": 1, "Transporting": 1, "Farming": 1 },
+  "Cattiva": { "Handiwork": 1, "Gathering": 1, "Mining": 1, "Transporting": 1 },
+  "Chikipi": { "Gathering": 1, "Farming": 1 },
+  "Lifmunk": { "Planting": 1, "Handiwork": 1, "Gathering": 1, "Lumbering": 1, "Medicine Production": 1 },
+  "Fuack": { "Watering": 1, "Handiwork": 1, "Transporting": 1 },
+  "Fuack Ignis": { "Kindling": 2, "Watering": 2, "Handiwork": 1, "Transporting": 1 },
+  "Vixy": { "Gathering": 1, "Farming": 1 },
+  "Celaray": { "Watering": 1, "Transporting": 1 },
+  "Celaray Lux": { "Watering": 1, "Generating Electricity": 2, "Transporting": 1 },
+  "Cremis": { "Gathering": 1, "Farming": 2 },
+  "Croajiro": { "Watering": 1, "Handiwork": 1, "Gathering": 1, "Transporting": 1 },
+  "Croajiro Noct": { "Watering": 1, "Handiwork": 2, "Gathering": 1, "Transporting": 1 },
+  "Herbil": { "Planting": 1, "Gathering": 1, "Transporting": 1 },
+  "Teafant": { "Watering": 1 },
+  "Gumoss": { "Planting": 1 },
+  "Pupperai": { "Gathering": 1, "Lumbering": 1, "Transporting": 1 },
+  "Clovee": { "Planting": 1, "Gathering": 1 },
+  "Jolthog": { "Generating Electricity": 1 },
+  "Jolthog Cryst": { "Cooling": 1 },
+  "Depresso": { "Handiwork": 1, "Mining": 1, "Transporting": 1, "Farming": 1 },
+  "Pengullet": { "Watering": 1, "Handiwork": 1, "Cooling": 1, "Transporting": 1 },
+  "Pengullet Lux": { "Watering": 1, "Generating Electricity": 2, "Handiwork": 1, "Transporting": 1 },
+  "Penking": { "Watering": 2, "Handiwork": 2, "Mining": 3, "Cooling": 2, "Transporting": 3 },
+  "Penking Lux": { "Watering": 2, "Generating Electricity": 3, "Handiwork": 2, "Mining": 3, "Transporting": 3 },
+  "Hoocrates": { "Gathering": 1 },
+  "Melpaca": { "Farming": 2 },
+  "Kingpaca": { "Gathering": 2 },
+  "Kingpaca Cryst": { "Gathering": 2, "Cooling": 4 },
+  "Daedream": { "Handiwork": 1, "Gathering": 1, "Transporting": 1 },
+  "Tanzee": { "Planting": 1, "Handiwork": 1, "Gathering": 1, "Lumbering": 1, "Transporting": 1 },
+  "Tanzee Ignis": { "Kindling": 1, "Handiwork": 1, "Lumbering": 1, "Transporting": 1 },
+  "Nox": { "Gathering": 1 },
+  "Flambelle": { "Kindling": 1, "Handiwork": 1, "Transporting": 1, "Farming": 1 },
+  "Rooby": { "Kindling": 1, "Farming": 1 },
+  "Mau": { "Gathering": 1, "Farming": 1 },
+  "Mau Cryst": { "Cooling": 1, "Farming": 1 },
+  "Rushoar": { "Mining": 1 },
+  "Foxparks": { "Kindling": 1 },
+  "Foxparks Cryst": { "Cooling": 2 },
+  "Killamari": { "Watering": 1, "Gathering": 1, "Transporting": 2 },
+  "Killamari Primo": { "Watering": 1, "Gathering": 1, "Transporting": 2 },
+  "Fuddler": { "Handiwork": 1, "Mining": 1, "Transporting": 1 },
+  "Eikthyrdeer": { "Lumbering": 2 },
+  "Eikthyrdeer Terra": { "Lumbering": 2 },
+  "Direhowl": { "Gathering": 1 },
+  "Caprity": { "Planting": 2, "Farming": 1 },
+  "Caprity Noct": { "Planting": 2, "Farming": 1 },
+  "Swee": { "Gathering": 1, "Cooling": 1 },
+  "Sweepa": { "Gathering": 2, "Cooling": 3 },
+  "Turtacle": { "Watering": 2, "Mining": 1, "Transporting": 1 },
+  "Turtacle Terra": { "Watering": 2, "Mining": 3, "Transporting": 1 },
+  "Hangyu": { "Handiwork": 1, "Gathering": 1, "Transporting": 2 },
+  "Hangyu Cryst": { "Handiwork": 3, "Gathering": 2, "Cooling": 2, "Transporting": 3 },
+  "Woolipop": { "Farming": 1 },
+  "Woolipop Terra": { "Farming": 1 },
+  "Mozzarina": { "Farming": 2 },
+  "Azurobe": { "Watering": 4 },
+  "Azurobe Cryst": { "Cooling": 4 },
+  "Sparkit": { "Generating Electricity": 1, "Handiwork": 1, "Transporting": 1, "Farming": 1 },
+  "Kelpsea": { "Watering": 1, "Farming": 1 },
+  "Kelpsea Ignis": { "Kindling": 1, "Farming": 1 },
+  "Ribbuny": { "Handiwork": 1, "Gathering": 1, "Transporting": 1 },
+  "Ribbuny Botan": { "Planting": 2, "Handiwork": 2, "Gathering": 2, "Transporting": 1 },
+  "Jelliette": { "Watering": 2, "Handiwork": 1, "Transporting": 1 },
+  "Jellroy": { "Watering": 2, "Handiwork": 1, "Medicine Production": 1, "Transporting": 1 },
+  "Amione": { "Watering": 1, "Handiwork": 2, "Transporting": 1 },
+  "Gloopie": { "Watering": 2, "Handiwork": 2, "Transporting": 2 },
+  "Gloopie Primo": { "Watering": 2, "Handiwork": 2, "Transporting": 2 },
+  "Galeclaw": { "Gathering": 2 },
+  "Wispaw": { "Handiwork": 2, "Lumbering": 1, "Medicine Production": 1, "Transporting": 1 },
+  "Nitewing": { "Gathering": 2 },
+  "Tombat": { "Gathering": 2, "Mining": 3, "Transporting": 2 },
+  "Tocotoco": { "Gathering": 1 },
+  "Univolt": { "Generating Electricity": 3, "Lumbering": 1 },
+  "Univolt Cryst": { "Lumbering": 3, "Cooling": 6 },
+  "Gobfin": { "Watering": 2, "Handiwork": 2, "Transporting": 1 },
+  "Gobfin Ignis": { "Kindling": 2, "Handiwork": 2, "Transporting": 1 },
+  "Loupmoon": { "Handiwork": 2 },
+  "Loupmoon Cryst": { "Handiwork": 4, "Cooling": 4 },
+  "Cawgnito": { "Lumbering": 2, "Farming": 1 },
+  "Arsox": { "Kindling": 3, "Lumbering": 2 },
+  "Muffly": { "Cooling": 2, "Transporting": 1 },
+  "Bristla": { "Planting": 2, "Handiwork": 2, "Gathering": 2, "Medicine Production": 2, "Transporting": 1 },
+  "Cinnamoth": { "Planting": 2, "Gathering": 2, "Medicine Production": 2 },
+  "Puffolt": { "Generating Electricity": 2, "Transporting": 1 },
+  "Elphidran": { "Lumbering": 3 },
+  "Elphidran Aqua": { "Watering": 4, "Lumbering": 3 },
+  "Vanwyrm": { "Kindling": 2, "Transporting": 3 },
+  "Vanwyrm Cryst": { "Cooling": 2, "Transporting": 3 },
+  "Felbat": { "Medicine Production": 3 },
+  "Vaelet": { "Planting": 3, "Handiwork": 3, "Gathering": 3, "Medicine Production": 3, "Transporting": 2, "Farming": 2 },
+  "Beegarde": { "Planting": 2, "Handiwork": 2, "Gathering": 3, "Lumbering": 2, "Medicine Production": 2, "Transporting": 2, "Farming": 3 },
+  "Elizabee": { "Planting": 4, "Handiwork": 4, "Gathering": 4, "Lumbering": 3, "Medicine Production": 4 },
+  "Lovander": { "Handiwork": 3, "Mining": 2, "Medicine Production": 3, "Transporting": 2 },
+  "Grintale": { "Gathering": 3 },
+  "Tarantriss": { "Handiwork": 3, "Gathering": 3, "Medicine Production": 2, "Transporting": 2 },
+  "Polapup": { "Watering": 3, "Cooling": 4 },
+  "Polapup Terra": { "Mining": 4, "Cooling": 4 },
+  "Leezpunk": { "Handiwork": 2, "Gathering": 1, "Transporting": 1 },
+  "Leezpunk Ignis": { "Kindling": 2, "Handiwork": 2, "Gathering": 1, "Transporting": 1 },
+  "Gorirat": { "Handiwork": 2, "Lumbering": 3, "Transporting": 3 },
+  "Gorirat Terra": { "Handiwork": 2, "Mining": 3, "Transporting": 3 },
+  "Surfent": { "Watering": 3, "Farming": 2 },
+  "Surfent Terra": { "Gathering": 3 },
+  "Robinquill": { "Planting": 2, "Handiwork": 3, "Gathering": 3, "Lumbering": 2, "Medicine Production": 1, "Transporting": 2 },
+  "Robinquill Terra": { "Handiwork": 3, "Gathering": 3, "Lumbering": 2, "Medicine Production": 2, "Transporting": 2 },
+  "Flopie": { "Planting": 2, "Handiwork": 2, "Gathering": 2, "Medicine Production": 1, "Transporting": 1 },
+  "Wixen": { "Kindling": 3, "Handiwork": 3, "Transporting": 2 },
+  "Wixen Noct": { "Kindling": 4, "Handiwork": 4, "Transporting": 2 },
+  "Katress": { "Handiwork": 3, "Medicine Production": 3, "Transporting": 2 },
+  "Katress Ignis": { "Kindling": 3, "Handiwork": 3, "Medicine Production": 3, "Transporting": 2 },
+  "Helzephyr": { "Transporting": 4 },
+  "Helzephyr Lux": { "Generating Electricity": 4, "Transporting": 5 },
+  "Elgrove": { "Planting": 3, "Gathering": 2, "Lumbering": 3, "Mining": 2, "Transporting": 3 },
+  "Elgrove Cryst": { "Lumbering": 3, "Mining": 3, "Cooling": 5, "Transporting": 3 },
+  "Lunaris": { "Handiwork": 4, "Gathering": 2, "Transporting": 2 },
+  "Fenglope": { "Lumbering": 3 },
+  "Fenglope Lux": { "Generating Electricity": 5, "Lumbering": 4 },
+  "Dinossom": { "Planting": 3, "Lumbering": 3 },
+  "Dinossom Lux": { "Generating Electricity": 3, "Lumbering": 4 },
+  "Bushi": { "Kindling": 2, "Handiwork": 2, "Gathering": 1, "Lumbering": 3, "Transporting": 2 },
+  "Bushi Noct": { "Kindling": 2, "Handiwork": 2, "Gathering": 1, "Lumbering": 5, "Transporting": 2 },
+  "Munchill": { "Watering": 2, "Cooling": 3, "Transporting": 1 },
+  "Mammorest": { "Planting": 4, "Lumbering": 4, "Mining": 4 },
+  "Mammorest Cryst": { "Lumbering": 5, "Mining": 4, "Cooling": 5 },
+  "Finsider": { "Watering": 2, "Transporting": 1 },
+  "Finsider Ignis": { "Kindling": 2, "Watering": 2, "Transporting": 1 },
+  "Petallia": { "Planting": 4, "Handiwork": 3, "Gathering": 3, "Medicine Production": 4, "Transporting": 2 },
+  "Petallia Ignis": { "Kindling": 4, "Handiwork": 3, "Gathering": 3, "Medicine Production": 4, "Transporting": 2 },
+  "Leafan": { "Planting": 3, "Handiwork": 3, "Gathering": 3, "Transporting": 2 },
+  "Incineram": { "Kindling": 3, "Handiwork": 2, "Mining": 3, "Transporting": 2 },
+  "Incineram Noct": { "Handiwork": 3, "Mining": 4, "Transporting": 3 },
+  "Dazzi": { "Generating Electricity": 3, "Handiwork": 2, "Transporting": 2 },
+  "Dazzi Noct": { "Generating Electricity": 1, "Handiwork": 1, "Medicine Production": 1, "Transporting": 2 },
+  "Pyrin": { "Kindling": 4, "Lumbering": 2 },
+  "Pyrin Noct": { "Kindling": 4, "Lumbering": 3 },
+  "Relaxaurus": { "Watering": 3, "Transporting": 3 },
+  "Relaxaurus Lux": { "Generating Electricity": 4, "Transporting": 3 },
+  "Foxcicle": { "Cooling": 4, "Farming": 3 },
+  "Beakon": { "Generating Electricity": 4, "Gathering": 2, "Transporting": 5 },
+  "Beakon Cryst": { "Gathering": 2, "Cooling": 5, "Transporting": 5 },
+  "Ghangler": { "Watering": 5, "Transporting": 2 },
+  "Ghangler Ignis": { "Kindling": 5, "Watering": 5, "Transporting": 2 },
+  "Rayhound": { "Generating Electricity": 4 },
+  "Rayhound Cryst": { "Cooling": 3 },
+  "Menasting": { "Lumbering": 3, "Mining": 5 },
+  "Menasting Terra": { "Lumbering": 3, "Mining": 6 },
+  "Needoll": { "Planting": 3, "Gathering": 3, "Transporting": 1 },
+  "Needoll Noct": { "Planting": 3, "Gathering": 3, "Transporting": 1 },
+  "Reindrix": { "Lumbering": 3, "Cooling": 3 },
+  "Mossanda": { "Planting": 3, "Handiwork": 2, "Lumbering": 4, "Transporting": 4 },
+  "Mossanda Lux": { "Generating Electricity": 4, "Handiwork": 3, "Lumbering": 4, "Transporting": 4 },
+  "Chillet": { "Gathering": 1, "Cooling": 2 },
+  "Chillet Ignis": { "Kindling": 4, "Gathering": 3 },
+  "Ragnahawk": { "Kindling": 4, "Transporting": 5 },
+  "Moldron": { "Kindling": 5, "Mining": 5 },
+  "Moldron Cryst": { "Mining": 5, "Cooling": 5 },
+  "Palumba": { "Planting": 4, "Gathering": 4, "Mining": 5 },
+  "Digtoise": { "Mining": 4 },
+  "Broncherry": { "Planting": 5 },
+  "Broncherry Aqua": { "Watering": 5 },
+  "Dumud": { "Watering": 2, "Mining": 2, "Transporting": 1, "Farming": 1 },
+  "Dumud Gild": { "Watering": 2, "Mining": 2, "Transporting": 1, "Farming": 4 },
+  "Braloha": { "Planting": 5, "Gathering": 5, "Mining": 3 },
+  "Kitsun": { "Kindling": 3 },
+  "Kitsun Noct": { "Kindling": 4 },
+  "Blazehowl": { "Kindling": 5, "Lumbering": 3 },
+  "Blazehowl Noct": { "Kindling": 5, "Lumbering": 3 },
+  "Warsect": { "Planting": 3, "Handiwork": 3, "Lumbering": 4, "Transporting": 5 },
+  "Warsect Terra": { "Handiwork": 2, "Mining": 5, "Transporting": 5 },
+  "Frostplume": { "Gathering": 2, "Cooling": 4 },
+  "Majex": { "Kindling": 4, "Handiwork": 5, "Medicine Production": 3, "Transporting": 2 },
+  "Sibelyx": { "Medicine Production": 3, "Cooling": 3, "Farming": 3 },
+  "Sibelyx Primo": { "Medicine Production": 3, "Farming": 4 },
+  "Maraith": { "Gathering": 4, "Mining": 4 },
+  "Shroomer": { "Planting": 3, "Handiwork": 2, "Gathering": 3, "Lumbering": 2, "Farming": 3 },
+  "Shroomer Noct": { "Planting": 3, "Handiwork": 3, "Gathering": 3, "Lumbering": 2 },
+  "Icelyn": { "Handiwork": 5, "Medicine Production": 4, "Cooling": 5, "Transporting": 2 },
+  "Gildra": { "Handiwork": 5, "Medicine Production": 4, "Transporting": 2 },
+  "Jormuntide": { "Watering": 7 },
+  "Jormuntide Ignis": { "Kindling": 7 },
+  "Suzaku": { "Kindling": 5 },
+  "Suzaku Aqua": { "Watering": 6 },
+  "Dazemu": { "Gathering": 2 },
+  "Quivern": { "Handiwork": 2, "Gathering": 3, "Mining": 4, "Transporting": 5 },
+  "Quivern Botan": { "Planting": 5, "Handiwork": 2, "Gathering": 4, "Mining": 3, "Transporting": 4 },
+  "Lullu": { "Planting": 3, "Handiwork": 3, "Gathering": 2, "Medicine Production": 3 },
+  "Kikit": { "Mining": 1 },
+  "Yakumo": { "Gathering": 2 },
+  "Skutlass": { "Watering": 4, "Gathering": 1, "Lumbering": 4 },
+  "Skutlass Ignis": { "Kindling": 3, "Watering": 2, "Gathering": 2, "Lumbering": 3 },
+  "Reptyro": { "Kindling": 5, "Mining": 5 },
+  "Reptyro Cryst": { "Mining": 5, "Cooling": 5 },
+  "Starryon": { "Gathering": 5 },
+  "Starryon Primo": { "Gathering": 7 },
+  "Pierdon": { "Mining": 5 },
+  "Pierdon Cryst": { "Mining": 5, "Cooling": 6 },
+  "Cryolinx": { "Handiwork": 3, "Lumbering": 4, "Cooling": 4, "Transporting": 4 },
+  "Cryolinx Terra": { "Handiwork": 2, "Lumbering": 6, "Mining": 5, "Transporting": 4 },
+  "Snugloo": { "Handiwork": 2, "Mining": 3, "Cooling": 3, "Transporting": 2 },
+  "Wumpo": { "Handiwork": 3, "Lumbering": 5, "Cooling": 5, "Transporting": 6 },
+  "Wumpo Botan": { "Planting": 3, "Handiwork": 3, "Lumbering": 5, "Transporting": 6 },
+  "Sootseer": { "Kindling": 3, "Handiwork": 3, "Gathering": 2, "Mining": 3, "Farming": 2 },
+  "Carnibora": { "Planting": 6, "Handiwork": 4, "Gathering": 4, "Transporting": 2 },
+  "Blazamut": { "Kindling": 6, "Mining": 7 },
+  "Blazamut Ryu": { "Kindling": 6, "Mining": 7 },
+  "Dualith": { "Planting": 3, "Gathering": 3, "Lumbering": 5, "Mining": 6, "Transporting": 6 },
+  "Dualith Noct": { "Planting": 3, "Gathering": 3, "Lumbering": 5, "Mining": 6, "Transporting": 6 },
+  "Anubis": { "Handiwork": 6, "Mining": 6, "Transporting": 4 },
+  "Sekhmet": { "Handiwork": 6, "Mining": 3, "Transporting": 2 },
+  "Prixter": { "Gathering": 2, "Lumbering": 4, "Medicine Production": 2 },
+  "Prixter Lux": { "Generating Electricity": 3, "Gathering": 2, "Lumbering": 4, "Medicine Production": 2 },
+  "Tetroise": { "Mining": 4 },
+  "Tetroise Primo": { "Mining": 6 },
+  "Nyafia": { "Handiwork": 4, "Gathering": 4, "Lumbering": 2, "Transporting": 3 },
+  "Mimog": { "Gathering": 1, "Transporting": 2 },
+  "Xenovader": { "Lumbering": 3, "Transporting": 2 },
+  "Xenogard": { "Mining": 4 },
+  "Prunelia": { "Planting": 3, "Handiwork": 1, "Gathering": 2, "Medicine Production": 3, "Transporting": 1 },
+  "Nitemary": { "Handiwork": 4, "Transporting": 2 },
+  "Nitemary Botan": { "Planting": 3, "Handiwork": 4, "Transporting": 2 },
+  "Smokie": { "Gathering": 2 },
+  "Smokie Cryst": { "Gathering": 2, "Cooling": 2 },
+  "Omascul": { "Gathering": 5 },
+  "Whalaska": { "Watering": 5, "Cooling": 6 },
+  "Whalaska Ignis": { "Kindling": 5, "Cooling": 6 },
+  "Verdash": { "Planting": 4, "Handiwork": 5, "Gathering": 5, "Lumbering": 3, "Transporting": 3 },
+  "Splatterina": { "Handiwork": 6, "Lumbering": 3, "Medicine Production": 5, "Transporting": 2 },
+  "Gildane": { "Gathering": 5 },
+  "Dogen": { "Handiwork": 4, "Gathering": 3, "Lumbering": 3, "Medicine Production": 2, "Transporting": 3 },
+  "Bulldosu": { "Mining": 4, "Transporting": 3 },
+  "Celesdir": { "Gathering": 4, "Lumbering": 7 },
+  "Celesdir Noct": { "Gathering": 4, "Lumbering": 8 },
+  "Astegon": { "Handiwork": 3, "Mining": 7 },
+  "Knocklem": { "Gathering": 4, "Mining": 7, "Transporting": 7 },
+  "Knocklem Ignis": { "Kindling": 5, "Mining": 7, "Transporting": 7 },
+  "Silvegis": { "Lumbering": 6 },
+  "Azurmane": { "Generating Electricity": 5 },
+  "Valentail": { "Gathering": 2 },
+  "Snock": { "Generating Electricity": 4 },
+  "Snock Terra": { "Generating Electricity": 4 },
+  "Souffline": { "Planting": 2, "Transporting": 2 },
+  "Lapiron": { "Handiwork": 3, "Gathering": 4, "Mining": 2, "Transporting": 1 },
+  "Hoodle": { "Handiwork": 1, "Transporting": 1 },
+  "Slowatt": { "Generating Electricity": 3 },
+  "Bakemi": { "Handiwork": 3, "Medicine Production": 4, "Transporting": 2 },
+  "Solmora": { "Watering": 4 },
+  "Solmora Lux": { "Watering": 4, "Generating Electricity": 6 },
+  "Lapure": { "Handiwork": 6, "Gathering": 5 },
+  "Eidrolon": { "Transporting": 6 },
+  "Eidrolon Ignis": { "Kindling": 6, "Transporting": 6 },
+  "Dynamoff": { "Generating Electricity": 6, "Gathering": 3, "Transporting": 3 },
+  "Tropicaw": { "Planting": 5, "Gathering": 5 },
+  "Flaracle": { "Kindling": 7, "Handiwork": 6, "Transporting": 2 },
+  "Ophydia": { "Watering": 5, "Planting": 7 },
+  "Dupin": { "Kindling": 7, "Handiwork": 5, "Medicine Production": 4, "Transporting": 2 },
+  "Roujay": { "Gathering": 5, "Transporting": 5 },
+  "Venusa": { "Handiwork": 6, "Gathering": 6, "Medicine Production": 5, "Transporting": 2 },
+  "Mycora": { "Planting": 6, "Handiwork": 4, "Gathering": 4, "Medicine Production": 6 },
+  "Loomen": { "Kindling": 4, "Handiwork": 4, "Medicine Production": 4 },
+  "Wistella": { "Handiwork": 6, "Medicine Production": 6, "Transporting": 1 },
+  "Solenne": { "Handiwork": 8, "Gathering": 4, "Transporting": 2 },
+  "Renjishi": { "Kindling": 8, "Handiwork": 6, "Gathering": 5, "Transporting": 5 },
+  "Aegidron": { "Mining": 8 },
+  "Grizzbolt": { "Generating Electricity": 5, "Handiwork": 4, "Lumbering": 3, "Transporting": 5 },
+  "Lyleen": { "Planting": 7, "Handiwork": 5, "Gathering": 6, "Medicine Production": 5 },
+  "Lyleen Noct": { "Handiwork": 5, "Gathering": 6, "Medicine Production": 7 },
+  "Orserk": { "Generating Electricity": 8, "Handiwork": 3, "Transporting": 4 },
+  "Faleris": { "Kindling": 6, "Transporting": 3 },
+  "Faleris Aqua": { "Watering": 6, "Transporting": 5 },
+  "Shadowbeak": { "Gathering": 2 },
+  "Selyne": { "Handiwork": 7, "Medicine Production": 6, "Transporting": 3 },
+  "Bastigor": { "Lumbering": 6, "Mining": 5, "Cooling": 8 },
+  "Shaolong": { "Watering": 8, "Gathering": 5 },
+  "Silvance": { "Planting": 6, "Handiwork": 6, "Gathering": 4, "Medicine Production": 8, "Transporting": 2 },
+  "Dandilord": { "Planting": 8, "Handiwork": 6, "Gathering": 5, "Medicine Production": 6, "Transporting": 3 },
+  "Bellanoir": { "Handiwork": 5, "Medicine Production": 5, "Transporting": 4 },
+  "Bellanoir Libero": { "Handiwork": 6, "Medicine Production": 7, "Transporting": 4 },
+  "Xenolord": { "Gathering": 2 },
+  "Hartalis": { "Gathering": 7, "Lumbering": 7 },
+  "Paladius": { "Lumbering": 6, "Mining": 6 },
+  "Necromus": { "Lumbering": 6, "Mining": 6 },
+  "Frostallion": { "Cooling": 7 },
+  "Frostallion Noct": { "Gathering": 7 },
+  "Neptilius": { "Watering": 7 },
+  "Jetragon": { "Gathering": 8 },
+  "Panthalus": {  },
+};
+// Passive Skills some Pals always have (PalCalc data v28), e.g. every Gorirat is a Hooligan.
+const PAL_STARTS = {
+  "Anubis": ["Earth Emperor"],
+  "Digtoise": ["Hard Skin"],
+  "Gorirat": ["Hooligan"],
+  "Gorirat Terra": ["Hooligan"],
+  "Jormuntide": ["Lord of the Sea"],
+  "Cattiva": ["Coward"],
+  "Reptyro": ["Heavyweight"],
+  "Reptyro Cryst": ["Heavyweight"],
+  "Relaxaurus": ["Glutton"],
+  "Frostallion": ["Legend", "Ice Emperor"],
+  "Frostallion Noct": ["Legend", "Lord of the Underworld"],
+  "Mammorest": ["Heavyweight"],
+  "Mammorest Cryst": ["Heavyweight"],
+  "Broncherry": ["Heavyweight"],
+  "Broncherry Aqua": ["Heavyweight"],
+  "Blazamut": ["Flame Emperor"],
+  "Blazamut Ryu": ["Eternal Flame"],
+  "Lovander": ["Abnormal"],
+  "Wumpo": ["Heavyweight"],
+  "Wumpo Botan": ["Heavyweight"],
+  "Lyleen": ["Spirit Emperor"],
+  "Astegon": ["Hard Skin"],
+  "Jetragon": ["Legend", "Divine Dragon"],
+  "Kingpaca": ["Heavyweight"],
+  "Kingpaca Cryst": ["Heavyweight"],
+  "Warsect": ["Hard Skin"],
+  "Warsect Terra": ["Hard Skin"],
+  "Paladius": ["Legend", "Celestial Emperor"],
+  "Necromus": ["Legend", "Lord of the Underworld"],
+  "Orserk": ["Lord of Lightning"],
+  "Bellanoir Libero": ["Siren of the Void"],
+  "Knocklem": ["Heavyweight"],
+  "Knocklem Ignis": ["Heavyweight"],
+  "Xenovader": ["Otherworldly Cells"],
+  "Xenogard": ["Otherworldly Cells"],
+  "Xenolord": ["Invader", "Otherworldly Cells"],
+  "Silvegis": ["Heavyweight"],
+  "Splatterina": ["Sadist"],
+  "Pierdon": ["Heavyweight"],
+  "Pierdon Cryst": ["Heavyweight"],
+  "Hartalis": ["Savior"],
+  "Braloha": ["Heavyweight"],
+  "Dualith": ["Heavyweight"],
+  "Dualith Noct": ["Heavyweight"],
+  "Neptilius": ["Legend", "Lunker"],
+  "Aegidron": ["Heavyweight"],
+};
+// A Pal has 0 to 4 Passive Skills, each count as likely, and never the same one twice (see
+// `unique`); the slots past the count say None. A Lucky Pal always has the Lucky passive and
+// only a Lucky Pal has it; the Pals above always have theirs too (see `starts`).
+const PAL_NONE = "None";
+const PAL_COUNTS = ["0", "1", "2", "3", "4"];
+const palCountCat = () => ({
+  id: uid(), name: "Passive Skills", items: [...PAL_COUNTS], fit: { Lucky: { Yes: PAL_COUNTS.slice(1), No: [...PAL_COUNTS] } },
+  starts: { group: "passive", by: { Lucky: { Yes: ["Lucky"] }, Pal: structuredClone(PAL_STARTS) } },
+});
+const palPassiveFit = (n) => {
+  const all = Object.keys(PAL_PASSIVES);
+  return {
+    "Passive Skills": Object.fromEntries(PAL_COUNTS.map((k) => [k, +k >= n ? all : [PAL_NONE]])),
+    Lucky: { Yes: [PAL_NONE, ...all], No: [PAL_NONE, ...all.filter((s) => s !== "Lucky")] },
+  };
+};
+// Alpha: 1 in 5, quietly (no gold). An Alpha is one size bigger (see `grow`) and rolls an IV
+// of 50–100% instead of 0–100%.
+const PAL_IVS = Array.from({ length: 101 }, (_, i) => `${i}%`);
+const palAlphaCat = () => ({
+  id: uid(), name: "Alpha", items: ["No", "Yes"], rare: { item: "Yes", odds: 5, quiet: true }, badges: { Yes: ["1/5 chance"] },
+  notes: { Yes: "One size bigger, higher IV, work levels +1, more HP, far less damage taken and 10× EXP when defeated" },
+});
+const palIvCat = () => ({ id: uid(), name: "IV", items: [...PAL_IVS], fit: { Alpha: { Yes: PAL_IVS.slice(50), No: [...PAL_IVS] } } });
+const PAL_GROW = { by: "Alpha", when: "Yes" };
+// Work Suitability: each Pal's whole set ("Handiwork · Lumbering · Transporting"), with levels
+// rolled from its own (see `levels`); Alpha and Lucky add 1 each.
+const palWorkSet = (n) => Object.keys(PAL_WORK[n] || {}).join(" · ") || PAL_NONE;
+// Type: a Pal's one or two types as one option ("Dark · Fire"), its main type first.
+const PAL_TYPES = ["Neutral", "Fire", "Water", "Grass", "Electric", "Ice", "Ground", "Dark", "Dragon"];
+const palTypeSet = (n) => PALS[n][0].join(" · ");
+// A table from what each Pal has: every `key` of a Pal → the `val`s of the Pals with it (either can be a list).
+const palPairsBy = (key, val) => {
+  const t = {};
+  Object.keys(PALS).forEach((n) => [key(n)].flat().forEach((k) => { t[k] = [...new Set([...(t[k] || []), ...[val(n)].flat()])]; }));
+  return t;
+};
+const palTypeCat = () => {
+  const rank = (s) => s.split(" · ").map((t) => PAL_TYPES.indexOf(t) + 1);
+  const items = [...new Set(Object.keys(PALS).map(palTypeSet))].sort((a, b) => {
+    const [x, y] = [rank(a), rank(b)];
+    return x[0] - y[0] || (x[1] || 0) - (y[1] || 0);
+  });
+  return {
+    id: uid(), name: "Type", items,
+    fit: { Pal: Object.fromEntries(Object.keys(PALS).map((n) => [n, [palTypeSet(n)]])), Region: palPairsBy((n) => PALS[n][6], palTypeSet) },
+  };
+};
+const palWorkCat = () => {
+  const sets = Object.fromEntries(Object.keys(PALS).map((n) => [n, palWorkSet(n)]));
+  return {
+    id: uid(), name: "Work Suitability", items: [...new Set(Object.values(sets))],
+    fit: { Pal: Object.fromEntries(Object.entries(sets).map(([n, s]) => [n, [s]])), Type: palPairsBy(palTypeSet, palWorkSet) },
+    levels: { by: "Pal", base: structuredClone(PAL_WORK), max: 10, bonus: { Alpha: "Yes", Lucky: "Yes" } },
+  };
+};
 const palPassiveCats = () => [1, 2, 3, 4].map((n) => ({
-  id: uid(), name: `Passive Skill ${n}`, items: Object.keys(PAL_PASSIVES), notes: { ...PAL_PASSIVES }, unique: "passive",
+  id: uid(), name: `Passive Skill ${n}`, items: [PAL_NONE, ...Object.keys(PAL_PASSIVES)],
+  notes: { [PAL_NONE]: "No passive skill in this slot", ...PAL_PASSIVES }, unique: "passive", fit: palPassiveFit(n),
 }));
 // Every other category follows the Pal, so a roll describes a real one. With Pal hidden,
 // Type still follows Region, and Work Suitability and Partner Ability still follow Type.
@@ -1668,14 +2088,17 @@ const palworldMulti = () => {
     cats: [
       cat("Pal", Object.keys(PALS)),
       cat("Region", options(6), 6),
-      cat("Type", ["Neutral", "Fire", "Water", "Grass", "Electric", "Ice", "Ground", "Dark", "Dragon"], 0, { Region: palPairs(6, 0) }),
+      palTypeCat(),
       cat("Rarity", ["Common", "Rare", "Epic", "Legendary"], 1),
-      cat("Size", ["XS", "S", "M", "L", "XL"], 2),
+      { ...cat("Size", ["XS", "S", "M", "L", "XL"], 2), grow: { ...PAL_GROW } },
       cat("Activity", ["Daytime", "Nocturnal"], 3),
       cat("Gender", ["Male", "Female"]),
-      cat("Work Suitability", options(5), 5, { Type: palPairs(0, 5) }),
-      { ...cat("Partner Ability", Object.keys(PAL_PARTNERS), 4, { Type: palPairs(0, 4) }), notes: { ...PAL_PARTNERS } },
+      palWorkCat(),
+      { ...cat("Partner Ability", Object.keys(PAL_PARTNERS), 4, { Type: palPairsBy(palTypeSet, (n) => PALS[n][4]) }), notes: { ...PAL_PARTNERS } },
+      palCountCat(),
       ...palPassiveCats(),
+      palAlphaCat(),
+      palIvCat(),
       { ...cat("Lucky", ["No", "Yes"]), ...rareYes() },
     ],
   };
@@ -1717,6 +2140,15 @@ function load() {
     }
     d.seededCountries = true;
   }
+  // Once: label each country with its continent (badges you already gave a country stay).
+  if (!d.countryContinents) {
+    const l = d.lists.find((x) => x.type !== "multi" && x.name === COUNTRIES.name);
+    if (l) {
+      const b = continentBadges();
+      l.items.forEach((n) => { if (b[n] && !(l.badges && l.badges[n])) (l.badges = l.badges || {})[n] = b[n]; });
+    }
+    d.countryContinents = true;
+  }
   // The Palworld Multiple, right after the Pokémon one.
   if (!d.seededPalworld) {
     if (!d.lists.some((l) => l.name === PALWORLD.name)) d.lists.splice(d.lists.findIndex((l) => l.name === POKEMON.name) + 1, 0, palworldMulti());
@@ -1732,6 +2164,57 @@ function load() {
       m.description = m.description.replace("passive skill and", "passive skills and");
     }
     d.palPassives = true;
+  }
+  // Once: the Palworld Multiple rolls how many Passive Skills (0–4) too, the Lucky passive
+  // comes only with Lucky, and Pals like Gorirat always have their own.
+  if (!d.palPassiveRules) {
+    const m = d.lists.find((l) => l.type === "multi" && l.name === PALWORLD.name);
+    const slots = m ? m.cats.filter((c) => /^Passive Skill [1-4]$/.test(c.name)) : [];
+    slots.forEach((c) => {
+      if (!c.items.includes(PAL_NONE)) c.items.unshift(PAL_NONE);
+      if (c.notes && !c.notes[PAL_NONE]) c.notes = { [PAL_NONE]: "No passive skill in this slot", ...c.notes };
+      c.fit = palPassiveFit(+c.name.slice(-1));
+    });
+    const count = slots.length && m.cats.find((c) => c.name === "Passive Skills");
+    if (count) Object.assign(count, { fit: palCountCat().fit, starts: palCountCat().starts });
+    else if (slots.length) m.cats.splice(m.cats.indexOf(slots[0]), 0, palCountCat());
+    d.palPassiveRules = true;
+  }
+  // Once: the Palworld Multiple rolls Alpha (bigger, higher IV) and IV, before Lucky.
+  if (!d.palAlpha) {
+    const m = d.lists.find((l) => l.type === "multi" && l.name === PALWORLD.name);
+    if (m && !m.cats.some((c) => c.name === "Alpha")) {
+      const lucky = m.cats.findIndex((c) => c.name === "Lucky");
+      m.cats.splice(lucky < 0 ? m.cats.length : lucky, 0, palAlphaCat(), ...(m.cats.some((c) => c.name === "IV") ? [] : [palIvCat()]));
+      const size = m.cats.find((c) => c.name === "Size");
+      if (size) size.grow = { ...PAL_GROW };
+      m.description = m.description.replace(/passive skills and lucky$/, "passive skills, alpha, IV and lucky");
+    }
+    d.palAlpha = true;
+  }
+  // Once: Work Suitability shows a Pal's whole set, with levels.
+  if (!d.palWork) {
+    const m = d.lists.find((l) => l.type === "multi" && l.name === PALWORLD.name);
+    const w = m && m.cats.find((c) => c.name === "Work Suitability");
+    if (w) {
+      const { items, fit, levels } = palWorkCat();
+      Object.assign(w, { items, fit, levels });
+      delete w.badges; delete w.notes; delete w.rare;
+    }
+    d.palWork = true;
+  }
+  // Once: Type shows a Pal's one or two types ("Dark · Fire"); what follows Type follows the pair.
+  if (!d.palTypes) {
+    const m = d.lists.find((l) => l.type === "multi" && l.name === PALWORLD.name);
+    const named = (n) => m && m.cats.find((c) => c.name === n);
+    if (named("Type")) {
+      const { items, fit } = palTypeCat();
+      Object.assign(named("Type"), { items, fit });
+      const w = named("Work Suitability"), pa = named("Partner Ability");
+      if (w && w.fit) w.fit.Type = palPairsBy(palTypeSet, palWorkSet);
+      if (pa && pa.fit) pa.fit.Type = palPairsBy(palTypeSet, (n) => PALS[n][4]);
+    }
+    d.palTypes = true;
   }
   // Once: give a Multiple's "Nature" category the stat effects of each nature.
   if (!d.natureBadges) {
@@ -1801,6 +2284,8 @@ const findList = (id) => db.lists.find((l) => l.id === id);
 // `notes` { "option": "what it means" }: shown with the option.
 const isMulti = (l) => l.type === "multi";
 const isRare = (c, v) => !!c.rare && c.rare.item === v;
+// Rare enough for the gold celebration (`quiet` odds, like Alpha's 1 in 5, get none).
+const isGold = (c, v) => isRare(c, v) && !c.rare.quiet;
 const linkedList = (c) => {
   const l = c.link && findList(c.link);
   return l && !isMulti(l) ? l : null;
@@ -1864,9 +2349,11 @@ function rollCombo(list, keepValid) {
     picks = Object.fromEntries(kept.map((c) => [c.id, before[c.id]]));
     for (const c of todo) picks[c.id] = pickOption(c, fitOptions(list, c, catOptions(c), picks));
   } while (++tries < 30 && !live.every((c) => fits(list, c, picks[c.id], picks)));
+  startsFirst(list, picks, todo);
   todo.forEach((c) => cur.locks.delete(c.id));
   cur.before = before;
   cur.picks = picks;
+  rollLevels(list, !keepValid);
   cur.spin = !keepValid && !!db.wheel;
   record(list);
 }
@@ -1879,14 +2366,75 @@ const inFit = (table, pick, v) => {
   if (!fitMentions.has(table)) fitMentions.set(table, new Set(Object.values(table).flat()));
   return !fitMentions.get(table).has(v);
 };
+// `grow`: when another category lands on one option (Alpha: Yes), this one is a step further
+// along its options (Size S → M; the last one stays). Its rules still go by the usual value,
+// so these are the usual values it could have come from (none for the first option).
+const grown = (list, g, val) => {
+  const by = list.cats.find((x) => x.name === g.grow.by && !x.off);
+  return !!by && val(by) === g.grow.when;
+};
+function usualVals(list, x, val) {
+  const p = val(x);
+  if (!x.grow || !grown(list, x, val)) return [p];
+  const o = x.items, i = o.indexOf(p);
+  return i < 0 ? [p] : i === o.length - 1 ? o.slice(-2) : i ? [o[i - 1]] : [];
+}
+// Does `a` go with `b` by a's table for b?
+function pairFits(list, a, b, val) {
+  const t = a.fit && a.fit[b.name];
+  if (!t) return true;
+  if (!a.grow && !b.grow) return inFit(t, val(b), val(a));
+  const bs = usualVals(list, b, val);
+  return usualVals(list, a, val).some((x) => bs.some((y) => inFit(t, y, x)));
+}
 // Does option `v` of category `c` go with the picks so far (both ways round)?
-const fits = (list, c, v, picks) =>
-  list.cats.every((d) => {
+function fits(list, c, v, picks) {
+  const val = (x) => (x === c ? v : picks[x.id]);
+  const withAll = (x) => (!x.grow || usualVals(list, x, val).length) &&
+    list.cats.every((d) => d === x || val(d) == null || (pairFits(list, x, d, val) && pairFits(list, d, x, val)));
+  return list.cats.every((d) => {
     if (d === c || picks[d.id] == null) return true;
-    if (c.unique && c.unique === d.unique && picks[d.id] === v) return false; // e.g. the same Passive Skill twice
-    const mine = c.fit && c.fit[d.name], theirs = d.fit && d.fit[c.name];
-    return (!mine || inFit(mine, picks[d.id], v)) && (!theirs || inFit(theirs, v, picks[d.id]));
+    if (c.unique && c.unique === d.unique && picks[d.id] === v && v !== PAL_NONE) return false; // e.g. the same Passive Skill twice
+    return pairFits(list, c, d, val) && pairFits(list, d, c, val);
+  }) && (!c.grow || usualVals(list, c, val).length > 0)
+    // Alpha changes what Size has to be, so check the categories that grow with it.
+    && list.cats.every((g) => !g.grow || g === c || g.grow.by !== c.name || val(g) == null || withAll(g))
+    && startsFit(list, c, v, picks);
+}
+// A category's `starts` lists what its group must hold, by other picks (Lucky → the Lucky
+// passive, Gorirat → Hooligan), in that order.
+const startsCat = (list) => list.cats.find((x) => x.starts && x.starts.by);
+const startsNeed = (list, s, pick) => Object.entries(s.starts.by).flatMap(([name, rows]) => {
+  const d = list.cats.find((x) => x.name === name && !x.off);
+  return (d && pick(d) != null && rows[pick(d)]) || [];
+});
+// Each one must be in the group already or still have an open slot to land in.
+function startsFit(list, c, v, picks) {
+  const s = startsCat(list);
+  if (!s || (c !== s && c.unique !== s.starts.group && !s.starts.by[c.name])) return true;
+  const pick = (d) => (d === c ? v : picks[d.id]);
+  const need = new Set(startsNeed(list, s, pick));
+  if (!need.size) return true;
+  let open = 0, held = 0;
+  list.cats.forEach((d) => {
+    if (d.off || d.unique !== s.starts.group) return;
+    const p = pick(d);
+    if (p == null) open++;
+    else { need.delete(p); if (p !== PAL_NONE) held++; }
   });
+  const count = s.off ? NaN : parseInt(pick(s), 10);
+  return need.size <= Math.min(open, Number.isFinite(count) ? count - held : open);
+}
+// Rolled ones come first in the group, in `starts` order; the rest keep their places.
+function startsFirst(list, picks, rolled) {
+  const s = startsCat(list);
+  if (!s) return;
+  const need = startsNeed(list, s, (d) => picks[d.id]);
+  const slots = rolled.filter((d) => d.unique === s.starts.group && picks[d.id] != null && picks[d.id] !== PAL_NONE);
+  const rank = (p) => (need.includes(p) ? need.indexOf(p) : need.length);
+  const vals = slots.map((d) => picks[d.id]).sort((a, b) => rank(a) - rank(b));
+  slots.forEach((d, i) => { picks[d.id] = vals[i]; });
+}
 const fitOptions = (list, c, o, picks) => {
   const good = o.filter((v) => fits(list, c, v, picks));
   return good.length ? good : o;
@@ -1906,7 +2454,7 @@ function fitOrder(cats) {
   const order = [];
   let left = cats;
   while (left.length) {
-    const ready = left.filter((c) => !Object.keys(c.fit || {}).some((n) => left.some((x) => x !== c && x.name === n)));
+    const ready = left.filter((c) => ![...Object.keys(c.fit || {}), ...(c.grow ? [c.grow.by] : [])].some((n) => left.some((x) => x !== c && x.name === n)));
     const next = ready.length ? ready : left;
     order.push(...next);
     left = left.filter((c) => !next.includes(c));
@@ -1920,23 +2468,75 @@ function renameInFit(list, c, old, v) {
   list.cats.forEach((d) => {
     const t = d.fit && d.fit[c.name];
     if (t && t[old] && v !== old) { t[v] = t[old]; delete t[old]; }
+    if (d.grow && d.grow.by === c.name && d.grow.when === old) d.grow.when = v;
+    const lv = d.levels;
+    if (lv && lv.by === c.name && lv.base[old] && v !== old) { lv.base[v] = lv.base[old]; delete lv.base[old]; }
+    if (lv && lv.bonus && lv.bonus[c.name] === old) lv.bonus[c.name] = v;
+    const st = d.starts && d.starts.by;
+    if (st && st[c.name] && st[c.name][old] && v !== old) { st[c.name][v] = st[c.name][old]; delete st[c.name][old]; }
+    if (st && c.unique === d.starts.group) Object.values(st).forEach((t2) => Object.values(t2).forEach((r) => {
+      if (r.includes(old)) r[r.indexOf(old)] = v;
+    }));
   });
 }
+// `levels`: the option is a set of skills ("Handiwork · Lumbering"), each shown with a level:
+// its usual one for the pick of `by` (from `base`, else 1), plus a boost where each extra
+// step is half as likely as the last, plus 1 for each `bonus` that came up, up to `max`.
+// `fresh` rolls new levels for unlocked ones; otherwise they change only with what they hang on.
+function rollLevels(list, fresh) {
+  cur.levels = cur.levels || {};
+  const named = (n) => list.cats.find((x) => x.name === n && !x.off);
+  liveCats(list).forEach((c) => {
+    if (!c.levels) return;
+    const L = c.levels, v = cur.picks[c.id], by = named(L.by);
+    const base = (by && L.base[cur.picks[by.id]]) || {};
+    const bonus = Object.entries(L.bonus || {}).filter(([n, w]) => { const d = named(n); return d && cur.picks[d.id] === w; }).length;
+    // Alpha or Lucky picked by hand keeps the rolled levels and only adds its bonus.
+    const sig = JSON.stringify([v, by ? cur.picks[by.id] : null]);
+    let lv = cur.levels[c.id];
+    if (!lv || lv.sig !== sig || (fresh && !cur.locks.has(c.id))) {
+      const skills = v == null || v === PAL_NONE ? [] : String(v).split(" · ");
+      lv = { sig, rolled: skills.map((s) => {
+        let n = Math.max(1, base[s] || 1);
+        while (n < L.max && rand(2) === 0) n++;
+        return [s, n];
+      }) };
+    }
+    lv.text = lv.rolled.length ? lv.rolled.map(([s, n]) => `${s} ${Math.min(L.max, n + bonus)}`).join(" · ") : v;
+    cur.levels[c.id] = lv;
+  });
+}
+// What a result row shows: the option, or its skills with their levels.
+const shownVal = (me, c, v) => (c.levels && me.levels && me.levels[c.id] && me.picks[c.id] === v ? me.levels[c.id].text : v);
 // After a pick by hand: re-pick unlocked categories that no longer go with it. Returns their names.
 function refit(list) {
   const before = { ...cur.picks }, live = fitOrder(liveCats(list));
   const free = live.filter((c) => !cur.locks.has(c.id));
   // Follow what's locked and what this one depends on; unlocked followers adapt after it.
-  const repick = (c) => {
-    const follower = (id) => { const d = list.cats.find((x) => x.id === id); return d.fit && d.fit[c.name]; };
-    const fixed = Object.fromEntries(Object.entries(cur.picks).filter(([id]) => cur.locks.has(id) || !follower(id)));
-    cur.picks[c.id] = pickOption(c, fitOptions(list, c, catOptions(c), fixed));
+  const s = startsCat(list);
+  const fixedFor = (c) => {
+    // Followers: by `fit`, by `grow` (Size after Alpha), and the Passive Skills after the Pal or Lucky (`starts`).
+    const follower = (id) => {
+      const d = list.cats.find((x) => x.id === id);
+      return !!d && !!((d.fit && d.fit[c.name]) || (d.grow && d.grow.by === c.name) ||
+        (s && s.starts.by[c.name] && (d === s || d.unique === s.starts.group)));
+    };
+    return Object.fromEntries(Object.entries(cur.picks).filter(([id]) => cur.locks.has(id) || !follower(id)));
   };
+  const repick = (c) => { cur.picks[c.id] = pickOption(c, fitOptions(list, c, catOptions(c), fixedFor(c))); };
   const allFit = () => live.every((c) => fits(list, c, cur.picks[c.id], cur.picks));
-  free.forEach((c) => fits(list, c, cur.picks[c.id], cur.picks) || repick(c));
+  // A follower out of step (Size after Alpha) re-picks itself; what it follows stays.
+  free.forEach((c) => fits(list, c, cur.picks[c.id], fixedFor(c)) || repick(c));
   // Locks can leave a dead end (e.g. a Region with no fitting Type): re-pick everything related.
-  const related = free.filter((c) => c.fit || live.some((d) => d.fit && d.fit[c.name]));
-  for (let tries = 0; tries < 30 && !allFit(); tries++) related.forEach(repick);
+  const related = free.filter((c) => c.fit || c.grow || live.some((d) => (d.fit && d.fit[c.name]) || (d.grow && d.grow.by === c.name)));
+  // Re-roll them together, in order, as a roll would: first only the followers (so the Pal
+  // stays), then everything related.
+  const leads = (c) => !c.fit && !c.grow && !(s && (c === s || c.unique === s.starts.group));
+  for (let tries = 0; tries < 30 && !allFit(); tries++) {
+    const redo = tries < 10 ? related.filter((c) => !leads(c)) : related;
+    redo.forEach((c) => delete cur.picks[c.id]);
+    redo.forEach((c) => { cur.picks[c.id] = pickOption(c, fitOptions(list, c, catOptions(c), cur.picks)); });
+  }
   return free.filter((c) => cur.picks[c.id] !== before[c.id]).map((c) => c.name);
 }
 const comboStale = (list) => {
@@ -2177,7 +2777,7 @@ function slotSpin(list, reels) {
     }
     if (seq[seq.length - 1] === pick) seq[seq.length - 1] = other();
     seq.push(pick, other()); // the one after shows in the little bounce
-    strip.innerHTML = seq.map((x) => `<span>${esc(x)}</span>`).join("");
+    strip.innerHTML = seq.map((x, i) => `<span>${esc(i === len - 1 ? shownVal(me, c, x) : x)}</span>`).join("");
     const anim = strip.animate([{ transform: "translateY(0)" }, { transform: `translateY(${-(len - 1) * h}px)` }],
       { duration: 1500 + k * 550, easing: "cubic-bezier(0.25, 0.75, 0.3, 1.04)", fill: "forwards" });
     anim.finished.then(() => {
@@ -2209,7 +2809,7 @@ function slotSpin(list, reels) {
   Promise.all(runs.map((r) => r.anim.finished)).then(() => {
     if (!done()) return;
     box.classList.replace("spinning", "won");
-    const hits = reels.filter((c) => isRare(c, me.picks[c.id]));
+    const hits = reels.filter((c) => isGold(c, me.picks[c.id]));
     if (hits.length) {
       hits.forEach((c) => $(`.combo-row[data-cat="${c.id}"]`).classList.add("gold"));
       goldBurst(hits[0]);
@@ -2508,13 +3108,13 @@ function renderCombo(list) {
   const spinning = cur.spin;
   const off = spinning ? 'aria-disabled="true"' : "";
   // Rare options on show (one still on its reel hasn't landed yet).
-  const gold = shown.filter((c) => isRare(c, cur.picks[c.id]) && !(spinning && reels.includes(c)));
+  const gold = shown.filter((c) => isGold(c, cur.picks[c.id]) && !(spinning && reels.includes(c)));
 
   const rows = shown.map((c, k) => {
     const locked = cur.locks.has(c.id);
     const val = spinning && reels.includes(c)
-      ? `<span class="combo-val reel" data-cat="${c.id}"><span class="strip"><span>${esc(cur.picks[c.id])}</span></span></span>`
-      : `<span class="combo-val">${esc(cur.picks[c.id])}</span>${badgePills(optionBadges(list, c, cur.picks[c.id]))}${optionNote(c, cur.picks[c.id])}`;
+      ? `<span class="combo-val reel" data-cat="${c.id}"><span class="strip"><span>${esc(shownVal(cur, c, cur.picks[c.id]))}</span></span></span>`
+      : `<span class="combo-val">${esc(shownVal(cur, c, cur.picks[c.id]))}</span>${badgePills(optionBadges(list, c, cur.picks[c.id]))}${optionNote(c, cur.picks[c.id])}`;
     return `
       <div class="combo-row${locked ? " locked" : ""}${gold.includes(c) ? " gold" : ""}" data-cat="${c.id}" style="--k:${k};--c:${WHEEL_COLORS[k % WHEEL_COLORS.length]}">
         <button class="combo-main" data-act="pickCat" data-cat="${c.id}" ${off}>
@@ -2963,7 +3563,7 @@ const actions = {
   toggleHide: (el) => {
     const id = el.dataset.cat;
     cur.hidden.has(id) ? cur.hidden.delete(id) : cur.hidden.add(id);
-    cur.goldShown = cur.goldShown || liveCats(findList(cur.id)).some((c) => isRare(c, cur.picks[c.id])); // showing it again isn't news
+    cur.goldShown = cur.goldShown || liveCats(findList(cur.id)).some((c) => isGold(c, cur.picks[c.id])); // showing it again isn't news
     render();
     renderSheet(true);
   },
@@ -2977,6 +3577,7 @@ const actions = {
     cur.picks[c.id] = catOptions(c)[+el.dataset.i];
     cur.locks.add(c.id); // choosing by hand also locks it
     const changed = refit(list);
+    rollLevels(list, false);
     record(list);
     closeSheet();
     if (changed.length) toast(`${changed.join(", ")} changed to match`);
@@ -3208,6 +3809,11 @@ document.addEventListener("change", (e) => {
     // Categories that follow this one keep following it.
     currentList().cats.forEach((d) => {
       if (d.fit && d.fit[old] && c.name !== old) { d.fit[c.name] = d.fit[old]; delete d.fit[old]; }
+      const st = d.starts && d.starts.by;
+      if (st && st[old] && c.name !== old) { st[c.name] = st[old]; delete st[old]; }
+      if (d.grow && d.grow.by === old) d.grow.by = c.name;
+      if (d.levels && d.levels.by === old) d.levels.by = c.name;
+      if (d.levels && d.levels.bonus && old in d.levels.bonus && c.name !== old) { d.levels.bonus[c.name] = d.levels.bonus[old]; delete d.levels.bonus[old]; }
     });
   } else if (f === "item") {
     const i = +e.target.dataset.i, items = editItems(), owner = editOwner(), old = items[i];
@@ -3479,6 +4085,18 @@ function cleanNotes(n) {
   return Object.keys(out).length ? out : null;
 }
 // Related options from a file: { "category": { "option": ["option", …] } }, anything else dropped.
+// Skill levels from a file: { by, base: { "option": { "skill": level } }, max, bonus: { "category": "option" } }.
+function cleanLevels(l) {
+  if (!l || typeof l !== "object" || typeof l.by !== "string" || !Number.isInteger(l.max) || l.max < 1) return null;
+  const base = {}, bonus = {};
+  for (const [k, row] of Object.entries(l.base || {})) {
+    if (!row || typeof row !== "object") continue;
+    const r = Object.fromEntries(Object.entries(row).filter(([, n]) => Number.isInteger(n) && n >= 0));
+    if (Object.keys(r).length) base[k] = r;
+  }
+  for (const [k, w] of Object.entries(l.bonus || {})) if (typeof w === "string") bonus[k] = w;
+  return { by: l.by, base, max: l.max, bonus };
+}
 function cleanFit(f) {
   if (!f || typeof f !== "object" || Array.isArray(f)) return null;
   const out = {};
@@ -3514,7 +4132,7 @@ function exportBackup() {
         type: "multi", ...extra,
         categories: l.cats.map((c) => {
           const k = linkedList(c);
-          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }), ...(c.rare && { rare: c.rare }), ...(c.fit && { fit: c.fit }), ...(c.notes && { notes: c.notes }), ...(c.unique && { unique: c.unique }) };
+          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }), ...(c.rare && { rare: c.rare }), ...(c.fit && { fit: c.fit }), ...(c.notes && { notes: c.notes }), ...(c.unique && { unique: c.unique }), ...(c.starts && { starts: c.starts }), ...(c.grow && { grow: c.grow }), ...(c.levels && { levels: c.levels }) };
         }),
       };
     } else {
@@ -3555,10 +4173,13 @@ $("#file").addEventListener("change", async (e) => {
         name: String(c.name || "").trim() || "Category",
         items: clean(Array.isArray(c.items) ? c.items : []),
         ...(c.off === true && { off: true }),
-        ...(c.rare && typeof c.rare.item === "string" && Number.isInteger(c.rare.odds) && c.rare.odds > 0 && { rare: { item: c.rare.item, odds: c.rare.odds } }),
+        ...(c.rare && typeof c.rare.item === "string" && Number.isInteger(c.rare.odds) && c.rare.odds > 0 && { rare: { item: c.rare.item, odds: c.rare.odds, ...(c.rare.quiet === true && { quiet: true }) } }),
+        ...(c.grow && typeof c.grow.by === "string" && typeof c.grow.when === "string" && { grow: { by: c.grow.by, when: c.grow.when } }),
+        ...(cleanLevels(c.levels) && { levels: cleanLevels(c.levels) }),
         ...(cleanFit(c.fit) && { fit: cleanFit(c.fit) }),
         ...(cleanNotes(c.notes) && { notes: cleanNotes(c.notes) }),
         ...(typeof c.unique === "string" && { unique: c.unique }),
+        ...(c.starts && typeof c.starts.group === "string" && cleanFit(c.starts.by) && { starts: { group: c.starts.group, by: cleanFit(c.starts.by) } }),
         ...(cleanBadges(c.badges) && { badges: cleanBadges(c.badges) }),
         ...(c.link && { linkName: String(c.link).trim() }), // turned into an id below
       }));
