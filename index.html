@@ -423,6 +423,16 @@
   /* A near-best option (IV 90–99%): the soft accent highlight. */
   .combo-row.silver { background: var(--accent-soft); }
   .combo-val.empty { color: var(--muted); font-weight: 600; opacity: 0.6; }
+  /* A group row (Passive Skills): one tappable block per slot that came up. */
+  .combo-group { cursor: default; }
+  .combo-group:active { background: none; }
+  .combo-sub { display: block; width: calc(100% + 16px); margin: 0 0 0 -8px; padding: 4px 8px 6px; background: none; border: 0; border-radius: 12px; text-align: left; }
+  .combo-sub:active { background: var(--surface-2); }
+  .combo-sub + .combo-sub { margin-top: 6px; }
+  .combo-val.sub { font-size: clamp(19px, 5.4vw, 23px); }
+  .sub-lock { display: inline-block; margin-left: 6px; vertical-align: -1px; color: var(--accent); }
+  .sub-lock svg { width: 15px; height: 15px; }
+  .combo-add { margin: 4px 0 0 -2px; padding: 4px 2px; background: none; border: 0; color: var(--accent); font-size: 14px; font-weight: 600; }
   /* Work Suitability: one chip per skill with its level. */
   .work-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
   .work-chip {
@@ -4040,6 +4050,15 @@ function renderResult(list) {
   if (spinning) spin(list);
 }
 
+// The slots of the `starts` group (e.g. Passive Skill 1–4) among `cats`, with their count category:
+// { name, count, members }, or null when there aren't at least two of them.
+function comboGroup(list, cats) {
+  const s = startsCat(list);
+  const members = s ? cats.filter((c) => c.unique === s.starts.group) : [];
+  if (members.length < 2) return null;
+  return { name: s.name, count: cats.includes(s) ? s : null, members };
+}
+
 // Multiple: one row per category with its pick. Tap a row to choose it
 // yourself; the lock keeps it when you reroll (until you leave this screen).
 function renderCombo(list) {
@@ -4060,7 +4079,49 @@ function renderCombo(list) {
   // Rare options on show (one still on its reel hasn't landed yet).
   const gold = shown.filter((c) => isGold(c, cur.picks[c.id]) && !(spinning && reels.includes(c)));
 
-  const rows = shown.map((c, k) => {
+  // A group of slots with a count (Palworld's Passive Skills) shows as one row: the ones that
+  // came up, each tappable, and one lock for all. The count is not shown on its own.
+  const g = comboGroup(list, shown);
+  const filled = g ? g.members.filter((c) => !isEmptyVal(c, cur.picks[c.id])) : [];
+  const fills = (c) => !isEmptyVal(c, cur.picks[c.id]);
+  // While spinning, the group's reels are the slots that land on a passive (or the first slot if none do).
+  let gReels = g ? g.members.filter((c) => reels.includes(c) && fills(c)) : [];
+  if (g && !filled.length && reels.includes(g.members[0])) gReels = [g.members[0]];
+  const spinReels = reels.filter((c) => !g || (c !== g.count && (!g.members.includes(c) || gReels.includes(c))));
+  const reelOf = (c) => `<span class="combo-val reel" data-cat="${c.id}"><span class="strip"><span>${esc(shownVal(cur, c, cur.picks[c.id]))}</span></span></span>`;
+  const groupRow = (k) => {
+    const ids = [...g.members, ...(g.count ? [g.count] : [])].map((c) => c.id);
+    const allLocked = g.members.every((c) => cur.locks.has(c.id));
+    const some = g.members.some((c) => cur.locks.has(c.id));
+    const seen = spinning ? g.members.filter((c) => gReels.includes(c) || (!reels.includes(c) && fills(c))) : filled;
+    const subs = seen.map((c) => {
+      const v = cur.picks[c.id];
+      const lockMark = some && !allLocked && cur.locks.has(c.id) ? `<span class="sub-lock" aria-label="Locked">${I.lock}</span>` : "";
+      const body = spinning && gReels.includes(c)
+        ? reelOf(c)
+        : `<span class="combo-val sub${isEmptyVal(c, v) ? " empty" : ""}">${esc(shownVal(cur, c, v))}${lockMark}</span>${badgePills(optionBadges(list, c, v))}${optionNote(c, v)}`;
+      return `<button class="combo-sub" data-act="pickCat" data-cat="${c.id}" aria-label="${esc(c.name)}" ${off}>${body}</button>`;
+    }).join("");
+    const firstEmpty = g.members.find((c) => !fills(c));
+    const none = !seen.length
+      ? `<button class="combo-sub" data-act="pickCat" data-cat="${g.members[0].id}" ${off}><span class="combo-val sub empty">-</span><span class="opt-note">No ${esc(g.name.toLowerCase())}</span></button>` : "";
+    const add = !spinning && seen.length && firstEmpty ? `<button class="combo-add" data-act="pickCat" data-cat="${firstEmpty.id}">+ Add</button>` : "";
+    const n = catOptions(g.members[0]).length;
+    return `
+      <div class="combo-row${allLocked ? " locked" : ""}" data-cat="${g.members[0].id}" data-cats="${ids.join(",")}" style="--k:${k};--c:${WHEEL_COLORS[k % WHEEL_COLORS.length]}">
+        <div class="combo-main combo-group">
+          <span class="combo-cat">${esc(g.name)}</span>
+          ${subs}${none}${add}
+        </div>
+        <span class="combo-count" title="${n} options" aria-label="${n} options">${n}</span>
+        <button class="iconbtn lockbtn" data-act="lock" data-cats="${ids.join(",")}" aria-pressed="${allLocked}" aria-label="${allLocked ? "Unlock" : "Lock"} ${esc(g.name)}" ${off}>${allLocked ? I.lock : I.unlock}</button>
+        ${spinning ? "" : grip}
+      </div>`;
+  };
+
+  const rowCats = shown.filter((c) => !g || (c !== g.count && (!g.members.includes(c) || c === g.members[0])));
+  const rows = rowCats.map((c, k) => {
+    if (g && c === g.members[0]) return groupRow(k);
     const locked = cur.locks.has(c.id);
     const val = spinning && reels.includes(c)
       ? `<span class="combo-val reel" data-cat="${c.id}"><span class="strip"><span>${esc(shownVal(cur, c, cur.picks[c.id]))}</span></span></span>`
@@ -4121,7 +4182,7 @@ function renderCombo(list) {
       </div>` : ""}
       ${gold.length ? `<div class="gold-glow"></div>` : ""}
     </main>`;
-  if (spinning) return slotSpin(list, reels);
+  if (spinning) return slotSpin(list, spinReels);
   if (gold.length && !cur.goldShown) goldBurst(gold[0]);
   cur.goldShown = gold.length > 0;
 }
@@ -4384,7 +4445,8 @@ function renderSheet(again) {
   } else if (kind === "hide") {
     const list = cur && findList(cur.id);
     if (!list || !isMulti(list)) return noSheet();
-    const rows = liveCats(list).map((c) => `
+    const g = comboGroup(list, liveCats(list)); // a group's count has no row of its own to hide
+    const rows = liveCats(list).filter((c) => !g || c !== g.count).map((c) => `
         <button class="row compact${cur.hidden.has(c.id) ? " off" : ""}" data-act="toggleHide" data-cat="${c.id}" aria-pressed="${!cur.hidden.has(c.id)}">
           <span class="row-text"><div class="row-name">${esc(c.name)}</div></span>
           <span class="eyebtn${cur.hidden.has(c.id) ? " is-off" : ""}" aria-hidden="true">${cur.hidden.has(c.id) ? I.eyeOff : I.eye}</span>
@@ -4515,8 +4577,10 @@ const actions = {
   },
   lock: (el) => {
     if (cur.spin) return;
-    const id = el.dataset.cat;
-    cur.locks.has(id) ? cur.locks.delete(id) : cur.locks.add(id);
+    // One category, or a group's (data-cats): locks them all unless they all are already.
+    const ids = (el.dataset.cats || el.dataset.cat).split(",");
+    const all = ids.every((id) => cur.locks.has(id));
+    ids.forEach((id) => (all ? cur.locks.delete(id) : cur.locks.add(id)));
     render();
   },
   hideSheet: () => {
@@ -4993,8 +5057,10 @@ function endDrag() {
     save();
   } else if (to !== from && group.dataset.sort === "combo") {
     // Result screen rows skip empty categories, so move by id and leave those where they are.
-    const list = currentList(), ids = [...group.children].map((r) => r.dataset.cat);
-    ids.splice(to, 0, ...ids.splice(from, 1));
+    // A group row (Passive Skills) moves all of its categories.
+    const list = currentList(), rowIds = [...group.children].map((r) => (r.dataset.cats || r.dataset.cat).split(","));
+    rowIds.splice(to, 0, ...rowIds.splice(from, 1));
+    const ids = rowIds.flat();
     const byId = Object.fromEntries(list.cats.map((c) => [c.id, c]));
     let k = 0;
     list.cats = list.cats.map((c) => (ids.includes(c.id) ? byId[ids[k++]] : c));
