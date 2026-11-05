@@ -141,9 +141,9 @@
     display: inline-block; vertical-align: 1px;
     margin-right: 6px; padding: 1px 8px; border-radius: 999px;
     font-size: 12px; font-weight: 600; line-height: 18px;
-    background: hsl(var(--h) 80% 50% / 0.14); color: hsl(var(--h) 65% 36%);
+    background: hsl(var(--h) var(--s, 80%) 50% / 0.14); color: hsl(var(--h) var(--s, 65%) 36%);
   }
-  @media (prefers-color-scheme: dark) { .pill-label { color: hsl(var(--h) 85% 72%); } }
+  @media (prefers-color-scheme: dark) { .pill-label { color: hsl(var(--h) var(--s, 85%) 72%); } }
   .row .row-text > .pill-label { font-size: 14px; line-height: 24px; padding: 1px 10px; }
   .labels-in {
     display: flex; flex-wrap: wrap; align-items: center; gap: 6px 0;
@@ -423,12 +423,21 @@
   /* A near-best option (IV 90–99%): the soft accent highlight. */
   .combo-row.silver { background: var(--accent-soft); }
   .combo-val.empty { color: var(--muted); font-weight: 600; opacity: 0.6; }
+  /* `pills`: the pick shown as label pills, one per part ("Fire · Flying"). */
+  .val-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+  .val-pills .pill-label { margin: 0; padding: 4px 14px; border-radius: 10px; font-size: 17px; font-weight: 700; line-height: 24px; }
   /* A group row (Passive Skills): one tappable block per slot that came up. */
   .combo-group { cursor: default; }
   .combo-group:active { background: none; }
   .combo-sub { display: block; width: calc(100% + 16px); margin: 0 0 0 -8px; padding: 4px 8px 6px; background: none; border: 0; border-radius: 12px; text-align: left; }
   .combo-sub:active { background: var(--surface-2); }
-  .combo-sub + .combo-sub { margin-top: 6px; }
+  /* Between the passives: a light dashed line, inset, below the rows' own dividers. */
+  .combo-sub + .combo-sub { margin-top: 4px; padding-top: 0; }
+  .combo-sub + .combo-sub::before {
+    content: ""; display: block; height: 1px; margin: 0 0 9px;
+    background: repeating-linear-gradient(90deg, var(--line) 0 5px, transparent 5px 9px);
+  }
+  @media (prefers-color-scheme: dark) { .combo-sub + .combo-sub::before { background: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.12) 0 5px, transparent 5px 9px); } }
   .combo-val.sub { font-size: clamp(19px, 5.4vw, 23px); }
   .sub-lock { display: inline-block; margin-left: 6px; vertical-align: -1px; color: var(--accent); }
   .sub-lock svg { width: 15px; height: 15px; }
@@ -2944,7 +2953,7 @@ const palTypeCat = () => {
     return x[0] - y[0] || (x[1] || 0) - (y[1] || 0);
   });
   return {
-    id: uid(), name: "Type", items,
+    id: uid(), name: "Type", items, pills: true,
     fit: { Pal: Object.fromEntries(Object.keys(PALS).map((n) => [n, [palTypeSet(n)]])), Region: palPairsBy((n) => PALS[n][6], palTypeSet) },
   };
 };
@@ -3149,6 +3158,13 @@ function load() {
       m.cats.splice(r < 0 ? 1 : r + 1, 0, palHabitatCat());
     }
     d.palLabels4 = true;
+  }
+  // Once: the Palworld Type shows as pills.
+  if (!d.palTypePills) {
+    const m = d.lists.find((l) => l.type === "multi" && l.name === PALWORLD.name);
+    const t = m && m.cats.find((c) => c.name === "Type");
+    if (t) t.pills = true;
+    d.palTypePills = true;
   }
   // Once: give a Multiple's "Nature" category the stat effects of each nature.
   if (!d.natureBadges) {
@@ -3463,6 +3479,15 @@ const emptyOr = (c, v) => (isEmptyVal(c, v) ? "-" : v);
 const shownVal = (me, c, v) => emptyOr(c, c.levels && me.levels && me.levels[c.id] && me.picks[c.id] === v ? me.levels[c.id].text : v);
 // `shine`: options that light the row up, { gold: [...], silver: [...] } (IV 100% is gold).
 const shineOf = (c, v) => (c.shine && c.shine.gold && c.shine.gold.includes(v) ? "gold" : c.shine && c.shine.silver && c.shine.silver.includes(v) ? "silver" : "");
+// `pills`: the pick as pills, one per part ("Fire · Flying"), colored by type where it is one.
+const TYPE_HUES = { Neutral: [40, "12%"], Fire: [10], Water: [212], Grass: [118], Electric: [50], Ice: [188], Ground: [28], Dark: [275], Dragon: [325] };
+const valPills = (c, v) => {
+  if (!c.pills || v == null || isEmptyVal(c, v)) return "";
+  return `<span class="val-pills">${String(v).split(" · ").map((t) => {
+    const [hue, s] = TYPE_HUES[t] || [labelHue(t)];
+    return `<span class="pill-label" style="--h:${hue}${s ? `;--s:${s}` : ""}">${esc(t)}</span>`;
+  }).join("")}</span>`;
+};
 // Skill levels as chips: "Kindling  Lv 2".
 const levelChips = (me, c) => {
   const lv = c.levels && me.levels && me.levels[c.id];
@@ -4127,7 +4152,7 @@ function renderCombo(list) {
     const locked = cur.locks.has(c.id);
     const val = spinning && reels.includes(c)
       ? `<span class="combo-val reel" data-cat="${c.id}"><span class="strip"><span>${esc(shownVal(cur, c, cur.picks[c.id]))}</span></span></span>`
-      : `${levelChips(cur, c) || `<span class="combo-val${isEmptyVal(c, cur.picks[c.id]) ? " empty" : ""}">${esc(shownVal(cur, c, cur.picks[c.id]))}</span>`}${badgePills(optionBadges(list, c, cur.picks[c.id]))}${optionNote(c, cur.picks[c.id])}`;
+      : `${levelChips(cur, c) || valPills(c, cur.picks[c.id]) || `<span class="combo-val${isEmptyVal(c, cur.picks[c.id]) ? " empty" : ""}">${esc(shownVal(cur, c, cur.picks[c.id]))}</span>`}${badgePills(optionBadges(list, c, cur.picks[c.id]))}${optionNote(c, cur.picks[c.id])}`;
     const shine = spinning && reels.includes(c) ? "" : gold.includes(c) ? "gold" : shineOf(c, cur.picks[c.id]);
     return `
       <div class="combo-row${locked ? " locked" : ""}${shine ? ` ${shine}` : ""}" data-cat="${c.id}" style="--k:${k};--c:${WHEEL_COLORS[k % WHEEL_COLORS.length]}">
@@ -5177,7 +5202,7 @@ function exportBackup() {
         type: "multi", ...extra,
         categories: l.cats.map((c) => {
           const k = linkedList(c);
-          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }), ...(c.rare && { rare: c.rare }), ...(c.fit && { fit: c.fit }), ...(c.notes && { notes: c.notes }), ...(c.unique && { unique: c.unique }), ...(c.starts && { starts: c.starts }), ...(c.grow && { grow: c.grow }), ...(c.levels && { levels: c.levels }), ...(c.shine && { shine: c.shine }) };
+          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }), ...(c.rare && { rare: c.rare }), ...(c.fit && { fit: c.fit }), ...(c.notes && { notes: c.notes }), ...(c.unique && { unique: c.unique }), ...(c.starts && { starts: c.starts }), ...(c.grow && { grow: c.grow }), ...(c.levels && { levels: c.levels }), ...(c.shine && { shine: c.shine }), ...(c.pills && { pills: true }) };
         }),
       };
     } else {
@@ -5222,6 +5247,7 @@ $("#file").addEventListener("change", async (e) => {
         ...(c.grow && typeof c.grow.by === "string" && typeof c.grow.when === "string" && { grow: { by: c.grow.by, when: c.grow.when } }),
         ...(cleanLevels(c.levels) && { levels: cleanLevels(c.levels) }),
         ...(cleanShine(c.shine) && { shine: cleanShine(c.shine) }),
+        ...(c.pills === true && { pills: true }),
         ...(cleanFit(c.fit) && { fit: cleanFit(c.fit) }),
         ...(cleanNotes(c.notes) && { notes: cleanNotes(c.notes) }),
         ...(typeof c.unique === "string" && { unique: c.unique }),
