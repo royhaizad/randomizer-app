@@ -123,6 +123,7 @@
     margin: 0 -16px 12px; padding: 2px 16px;
   }
   .chips-row::-webkit-scrollbar { display: none; }
+  .pick-chips { margin-top: -4px; }
   .chip {
     flex: none; height: 34px; padding: 0 14px;
     display: flex; align-items: center; gap: 7px;
@@ -4305,6 +4306,8 @@ let shownSheet = null;
 function renderSheet(again) {
   const kind = history.state && history.state.sheet;
   const el = $("#sheet");
+  // Nothing left to show (e.g. after a reload): hide it, and let the page scroll and the next sheet open.
+  const noSheet = () => { el.hidden = true; el.innerHTML = ""; shownSheet = null; document.body.style.overflow = ""; };
   if (asking && kind !== "confirm" && shownSheet === "confirm") { asking.resolve(false); asking = null; }
   if (kind === shownSheet && !again) return;
   const keepScroll = again && el.querySelector(".panel") ? el.querySelector(".panel").scrollTop : 0;
@@ -4325,7 +4328,7 @@ function renderSheet(again) {
       <p class="foot">Your lists are saved on this phone only.<br>Back up now and then.</p>`;
   } else if (kind === "pick") {
     const list = cur && findList(cur.id);
-    if (!list) { el.hidden = true; return; }
+    if (!list) return noSheet();
     const rows = list.items.map((it, i) => `
         <button class="row compact" data-act="choose" data-i="${i}">
           <span class="row-text"><div class="row-name">${esc(it)}</div>${badgePills(badgesOf(list, it))}</span>
@@ -4333,7 +4336,7 @@ function renderSheet(again) {
         </button>`).join("");
     body = `<h2 class="sheet-title">${icon(list)} Pick by hand</h2><div class="group">${rows}</div>`;
   } else if (kind === "confirm") {
-    if (!asking) { el.hidden = true; return; }
+    if (!asking) return noSheet();
     body = `
       <h2 class="sheet-title">${esc(asking.title)}</h2>
       <p class="hint ask-text">${esc(asking.text)}</p>
@@ -4343,7 +4346,7 @@ function renderSheet(again) {
       </div>`;
   } else if (kind === "labels") {
     const list = currentList();
-    if (!list) { el.hidden = true; return; }
+    if (!list) return noSheet();
     const mine = list.labels || [], all = allLabels();
     const rows = all.map((s) => `
         <button class="row compact" data-act="toggleLabel" data-v="${esc(s)}">
@@ -4360,7 +4363,7 @@ function renderSheet(again) {
       ${all.length ? `<div class="label sheet-label">Tap to add or remove</div><div class="group">${rows}</div>` : ""}`;
   } else if (kind === "badges") {
     const owner = editOwner();
-    if (!owner || !owner.items.includes(badgeItem)) { el.hidden = true; return; }
+    if (!owner || !owner.items.includes(badgeItem)) return noSheet();
     const mine = badgesOf(owner, badgeItem);
     // Badges un-ticked while the sheet is open stay listed, so they can be ticked again.
     seenBadges = [...new Set([...seenBadges, ...allBadges(owner)])];
@@ -4380,7 +4383,7 @@ function renderSheet(again) {
       ${all.length ? `<div class="label sheet-label">Used in this ${route().view === "cat" ? "category" : "list"} · tap to add or remove</div><div class="group">${rows}</div>` : ""}`;
   } else if (kind === "hide") {
     const list = cur && findList(cur.id);
-    if (!list || !isMulti(list)) { el.hidden = true; return; }
+    if (!list || !isMulti(list)) return noSheet();
     const rows = liveCats(list).map((c) => `
         <button class="row compact${cur.hidden.has(c.id) ? " off" : ""}" data-act="toggleHide" data-cat="${c.id}" aria-pressed="${!cur.hidden.has(c.id)}">
           <span class="row-text"><div class="row-name">${esc(c.name)}</div></span>
@@ -4398,7 +4401,7 @@ function renderSheet(again) {
     body = `<h2 class="sheet-title">Sort lists</h2><div class="group">${rows}</div>`;
   } else if (kind === "icon") {
     const list = currentList();
-    if (!list) { el.hidden = true; return; }
+    if (!list) return noSheet();
     body = `
       <h2 class="sheet-title">Icon</h2>
       <div class="name-row">
@@ -4417,21 +4420,30 @@ function renderSheet(again) {
       </div>`;
   } else if (kind === "pickCat") {
     const list = cur && findList(cur.id), c = list && isMulti(list) && list.cats.find((x) => x.id === cur.pickCat);
-    if (!c) { el.hidden = true; return; }
+    if (!c) return noSheet();
     // Only what goes with your locked results; anything unlocked changes to match instead.
     const o = catOptions(c);
     const locked = Object.fromEntries(Object.entries(cur.picks).filter(([id]) => cur.locks.has(id) && id !== c.id));
     const shown = fitChoices(list, c, locked);
-    const rows = o.map((it, i) => !shown.includes(it) ? "" : `
+    // Filter by label (one at a time, like Home), from the labels of what's shown.
+    const tier = (s) => ["Gold", "Diamond", "Rainbow"].indexOf(s) + 1 || 9; // tiers first, in order
+    const labels = [...new Set(shown.flatMap((it) => optionBadges(list, c, it)))].sort((a, b) => tier(a) - tier(b) || a.localeCompare(b));
+    const pick = labels.includes(cur.pickLabel) ? cur.pickLabel : "";
+    const chips = labels.length > 1 ? `
+      <div class="chips-row pick-chips" role="toolbar" aria-label="Filter by label">
+        <button class="chip${pick ? "" : " on"}" data-act="pickLabel" data-v="">All</button>
+        ${labels.map((s) => `<button class="chip${pick === s ? " on" : ""}" data-act="pickLabel" data-v="${esc(s)}" style="--h:${badgeHue(s)}"><i></i>${esc(s)}</button>`).join("")}
+      </div>` : "";
+    const rows = o.map((it, i) => !shown.includes(it) || (pick && !optionBadges(list, c, it).includes(pick)) ? "" : `
         <button class="row compact" data-act="chooseCat" data-i="${i}">
           <span class="row-text"><div class="row-name">${esc(it)}</div>${badgePills(optionBadges(list, c, it))}${optionNote(c, it)}</span>
           ${it === cur.picks[c.id] ? `<span class="check">${I.check}</span>` : ""}
         </button>`).join("");
     const note = shown.length < o.length ? " Only options that go with your locked results are shown." : "";
-    body = `<h2 class="sheet-title">${esc(c.name)}</h2><p class="hint">Your choice stays locked when you reroll.${note}</p><div class="group">${rows}</div>`;
+    body = `<h2 class="sheet-title">${esc(c.name)}</h2><p class="hint">Your choice stays locked when you reroll.${note}</p>${chips}<div class="group">${rows}</div>`;
   } else if (kind === "link") {
     const c = currentCat();
-    if (!c) { el.hidden = true; return; }
+    if (!c) return noSheet();
     const lists = db.lists.filter((l) => !isMulti(l));
     const rows = [{ id: "", emoji: "", name: "Don't link a list", items: null }, ...lists].map((l) => `
         <button class="row compact" data-act="setLink" data-id="${l.id}">
@@ -4520,7 +4532,14 @@ const actions = {
   pickCat: (el) => {
     if (cur.spin) return;
     cur.pickCat = el.dataset.cat;
+    cur.pickLabel = "";
     openSheet("pickCat");
+  },
+  pickLabel: (el) => {
+    cur.pickLabel = el.dataset.v;
+    renderSheet(true);
+    const p = $("#sheet .panel");
+    if (p) p.scrollTop = 0;
   },
   chooseCat: (el) => {
     const list = findList(cur.id), c = list.cats.find((x) => x.id === cur.pickCat);
