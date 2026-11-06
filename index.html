@@ -1468,6 +1468,7 @@ const pokemonMulti = () => ({
       id: uid(), name, items,
       ...(name === "Nature" && { badges: natureBadges(items) }),
       ...(name === "Hidden Ability" && { notes: { ...HIDDEN_ABILITIES } }),
+      ...(name === "Type" && { pills: true }),
       ...(POKEMON_FIT[name] && { fit: structuredClone(POKEMON_FIT[name]) }),
     })), shinyCat()],
 });
@@ -3166,6 +3167,13 @@ function load() {
     if (t) t.pills = true;
     d.palTypePills = true;
   }
+  // Once: the Pokémon Type shows as pills too.
+  if (!d.pokeTypePills) {
+    const m = d.lists.find((l) => l.type === "multi" && l.name === POKEMON.name);
+    const t = m && m.cats.find((c) => c.name === "Type");
+    if (t) t.pills = true;
+    d.pokeTypePills = true;
+  }
   // Once: give a Multiple's "Nature" category the stat effects of each nature.
   if (!d.natureBadges) {
     d.lists.forEach((l) => l.type === "multi" && l.cats.forEach((c) => {
@@ -3480,7 +3488,12 @@ const shownVal = (me, c, v) => emptyOr(c, c.levels && me.levels && me.levels[c.i
 // `shine`: options that light the row up, { gold: [...], silver: [...] } (IV 100% is gold).
 const shineOf = (c, v) => (c.shine && c.shine.gold && c.shine.gold.includes(v) ? "gold" : c.shine && c.shine.silver && c.shine.silver.includes(v) ? "silver" : "");
 // `pills`: the pick as pills, one per part ("Fire · Flying"), colored by type where it is one.
-const TYPE_HUES = { Neutral: [40, "12%"], Fire: [10], Water: [212], Grass: [118], Electric: [50], Ice: [188], Ground: [28], Dark: [275], Dragon: [325] };
+// Palworld and Pokémon types; a second value is a lower saturation (the grey-ish ones).
+const TYPE_HUES = {
+  Neutral: [40, "12%"], Normal: [40, "12%"], Fire: [18], Water: [212], Grass: [120], Electric: [52], Ice: [182], Ground: [30],
+  Dark: [270, "22%"], Dragon: [255], Fighting: [2], Flying: [232, "55%"], Poison: [295], Psychic: [332], Bug: [78],
+  Rock: [42, "38%"], Ghost: [275], Steel: [200, "18%"], Fairy: [350],
+};
 const valPills = (c, v) => {
   if (!c.pills || v == null || isEmptyVal(c, v)) return "";
   return `<span class="val-pills">${String(v).split(" · ").map((t) => {
