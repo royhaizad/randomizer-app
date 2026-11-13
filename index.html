@@ -910,7 +910,7 @@ const POKEMON = {
     "Nature": ["Adamant", "Bashful", "Bold", "Brave", "Calm", "Careful", "Docile", "Gentle", "Hardy", "Hasty", "Impish", "Jolly", "Lax", "Lonely", "Mild", "Modest", "Naive", "Naughty", "Quiet", "Quirky", "Rash", "Relaxed", "Sassy", "Serious", "Timid"],
     "Gender": ["Male", "Female", "Genderless"],
     "Habitat": ["Cave", "Forest", "Grassland", "Mountain", "Rare", "Rough Terrain", "Sea", "Urban", "Water's Edge"],
-    "Egg Group": ["Amorphous (Blob/Gas/Slime/Ghost)", "Bug", "Ditto", "Dragon", "Fairy", "Field (Beast)", "Flying", "Grass", "Human-Like", "Mineral", "Monster (Kaiju)", "Undiscovered (Legendary/Baby)", "Water 1 (Terrestrial)", "Water 2 (Fish)", "Water 3 (Invertebrate)"],
+    "Egg Group": ["Amorphous", "Bug", "Ditto", "Dragon", "Fairy", "Field", "Flying", "Grass", "Human-Like", "Mineral", "Monster", "Undiscovered", "Water 1", "Water 2", "Water 3"],
     "Hidden Ability": Object.keys(HIDDEN_ABILITIES),
   },
 };
@@ -1216,214 +1216,214 @@ const POKEMON_FIT = {
       "Bug · Dark": ["Bug"],
       "Bug · Electric": ["Bug"],
       "Bug · Fairy": ["Bug", "Fairy"],
-      "Bug · Fighting": ["Undiscovered (Legendary/Baby)", "Bug"],
+      "Bug · Fighting": ["Undiscovered", "Bug"],
       "Bug · Fire": ["Bug"],
-      "Bug · Flying": ["Bug", "Water 1 (Terrestrial)"],
+      "Bug · Flying": ["Bug", "Water 1"],
       "Bug · Ghost": ["Mineral"],
       "Bug · Grass": ["Bug", "Grass"],
       "Bug · Ground": ["Bug"],
       "Bug · Poison": ["Bug"],
       "Bug · Psychic": ["Bug"],
       "Bug · Rock": ["Bug", "Mineral"],
-      "Bug · Steel": ["Bug", "Undiscovered (Legendary/Baby)"],
-      "Bug · Water": ["Water 3 (Invertebrate)", "Bug", "Water 1 (Terrestrial)"],
-      "Dark": ["Field (Beast)", "Undiscovered (Legendary/Baby)"],
-      "Dark · Dragon": ["Undiscovered (Legendary/Baby)", "Dragon"],
+      "Bug · Steel": ["Bug", "Undiscovered"],
+      "Bug · Water": ["Water 3", "Bug", "Water 1"],
+      "Dark": ["Field", "Undiscovered"],
+      "Dark · Dragon": ["Undiscovered", "Dragon"],
       "Dark · Fairy": ["Fairy", "Human-Like"],
-      "Dark · Fighting": ["Field (Beast)", "Dragon"],
-      "Dark · Fire": ["Undiscovered (Legendary/Baby)", "Field (Beast)"],
-      "Dark · Flying": ["Undiscovered (Legendary/Baby)", "Flying"],
+      "Dark · Fighting": ["Field", "Dragon"],
+      "Dark · Fire": ["Undiscovered", "Field"],
+      "Dark · Flying": ["Undiscovered", "Flying"],
       "Dark · Ghost": ["Human-Like"],
-      "Dark · Grass": ["Undiscovered (Legendary/Baby)"],
-      "Dark · Ground": ["Undiscovered (Legendary/Baby)"],
-      "Dark · Ice": ["Field (Beast)", "Undiscovered (Legendary/Baby)"],
-      "Dark · Normal": ["Field (Beast)"],
-      "Dark · Poison": ["Water 2 (Fish)"],
-      "Dark · Psychic": ["Water 1 (Terrestrial)", "Water 2 (Fish)"],
+      "Dark · Grass": ["Undiscovered"],
+      "Dark · Ground": ["Undiscovered"],
+      "Dark · Ice": ["Field", "Undiscovered"],
+      "Dark · Normal": ["Field"],
+      "Dark · Poison": ["Water 2"],
+      "Dark · Psychic": ["Water 1", "Water 2"],
       "Dark · Steel": ["Human-Like"],
-      "Dragon": ["Dragon", "Monster (Kaiju)", "Water 1 (Terrestrial)", "Undiscovered (Legendary/Baby)"],
-      "Dragon · Dark": ["Undiscovered (Legendary/Baby)"],
-      "Dragon · Electric": ["Undiscovered (Legendary/Baby)"],
+      "Dragon": ["Dragon", "Monster", "Water 1", "Undiscovered"],
+      "Dragon · Dark": ["Undiscovered"],
+      "Dragon · Electric": ["Undiscovered"],
       "Dragon · Fighting": ["Dragon"],
-      "Dragon · Fire": ["Undiscovered (Legendary/Baby)"],
-      "Dragon · Flying": ["Dragon", "Flying", "Water 1 (Terrestrial)", "Undiscovered (Legendary/Baby)"],
-      "Dragon · Ghost": ["Amorphous (Blob/Gas/Slime/Ghost)", "Dragon"],
-      "Dragon · Ground": ["Undiscovered (Legendary/Baby)", "Monster (Kaiju)", "Dragon"],
-      "Dragon · Ice": ["Undiscovered (Legendary/Baby)", "Mineral", "Dragon"],
-      "Dragon · Normal": ["Field (Beast)"],
-      "Dragon · Psychic": ["Undiscovered (Legendary/Baby)"],
-      "Dragon · Water": ["Water 2 (Fish)"],
-      "Electric": ["Field (Beast)", "Fairy", "Undiscovered (Legendary/Baby)", "Amorphous (Blob/Gas/Slime/Ghost)", "Water 1 (Terrestrial)", "Monster (Kaiju)", "Human-Like", "Mineral"],
-      "Electric · Dark": ["Field (Beast)", "Fairy"],
-      "Electric · Dragon": ["Undiscovered (Legendary/Baby)"],
-      "Electric · Fairy": ["Field (Beast)", "Fairy", "Undiscovered (Legendary/Baby)"],
-      "Electric · Fighting": ["Field (Beast)"],
-      "Electric · Flying": ["Amorphous (Blob/Gas/Slime/Ghost)", "Field (Beast)", "Flying", "Undiscovered (Legendary/Baby)", "Water 1 (Terrestrial)"],
-      "Electric · Ghost": ["Amorphous (Blob/Gas/Slime/Ghost)"],
-      "Electric · Grass": ["Mineral", "Amorphous (Blob/Gas/Slime/Ghost)"],
-      "Electric · Ground": ["Undiscovered (Legendary/Baby)"],
-      "Electric · Ice": ["Amorphous (Blob/Gas/Slime/Ghost)", "Undiscovered (Legendary/Baby)"],
-      "Electric · Normal": ["Monster (Kaiju)", "Dragon"],
-      "Electric · Poison": ["Human-Like", "Undiscovered (Legendary/Baby)"],
-      "Electric · Psychic": ["Field (Beast)", "Fairy"],
-      "Electric · Steel": ["Mineral", "Field (Beast)", "Fairy"],
-      "Fairy": ["Grass", "Undiscovered (Legendary/Baby)", "Fairy", "Field (Beast)", "Amorphous (Blob/Gas/Slime/Ghost)", "Mineral"],
-      "Fairy · Fighting": ["Undiscovered (Legendary/Baby)"],
-      "Fairy · Flying": ["Undiscovered (Legendary/Baby)", "Flying", "Fairy"],
-      "Fairy · Psychic": ["Undiscovered (Legendary/Baby)"],
-      "Fairy · Steel": ["Undiscovered (Legendary/Baby)", "Fairy"],
-      "Fighting": ["Human-Like", "Water 3 (Invertebrate)", "Field (Beast)", "Undiscovered (Legendary/Baby)", "Flying", "Water 1 (Terrestrial)", "Fairy", "Mineral"],
-      "Fighting · Dark": ["Field (Beast)", "Human-Like", "Undiscovered (Legendary/Baby)"],
-      "Fighting · Dragon": ["Undiscovered (Legendary/Baby)"],
-      "Fighting · Electric": ["Undiscovered (Legendary/Baby)"],
-      "Fighting · Fire": ["Field (Beast)"],
-      "Fighting · Flying": ["Flying", "Human-Like", "Undiscovered (Legendary/Baby)"],
-      "Fighting · Ghost": ["Undiscovered (Legendary/Baby)", "Field (Beast)"],
-      "Fighting · Ice": ["Water 3 (Invertebrate)"],
-      "Fighting · Poison": ["Field (Beast)"],
+      "Dragon · Fire": ["Undiscovered"],
+      "Dragon · Flying": ["Dragon", "Flying", "Water 1", "Undiscovered"],
+      "Dragon · Ghost": ["Amorphous", "Dragon"],
+      "Dragon · Ground": ["Undiscovered", "Monster", "Dragon"],
+      "Dragon · Ice": ["Undiscovered", "Mineral", "Dragon"],
+      "Dragon · Normal": ["Field"],
+      "Dragon · Psychic": ["Undiscovered"],
+      "Dragon · Water": ["Water 2"],
+      "Electric": ["Field", "Fairy", "Undiscovered", "Amorphous", "Water 1", "Monster", "Human-Like", "Mineral"],
+      "Electric · Dark": ["Field", "Fairy"],
+      "Electric · Dragon": ["Undiscovered"],
+      "Electric · Fairy": ["Field", "Fairy", "Undiscovered"],
+      "Electric · Fighting": ["Field"],
+      "Electric · Flying": ["Amorphous", "Field", "Flying", "Undiscovered", "Water 1"],
+      "Electric · Ghost": ["Amorphous"],
+      "Electric · Grass": ["Mineral", "Amorphous"],
+      "Electric · Ground": ["Undiscovered"],
+      "Electric · Ice": ["Amorphous", "Undiscovered"],
+      "Electric · Normal": ["Monster", "Dragon"],
+      "Electric · Poison": ["Human-Like", "Undiscovered"],
+      "Electric · Psychic": ["Field", "Fairy"],
+      "Electric · Steel": ["Mineral", "Field", "Fairy"],
+      "Fairy": ["Grass", "Undiscovered", "Fairy", "Field", "Amorphous", "Mineral"],
+      "Fairy · Fighting": ["Undiscovered"],
+      "Fairy · Flying": ["Undiscovered", "Flying", "Fairy"],
+      "Fairy · Psychic": ["Undiscovered"],
+      "Fairy · Steel": ["Undiscovered", "Fairy"],
+      "Fighting": ["Human-Like", "Water 3", "Field", "Undiscovered", "Flying", "Water 1", "Fairy", "Mineral"],
+      "Fighting · Dark": ["Field", "Human-Like", "Undiscovered"],
+      "Fighting · Dragon": ["Undiscovered"],
+      "Fighting · Electric": ["Undiscovered"],
+      "Fighting · Fire": ["Field"],
+      "Fighting · Flying": ["Flying", "Human-Like", "Undiscovered"],
+      "Fighting · Ghost": ["Undiscovered", "Field"],
+      "Fighting · Ice": ["Water 3"],
+      "Fighting · Poison": ["Field"],
       "Fighting · Psychic": ["Human-Like"],
-      "Fighting · Steel": ["Undiscovered (Legendary/Baby)", "Field (Beast)", "Human-Like"],
-      "Fighting · Water": ["Field (Beast)", "Undiscovered (Legendary/Baby)"],
-      "Fire": ["Field (Beast)", "Undiscovered (Legendary/Baby)", "Human-Like", "Fairy", "Amorphous (Blob/Gas/Slime/Ghost)", "Monster (Kaiju)", "Dragon"],
+      "Fighting · Steel": ["Undiscovered", "Field", "Human-Like"],
+      "Fighting · Water": ["Field", "Undiscovered"],
+      "Fire": ["Field", "Undiscovered", "Human-Like", "Fairy", "Amorphous", "Monster", "Dragon"],
       "Fire · Bug": ["Bug"],
-      "Fire · Dark": ["Field (Beast)"],
-      "Fire · Dragon": ["Undiscovered (Legendary/Baby)", "Monster (Kaiju)", "Dragon"],
-      "Fire · Fighting": ["Field (Beast)", "Human-Like"],
-      "Fire · Flying": ["Undiscovered (Legendary/Baby)", "Monster (Kaiju)", "Dragon", "Flying"],
-      "Fire · Ghost": ["Monster (Kaiju)", "Field (Beast)", "Human-Like", "Undiscovered (Legendary/Baby)"],
-      "Fire · Ground": ["Field (Beast)"],
-      "Fire · Normal": ["Field (Beast)"],
-      "Fire · Poison": ["Undiscovered (Legendary/Baby)"],
-      "Fire · Psychic": ["Field (Beast)", "Human-Like"],
-      "Fire · Rock": ["Amorphous (Blob/Gas/Slime/Ghost)", "Field (Beast)"],
-      "Fire · Steel": ["Undiscovered (Legendary/Baby)"],
-      "Fire · Water": ["Undiscovered (Legendary/Baby)"],
-      "Flying": ["Flying", "Undiscovered (Legendary/Baby)"],
+      "Fire · Dark": ["Field"],
+      "Fire · Dragon": ["Undiscovered", "Monster", "Dragon"],
+      "Fire · Fighting": ["Field", "Human-Like"],
+      "Fire · Flying": ["Undiscovered", "Monster", "Dragon", "Flying"],
+      "Fire · Ghost": ["Monster", "Field", "Human-Like", "Undiscovered"],
+      "Fire · Ground": ["Field"],
+      "Fire · Normal": ["Field"],
+      "Fire · Poison": ["Undiscovered"],
+      "Fire · Psychic": ["Field", "Human-Like"],
+      "Fire · Rock": ["Amorphous", "Field"],
+      "Fire · Steel": ["Undiscovered"],
+      "Fire · Water": ["Undiscovered"],
+      "Flying": ["Flying", "Undiscovered"],
       "Flying · Dark": ["Flying"],
       "Flying · Dragon": ["Flying", "Dragon"],
       "Flying · Fighting": ["Flying"],
       "Flying · Steel": ["Flying"],
-      "Flying · Water": ["Water 1 (Terrestrial)", "Flying"],
-      "Ghost": ["Undiscovered (Legendary/Baby)", "Amorphous (Blob/Gas/Slime/Ghost)", "Water 1 (Terrestrial)", "Water 3 (Invertebrate)", "Mineral", "Field (Beast)"],
-      "Ghost · Dark": ["Amorphous (Blob/Gas/Slime/Ghost)"],
-      "Ghost · Dragon": ["Undiscovered (Legendary/Baby)"],
-      "Ghost · Fairy": ["Amorphous (Blob/Gas/Slime/Ghost)", "Undiscovered (Legendary/Baby)"],
-      "Ghost · Fire": ["Amorphous (Blob/Gas/Slime/Ghost)"],
-      "Ghost · Flying": ["Amorphous (Blob/Gas/Slime/Ghost)", "Flying"],
-      "Ghost · Grass": ["Amorphous (Blob/Gas/Slime/Ghost)", "Grass", "Mineral"],
-      "Ghost · Ground": ["Amorphous (Blob/Gas/Slime/Ghost)"],
-      "Ghost · Poison": ["Amorphous (Blob/Gas/Slime/Ghost)"],
-      "Grass": ["Undiscovered (Legendary/Baby)", "Field (Beast)", "Grass", "Human-Like", "Monster (Kaiju)", "Fairy", "Dragon"],
-      "Grass · Dark": ["Field (Beast)", "Grass", "Undiscovered (Legendary/Baby)", "Human-Like"],
+      "Flying · Water": ["Water 1", "Flying"],
+      "Ghost": ["Undiscovered", "Amorphous", "Water 1", "Water 3", "Mineral", "Field"],
+      "Ghost · Dark": ["Amorphous"],
+      "Ghost · Dragon": ["Undiscovered"],
+      "Ghost · Fairy": ["Amorphous", "Undiscovered"],
+      "Ghost · Fire": ["Amorphous"],
+      "Ghost · Flying": ["Amorphous", "Flying"],
+      "Ghost · Grass": ["Amorphous", "Grass", "Mineral"],
+      "Ghost · Ground": ["Amorphous"],
+      "Ghost · Poison": ["Amorphous"],
+      "Grass": ["Undiscovered", "Field", "Grass", "Human-Like", "Monster", "Fairy", "Dragon"],
+      "Grass · Dark": ["Field", "Grass", "Undiscovered", "Human-Like"],
       "Grass · Dragon": ["Grass", "Dragon"],
-      "Grass · Fairy": ["Grass", "Fairy", "Undiscovered (Legendary/Baby)"],
-      "Grass · Fighting": ["Undiscovered (Legendary/Baby)", "Fairy", "Grass", "Flying", "Field (Beast)"],
-      "Grass · Fire": ["Undiscovered (Legendary/Baby)", "Grass"],
-      "Grass · Flying": ["Flying", "Fairy", "Grass", "Undiscovered (Legendary/Baby)", "Monster (Kaiju)"],
-      "Grass · Ghost": ["Flying", "Grass", "Mineral", "Amorphous (Blob/Gas/Slime/Ghost)"],
-      "Grass · Ground": ["Monster (Kaiju)", "Grass"],
-      "Grass · Ice": ["Monster (Kaiju)", "Grass"],
+      "Grass · Fairy": ["Grass", "Fairy", "Undiscovered"],
+      "Grass · Fighting": ["Undiscovered", "Fairy", "Grass", "Flying", "Field"],
+      "Grass · Fire": ["Undiscovered", "Grass"],
+      "Grass · Flying": ["Flying", "Fairy", "Grass", "Undiscovered", "Monster"],
+      "Grass · Ghost": ["Flying", "Grass", "Mineral", "Amorphous"],
+      "Grass · Ground": ["Monster", "Grass"],
+      "Grass · Ice": ["Monster", "Grass"],
       "Grass · Normal": ["Grass"],
-      "Grass · Poison": ["Grass", "Monster (Kaiju)", "Fairy", "Undiscovered (Legendary/Baby)"],
-      "Grass · Psychic": ["Undiscovered (Legendary/Baby)", "Grass"],
-      "Grass · Steel": ["Grass", "Mineral", "Undiscovered (Legendary/Baby)"],
-      "Ground": ["Field (Beast)", "Dragon", "Monster (Kaiju)", "Bug", "Undiscovered (Legendary/Baby)"],
-      "Ground · Dark": ["Field (Beast)"],
+      "Grass · Poison": ["Grass", "Monster", "Fairy", "Undiscovered"],
+      "Grass · Psychic": ["Undiscovered", "Grass"],
+      "Grass · Steel": ["Grass", "Mineral", "Undiscovered"],
+      "Ground": ["Field", "Dragon", "Monster", "Bug", "Undiscovered"],
+      "Ground · Dark": ["Field"],
       "Ground · Dragon": ["Bug", "Dragon"],
-      "Ground · Electric": ["Water 1 (Terrestrial)", "Amorphous (Blob/Gas/Slime/Ghost)"],
-      "Ground · Fighting": ["Undiscovered (Legendary/Baby)"],
-      "Ground · Flying": ["Undiscovered (Legendary/Baby)", "Bug"],
-      "Ground · Ghost": ["Mineral", "Amorphous (Blob/Gas/Slime/Ghost)"],
+      "Ground · Electric": ["Water 1", "Amorphous"],
+      "Ground · Fighting": ["Undiscovered"],
+      "Ground · Flying": ["Undiscovered", "Bug"],
+      "Ground · Ghost": ["Mineral", "Amorphous"],
       "Ground · Grass": ["Grass"],
-      "Ground · Normal": ["Field (Beast)"],
+      "Ground · Normal": ["Field"],
       "Ground · Psychic": ["Mineral"],
-      "Ground · Rock": ["Monster (Kaiju)", "Field (Beast)"],
-      "Ground · Steel": ["Field (Beast)", "Water 1 (Terrestrial)", "Amorphous (Blob/Gas/Slime/Ghost)", "Undiscovered (Legendary/Baby)"],
-      "Ice": ["Mineral", "Field (Beast)", "Fairy", "Amorphous (Blob/Gas/Slime/Ghost)", "Water 1 (Terrestrial)", "Undiscovered (Legendary/Baby)", "Monster (Kaiju)"],
+      "Ground · Rock": ["Monster", "Field"],
+      "Ground · Steel": ["Field", "Water 1", "Amorphous", "Undiscovered"],
+      "Ice": ["Mineral", "Field", "Fairy", "Amorphous", "Water 1", "Undiscovered", "Monster"],
       "Ice · Bug": ["Bug"],
-      "Ice · Fairy": ["Field (Beast)"],
-      "Ice · Fire": ["Field (Beast)"],
-      "Ice · Flying": ["Water 1 (Terrestrial)", "Field (Beast)", "Undiscovered (Legendary/Baby)"],
+      "Ice · Fairy": ["Field"],
+      "Ice · Fire": ["Field"],
+      "Ice · Flying": ["Water 1", "Field", "Undiscovered"],
       "Ice · Ghost": ["Fairy", "Mineral"],
-      "Ice · Ground": ["Field (Beast)"],
-      "Ice · Psychic": ["Human-Like", "Undiscovered (Legendary/Baby)"],
-      "Ice · Rock": ["Monster (Kaiju)", "Mineral"],
-      "Ice · Steel": ["Field (Beast)"],
-      "Ice · Water": ["Undiscovered (Legendary/Baby)", "Water 1 (Terrestrial)", "Field (Beast)"],
-      "Normal": ["Field (Beast)", "Monster (Kaiju)", "Fairy", "Amorphous (Blob/Gas/Slime/Ghost)", "Human-Like", "Mineral", "Water 1 (Terrestrial)", "Undiscovered (Legendary/Baby)", "Ditto"],
-      "Normal · Dragon": ["Monster (Kaiju)", "Dragon"],
-      "Normal · Fairy": ["Fairy", "Undiscovered (Legendary/Baby)"],
-      "Normal · Fighting": ["Field (Beast)", "Undiscovered (Legendary/Baby)"],
-      "Normal · Flying": ["Flying", "Field (Beast)", "Dragon"],
-      "Normal · Ghost": ["Field (Beast)"],
-      "Normal · Grass": ["Field (Beast)"],
-      "Normal · Ground": ["Field (Beast)"],
-      "Normal · Psychic": ["Field (Beast)", "Undiscovered (Legendary/Baby)"],
-      "Normal · Water": ["Water 1 (Terrestrial)", "Field (Beast)"],
-      "Poison": ["Field (Beast)", "Dragon", "Amorphous (Blob/Gas/Slime/Ghost)", "Monster (Kaiju)", "Mineral", "Undiscovered (Legendary/Baby)"],
-      "Poison · Bug": ["Water 3 (Invertebrate)", "Bug"],
-      "Poison · Dark": ["Amorphous (Blob/Gas/Slime/Ghost)", "Field (Beast)", "Water 3 (Invertebrate)", "Bug"],
-      "Poison · Dragon": ["Undiscovered (Legendary/Baby)", "Water 1 (Terrestrial)", "Dragon"],
-      "Poison · Fairy": ["Amorphous (Blob/Gas/Slime/Ghost)", "Undiscovered (Legendary/Baby)"],
-      "Poison · Fighting": ["Human-Like", "Undiscovered (Legendary/Baby)"],
-      "Poison · Fire": ["Monster (Kaiju)", "Dragon"],
+      "Ice · Ground": ["Field"],
+      "Ice · Psychic": ["Human-Like", "Undiscovered"],
+      "Ice · Rock": ["Monster", "Mineral"],
+      "Ice · Steel": ["Field"],
+      "Ice · Water": ["Undiscovered", "Water 1", "Field"],
+      "Normal": ["Field", "Monster", "Fairy", "Amorphous", "Human-Like", "Mineral", "Water 1", "Undiscovered", "Ditto"],
+      "Normal · Dragon": ["Monster", "Dragon"],
+      "Normal · Fairy": ["Fairy", "Undiscovered"],
+      "Normal · Fighting": ["Field", "Undiscovered"],
+      "Normal · Flying": ["Flying", "Field", "Dragon"],
+      "Normal · Ghost": ["Field"],
+      "Normal · Grass": ["Field"],
+      "Normal · Ground": ["Field"],
+      "Normal · Psychic": ["Field", "Undiscovered"],
+      "Normal · Water": ["Water 1", "Field"],
+      "Poison": ["Field", "Dragon", "Amorphous", "Monster", "Mineral", "Undiscovered"],
+      "Poison · Bug": ["Water 3", "Bug"],
+      "Poison · Dark": ["Amorphous", "Field", "Water 3", "Bug"],
+      "Poison · Dragon": ["Undiscovered", "Water 1", "Dragon"],
+      "Poison · Fairy": ["Amorphous", "Undiscovered"],
+      "Poison · Fighting": ["Human-Like", "Undiscovered"],
+      "Poison · Fire": ["Monster", "Dragon"],
       "Poison · Flying": ["Flying"],
-      "Poison · Ghost": ["Undiscovered (Legendary/Baby)"],
-      "Poison · Ground": ["Undiscovered (Legendary/Baby)", "Water 1 (Terrestrial)", "Field (Beast)", "Monster (Kaiju)"],
-      "Poison · Normal": ["Field (Beast)"],
-      "Poison · Psychic": ["Monster (Kaiju)", "Water 1 (Terrestrial)", "Undiscovered (Legendary/Baby)"],
-      "Poison · Water": ["Water 1 (Terrestrial)", "Dragon"],
-      "Psychic": ["Human-Like", "Field (Beast)", "Undiscovered (Legendary/Baby)", "Amorphous (Blob/Gas/Slime/Ghost)", "Flying", "Fairy", "Monster (Kaiju)", "Water 1 (Terrestrial)"],
-      "Psychic · Fairy": ["Undiscovered (Legendary/Baby)", "Field (Beast)", "Human-Like", "Amorphous (Blob/Gas/Slime/Ghost)", "Fairy"],
-      "Psychic · Fighting": ["Human-Like", "Amorphous (Blob/Gas/Slime/Ghost)"],
-      "Psychic · Fire": ["Undiscovered (Legendary/Baby)"],
-      "Psychic · Flying": ["Flying", "Field (Beast)", "Undiscovered (Legendary/Baby)"],
-      "Psychic · Ghost": ["Undiscovered (Legendary/Baby)"],
-      "Psychic · Grass": ["Undiscovered (Legendary/Baby)"],
+      "Poison · Ghost": ["Undiscovered"],
+      "Poison · Ground": ["Undiscovered", "Water 1", "Field", "Monster"],
+      "Poison · Normal": ["Field"],
+      "Poison · Psychic": ["Monster", "Water 1", "Undiscovered"],
+      "Poison · Water": ["Water 1", "Dragon"],
+      "Psychic": ["Human-Like", "Field", "Undiscovered", "Amorphous", "Flying", "Fairy", "Monster", "Water 1"],
+      "Psychic · Fairy": ["Undiscovered", "Field", "Human-Like", "Amorphous", "Fairy"],
+      "Psychic · Fighting": ["Human-Like", "Amorphous"],
+      "Psychic · Fire": ["Undiscovered"],
+      "Psychic · Flying": ["Flying", "Field", "Undiscovered"],
+      "Psychic · Ghost": ["Undiscovered"],
+      "Psychic · Grass": ["Undiscovered"],
       "Psychic · Normal": ["Fairy"],
-      "Psychic · Steel": ["Undiscovered (Legendary/Baby)"],
-      "Rock": ["Mineral", "Field (Beast)", "Monster (Kaiju)", "Undiscovered (Legendary/Baby)", "Water 3 (Invertebrate)"],
-      "Rock · Bug": ["Water 3 (Invertebrate)"],
-      "Rock · Dark": ["Monster (Kaiju)"],
-      "Rock · Dragon": ["Monster (Kaiju)", "Dragon"],
-      "Rock · Electric": ["Mineral", "Undiscovered (Legendary/Baby)"],
-      "Rock · Fairy": ["Undiscovered (Legendary/Baby)", "Fairy", "Mineral"],
-      "Rock · Fighting": ["Undiscovered (Legendary/Baby)"],
+      "Psychic · Steel": ["Undiscovered"],
+      "Rock": ["Mineral", "Field", "Monster", "Undiscovered", "Water 3"],
+      "Rock · Bug": ["Water 3"],
+      "Rock · Dark": ["Monster"],
+      "Rock · Dragon": ["Monster", "Dragon"],
+      "Rock · Electric": ["Mineral", "Undiscovered"],
+      "Rock · Fairy": ["Undiscovered", "Fairy", "Mineral"],
+      "Rock · Fighting": ["Undiscovered"],
       "Rock · Fire": ["Mineral"],
-      "Rock · Flying": ["Mineral", "Flying", "Water 3 (Invertebrate)"],
-      "Rock · Grass": ["Water 3 (Invertebrate)"],
-      "Rock · Ground": ["Monster (Kaiju)", "Mineral"],
-      "Rock · Ice": ["Monster (Kaiju)"],
-      "Rock · Poison": ["Undiscovered (Legendary/Baby)", "Mineral"],
-      "Rock · Psychic": ["Mineral", "Undiscovered (Legendary/Baby)"],
-      "Rock · Steel": ["Mineral", "Monster (Kaiju)", "Undiscovered (Legendary/Baby)"],
-      "Rock · Water": ["Water 1 (Terrestrial)", "Water 3 (Invertebrate)"],
-      "Steel": ["Undiscovered (Legendary/Baby)", "Mineral", "Field (Beast)"],
-      "Steel · Dragon": ["Dragon", "Mineral", "Undiscovered (Legendary/Baby)"],
-      "Steel · Fairy": ["Undiscovered (Legendary/Baby)", "Mineral", "Field (Beast)", "Fairy"],
-      "Steel · Fighting": ["Undiscovered (Legendary/Baby)"],
-      "Steel · Flying": ["Undiscovered (Legendary/Baby)", "Flying"],
-      "Steel · Ghost": ["Mineral", "Undiscovered (Legendary/Baby)"],
+      "Rock · Flying": ["Mineral", "Flying", "Water 3"],
+      "Rock · Grass": ["Water 3"],
+      "Rock · Ground": ["Monster", "Mineral"],
+      "Rock · Ice": ["Monster"],
+      "Rock · Poison": ["Undiscovered", "Mineral"],
+      "Rock · Psychic": ["Mineral", "Undiscovered"],
+      "Rock · Steel": ["Mineral", "Monster", "Undiscovered"],
+      "Rock · Water": ["Water 1", "Water 3"],
+      "Steel": ["Undiscovered", "Mineral", "Field"],
+      "Steel · Dragon": ["Dragon", "Mineral", "Undiscovered"],
+      "Steel · Fairy": ["Undiscovered", "Mineral", "Field", "Fairy"],
+      "Steel · Fighting": ["Undiscovered"],
+      "Steel · Flying": ["Undiscovered", "Flying"],
+      "Steel · Ghost": ["Mineral", "Undiscovered"],
       "Steel · Ground": ["Mineral"],
       "Steel · Poison": ["Mineral"],
-      "Steel · Psychic": ["Undiscovered (Legendary/Baby)", "Mineral"],
-      "Steel · Rock": ["Monster (Kaiju)"],
-      "Water": ["Water 1 (Terrestrial)", "Field (Beast)", "Water 2 (Fish)", "Dragon", "Monster (Kaiju)", "Amorphous (Blob/Gas/Slime/Ghost)", "Water 3 (Invertebrate)", "Fairy", "Undiscovered (Legendary/Baby)", "Flying"],
-      "Water · Bug": ["Water 1 (Terrestrial)", "Bug"],
-      "Water · Dark": ["Water 1 (Terrestrial)", "Water 3 (Invertebrate)", "Field (Beast)", "Water 2 (Fish)"],
-      "Water · Dragon": ["Water 1 (Terrestrial)", "Dragon", "Undiscovered (Legendary/Baby)"],
-      "Water · Electric": ["Water 2 (Fish)"],
-      "Water · Fairy": ["Undiscovered (Legendary/Baby)", "Water 1 (Terrestrial)", "Fairy", "Field (Beast)"],
-      "Water · Fighting": ["Water 1 (Terrestrial)", "Flying", "Undiscovered (Legendary/Baby)"],
-      "Water · Flying": ["Water 1 (Terrestrial)", "Flying", "Undiscovered (Legendary/Baby)", "Water 2 (Fish)", "Dragon"],
-      "Water · Ghost": ["Amorphous (Blob/Gas/Slime/Ghost)", "Water 2 (Fish)"],
-      "Water · Grass": ["Water 1 (Terrestrial)", "Grass"],
-      "Water · Ground": ["Water 1 (Terrestrial)", "Water 2 (Fish)", "Monster (Kaiju)", "Field (Beast)", "Amorphous (Blob/Gas/Slime/Ghost)"],
-      "Water · Ice": ["Monster (Kaiju)", "Water 1 (Terrestrial)", "Undiscovered (Legendary/Baby)", "Water 3 (Invertebrate)", "Field (Beast)"],
-      "Water · Poison": ["Water 3 (Invertebrate)", "Water 2 (Fish)"],
-      "Water · Psychic": ["Monster (Kaiju)", "Water 1 (Terrestrial)", "Water 2 (Fish)", "Water 3 (Invertebrate)"],
-      "Water · Rock": ["Water 1 (Terrestrial)", "Water 3 (Invertebrate)", "Monster (Kaiju)", "Water 2 (Fish)"],
-      "Water · Steel": ["Water 1 (Terrestrial)", "Field (Beast)"],
+      "Steel · Psychic": ["Undiscovered", "Mineral"],
+      "Steel · Rock": ["Monster"],
+      "Water": ["Water 1", "Field", "Water 2", "Dragon", "Monster", "Amorphous", "Water 3", "Fairy", "Undiscovered", "Flying"],
+      "Water · Bug": ["Water 1", "Bug"],
+      "Water · Dark": ["Water 1", "Water 3", "Field", "Water 2"],
+      "Water · Dragon": ["Water 1", "Dragon", "Undiscovered"],
+      "Water · Electric": ["Water 2"],
+      "Water · Fairy": ["Undiscovered", "Water 1", "Fairy", "Field"],
+      "Water · Fighting": ["Water 1", "Flying", "Undiscovered"],
+      "Water · Flying": ["Water 1", "Flying", "Undiscovered", "Water 2", "Dragon"],
+      "Water · Ghost": ["Amorphous", "Water 2"],
+      "Water · Grass": ["Water 1", "Grass"],
+      "Water · Ground": ["Water 1", "Water 2", "Monster", "Field", "Amorphous"],
+      "Water · Ice": ["Monster", "Water 1", "Undiscovered", "Water 3", "Field"],
+      "Water · Poison": ["Water 3", "Water 2"],
+      "Water · Psychic": ["Monster", "Water 1", "Water 2", "Water 3"],
+      "Water · Rock": ["Water 1", "Water 3", "Monster", "Water 2"],
+      "Water · Steel": ["Water 1", "Field"],
     },
   },
 };
@@ -1433,9 +1433,9 @@ const POKEMON_FIT = {
 // "Rare" is the legendary-style habitat, open to all.
 const ALL_HABITATS = POKEMON.cats.Habitat;
 POKEMON_FIT.Habitat["Egg Group"] = {
-  "Water 1 (Terrestrial)": [...ALL_HABITATS],
-  "Water 2 (Fish)": ["Sea", "Water's Edge", "Cave", "Rare"],
-  "Water 3 (Invertebrate)": ["Sea", "Water's Edge", "Cave", "Rare"],
+  "Water 1": [...ALL_HABITATS],
+  "Water 2": ["Sea", "Water's Edge", "Cave", "Rare"],
+  "Water 3": ["Sea", "Water's Edge", "Cave", "Rare"],
 };
 // Where each type can live, by real-world logic (fire near volcanoes and deserts, water
 // in the sea and rivers, steel around towns and mines…). A dual type lives only where
@@ -1472,19 +1472,60 @@ const ALL_TYPES = [...new Set(POKEMON.cats.Type.flatMap((t) => t.split(" · ")))
 const notType = (...t) => ALL_TYPES.filter((x) => !t.includes(x));
 const SEA_TYPES = ["Water", "Ice", "Poison", "Electric", "Rock", "Dark", "Psychic", "Ghost", "Dragon"];
 // Egg groups that used to show only their game name (saved lists are renamed once in load()).
+// What each egg group means, shown under the picked value.
+const EGG_NOTES = {"Water 1":"Terrestrial","Water 2":"Fish","Water 3":"Invertebrate","Amorphous":"Blob/Gas/Slime/Ghost","Field":"Beast","Monster":"Kaiju","Undiscovered":"Legendary/Baby"};
 const EGG_RENAMES = { "Amorphous": "Amorphous (Blob/Gas/Slime/Ghost)", "Field": "Field (Beast)", "Monster": "Monster (Kaiju)", "Undiscovered": "Undiscovered (Legendary/Baby)" };
 const EGG_TYPES = {
   "Ditto": ["Normal"],
-  "Water 2 (Fish)": SEA_TYPES,
-  "Water 3 (Invertebrate)": SEA_TYPES,
+  "Water 2": SEA_TYPES,
+  "Water 3": SEA_TYPES,
   "Mineral": ["Rock", "Steel", "Ground", "Ice", "Electric", "Fire", "Psychic", "Ghost"],
   "Grass": ["Grass", "Poison", "Bug", "Fairy", "Water", "Ground"],
-  "Field (Beast)": notType("Bug"),
-  "Monster (Kaiju)": notType("Bug", "Fairy"),
+  "Field": notType("Bug"),
+  "Monster": notType("Bug", "Fairy"),
   "Flying": notType("Bug"),
 };
 POKEMON_FIT["Egg Group"].Type = Object.fromEntries(POKEMON.cats.Type.map((t) => [t,
   POKEMON.cats["Egg Group"].filter((g) => t.split(" · ").every((x) => (EGG_TYPES[g] || ALL_TYPES).includes(x)))]));
+// Hidden Abilities tied to an element, by the types they suit (real-world logic: Blaze is
+// fire, Swift Swim is water, Sand Veil is earth and stone…). A Pokémon gets one if either
+// of its types suits it. Every ability not listed here suits any type.
+const ABILITY_TYPES = Object.fromEntries(Object.entries({
+  "Fire": "Blaze, Flash Fire, Flame Body, Drought, Flare Boost",
+  "Fire, Grass": "Solar Power",
+  "Fire, Poison": "White Smoke",
+  "Fire, Steel, Rock, Ground": "Heatproof",
+  "Water": "Torrent, Swift Swim, Drizzle, Hydration, Storm Drain, Liquid Voice, Propeller Tail",
+  "Water, Ice": "Water Veil",
+  "Water, Grass": "Rain Dish, Water Absorb, Damp",
+  "Water, Grass, Poison": "Dry Skin",
+  "Grass": "Overgrow, Chlorophyll, Leaf Guard, Harvest, Grass Pelt, Grassy Surge",
+  "Grass, Normal": "Sap Sipper",
+  "Grass, Bug, Poison": "Effect Spore",
+  "Grass, Fairy": "Aroma Veil",
+  "Grass, Bug, Fairy": "Honey Gather, Sweet Veil",
+  "Grass, Poison": "Poison Heal",
+  "Electric": "Static, Volt Absorb, Motor Drive, Galvanize, Electric Surge, Plus, Minus",
+  "Electric, Ground, Steel": "Lightning Rod",
+  "Ice": "Ice Body, Snow Cloak, Snow Warning, Slush Rush",
+  "Ice, Bug": "Ice Scales",
+  "Ground, Rock, Steel": "Sand Veil, Sand Rush, Sand Force",
+  "Rock": "Rocky Payload",
+  "Steel": "Heavy Metal, Light Metal, Steely Spirit, Mirror Armor",
+  "Flying": "Gale Wings, Big Pecks",
+  "Bug": "Swarm, Compound Eyes",
+  "Bug, Dragon, Poison": "Shed Skin",
+  "Poison": "Poison Touch, Toxic Boost, Corrosion, Stench",
+  "Dragon, Poison, Water, Bug": "Gooey",
+  "Psychic": "Psychic Surge, Telepathy",
+  "Psychic, Fairy": "Magic Bounce, Magic Guard",
+  "Psychic, Ghost": "Shadow Tag",
+  "Fairy": "Misty Surge, Pixilate",
+  "Ghost": "Cursed Body, Perish Body",
+  "Normal": "Imposter, Cud Chew",
+}).flatMap(([types, names]) => names.split(", ").map((n) => [n, types.split(", ")])));
+POKEMON_FIT["Hidden Ability"].Type = Object.fromEntries(POKEMON.cats.Type.map((t) => [t,
+  POKEMON.cats["Hidden Ability"].filter((a) => !ABILITY_TYPES[a] || t.split(" · ").some((x) => ABILITY_TYPES[a].includes(x)))]));
 // Every country in the world: the 193 UN members plus Palestine and Vatican City.
 const COUNTRIES = {
   name: "Random country",
@@ -1564,6 +1605,7 @@ const pokemonMulti = () => ({
       id: uid(), name, items,
       ...(name === "Nature" && { badges: natureBadges(items) }),
       ...(name === "Hidden Ability" && { notes: { ...HIDDEN_ABILITIES } }),
+      ...(name === "Egg Group" && { notes: { ...EGG_NOTES } }),
       ...(name === "Type" && { pills: true }),
       ...(POKEMON_FIT[name] && { fit: structuredClone(POKEMON_FIT[name]) }),
     })), shinyCat()],
@@ -3119,6 +3161,146 @@ const palworldMulti = () => {
   };
 };
 
+// The Ultimate Pokémon Generator: Pokémon and Pal categories in one list, for inventing your own
+// Pokémon. Every link between categories follows real-world logic, not existing Pokémon or Pals.
+const ULTIMATE = {
+  name: "Ultimate Pokémon Generator",
+  emoji: "🌟",
+  description: "Type, egg group, stage, size, gender, nature, hidden ability, activity, habitat, region, work, passive skills, IV, alpha and prodigy",
+};
+const U_HABITATS = ["Grassland", "Forest", "Jungle", "Mountain", "Volcano", "Snow", "Desert", "Rough Terrain", "Cave", "Ruins", "Urban", "Sea", "Beach", "Wetland", "Water's Edge", "Rare"];
+const uBut = (...h) => U_HABITATS.filter((x) => !h.includes(x));
+// Where each type can live; a dual type lives only where both can. Rare is open to every type.
+const U_TYPE_HABITATS = {
+  Normal: uBut("Sea"),
+  Fire: ["Mountain", "Volcano", "Desert", "Rough Terrain", "Grassland", "Urban", "Cave", "Ruins"],
+  Water: ["Sea", "Beach", "Wetland", "Water's Edge", "Cave"],
+  Grass: ["Forest", "Jungle", "Grassland", "Wetland", "Water's Edge", "Mountain", "Urban", "Ruins", "Desert"],
+  Electric: ["Urban", "Grassland", "Mountain", "Sea", "Water's Edge", "Wetland"],
+  Ice: ["Snow", "Mountain", "Sea", "Cave", "Water's Edge", "Beach"],
+  Fighting: uBut("Sea"),
+  Poison: uBut("Mountain", "Snow"),
+  Ground: ["Desert", "Rough Terrain", "Cave", "Mountain", "Grassland", "Water's Edge", "Wetland", "Volcano", "Beach", "Ruins"],
+  Flying: uBut(),
+  Psychic: uBut(),
+  Bug: uBut("Sea", "Snow"),
+  Rock: ["Mountain", "Volcano", "Cave", "Desert", "Rough Terrain", "Sea", "Beach", "Water's Edge", "Ruins"],
+  Ghost: uBut(),
+  Dragon: ["Mountain", "Volcano", "Cave", "Sea", "Desert", "Rough Terrain", "Forest", "Jungle", "Water's Edge", "Ruins", "Snow"],
+  Dark: uBut("Sea"),
+  Steel: ["Urban", "Mountain", "Cave", "Rough Terrain", "Ruins", "Desert"],
+  Fairy: ["Forest", "Jungle", "Grassland", "Urban", "Mountain", "Water's Edge", "Wetland", "Cave", "Ruins"],
+};
+// Real-life areas and the land they have (by real geography). Rare is everywhere.
+const U_REGIONS = {
+  "Arctic": ["Snow", "Sea", "Beach", "Mountain", "Cave", "Water's Edge", "Wetland", "Grassland", "Urban"],
+  "North America": uBut("Jungle"),
+  "Central America & Caribbean": ["Jungle", "Forest", "Beach", "Sea", "Volcano", "Mountain", "Cave", "Ruins", "Urban", "Wetland", "Water's Edge", "Grassland"],
+  "South America": uBut(),
+  "Amazon": ["Jungle", "Forest", "Wetland", "Water's Edge", "Cave", "Ruins", "Grassland", "Urban"],
+  "Europe": uBut("Desert", "Jungle"),
+  "Middle East": ["Desert", "Rough Terrain", "Mountain", "Sea", "Beach", "Urban", "Ruins", "Cave", "Water's Edge", "Grassland", "Wetland", "Volcano", "Snow"],
+  "Sahara": ["Desert", "Rough Terrain", "Mountain", "Cave", "Ruins", "Urban", "Water's Edge", "Volcano"],
+  "Sub-Saharan Africa": uBut(),
+  "South Asia": uBut(),
+  "East Asia": uBut(),
+  "Southeast Asia": ["Jungle", "Forest", "Sea", "Beach", "Volcano", "Mountain", "Cave", "Ruins", "Urban", "Wetland", "Water's Edge", "Grassland", "Rough Terrain"],
+  "Australia & Pacific": uBut(),
+  "Antarctica": ["Snow", "Sea", "Beach", "Mountain", "Volcano", "Cave", "Water's Edge"],
+};
+const withRare = (rows) => Object.fromEntries(Object.entries(rows).map(([k, v]) => [k, [...new Set([...v, "Rare"])]]));
+const typesOf = (t) => t.split(" · ");
+const U_EGGS = POKEMON.cats["Egg Group"];
+const eggNamed = (start) => U_EGGS.find((g) => g.startsWith(start));
+const EGG_UNDISCOVERED = eggNamed("Undiscovered");
+// Real-life life stages, by egg group.
+const U_STAGE_SETS = {
+  animal: ["Egg", "Baby", "Child", "Adult", "Elder"],
+  bug: ["Egg", "Larva", "Pupa", "Adult", "Elder"],
+  plant: ["Seed", "Sprout", "Sapling", "Tree", "Flower", "Elder"],
+  mineral: ["Pebble", "Rock", "Boulder", "Crystal", "Elder"],
+  blob: ["Spark", "Wisp", "Adult", "Elder"],
+  ditto: ["Adult"],
+};
+const U_STAGES = [...new Set(Object.values(U_STAGE_SETS).flat())];
+const stageSetOf = (g) => (g === eggNamed("Bug") || g === eggNamed("Water 3") ? "bug" : g === eggNamed("Grass") ? "plant"
+  : g === eggNamed("Mineral") ? "mineral" : g === eggNamed("Amorphous") ? "blob" : g === eggNamed("Ditto") ? "ditto" : "animal");
+// The rarer kinds can't breed (Undiscovered egg group) and are fully grown.
+const U_RARITIES = POKEMON.cats.Rarity;
+const U_RARE_KINDS = ["Sub-Legendary", "Legendary", "Mythical", "Ultra Beast"];
+const U_GROWN = ["Adult", "Elder", "Tree", "Flower", "Boulder", "Crystal"];
+const U_SIZES = ["XS", "S", "M", "L", "XL"];
+const U_SIZE_BY_STAGE = {
+  Egg: ["XS", "S"], Seed: ["XS", "S"], Pebble: ["XS", "S"], Spark: ["XS", "S"], Baby: ["XS", "S"],
+  Child: ["XS", "S", "M"], Larva: ["XS", "S", "M"], Sprout: ["XS", "S", "M"], Wisp: ["XS", "S", "M"],
+  Tree: ["L", "XL"], Boulder: ["L", "XL"],
+};
+// Work jobs that need an element (either type will do); Handiwork needs hands.
+const U_JOB_TYPES = {
+  "Kindling": ["Fire"], "Watering": ["Water", "Ice"], "Planting": ["Grass"], "Generating Electricity": ["Electric"], "Cooling": ["Ice"],
+  "Mining": ["Rock", "Ground", "Steel", "Fighting", "Dragon"], "Medicine Production": ["Grass", "Poison", "Fairy", "Psychic", "Bug"],
+};
+const U_HANDS = ["Human-Like", "Fairy", "Field", "Monster", "Grass"].map(eggNamed);
+// Pal elements as Pokémon types, for the passives that boost an element's damage.
+const U_PAL_ELEMENTS = { Neutral: ["Normal"], Fire: ["Fire"], Water: ["Water"], Grass: ["Grass"], Electric: ["Electric"], Ice: ["Ice"], Ground: ["Ground", "Rock", "Steel"], Dark: ["Dark", "Ghost", "Poison"], Dragon: ["Dragon"] };
+const passiveTypes = (text) => {
+  const m = /^(.*?) damage \+/.exec(text || "");
+  if (!m) return null;
+  const els = Object.keys(U_PAL_ELEMENTS).filter((e) => new RegExp(`\\b${e}\\b`).test(m[1]));
+  return els.length ? els.flatMap((e) => U_PAL_ELEMENTS[e]) : null;
+};
+const ultimateMulti = () => {
+  const types = POKEMON.cats.Type, passives = Object.keys(PAL_PASSIVES);
+  const byType = (ok) => Object.fromEntries(types.map((t) => [t, ok(t)]));
+  const byEgg = (ok) => Object.fromEntries(U_EGGS.map((g) => [g, ok(g)]));
+  const byRarity = (rare, all) => Object.fromEntries(U_RARITIES.map((r) => [r, U_RARE_KINDS.includes(r) ? rare : all]));
+  const works = [...new Set(Object.keys(PALS).map(palWorkSet))];
+  const jobsOk = (w, t) => w === PAL_NONE || w.split(" · ").every((j) => !U_JOB_TYPES[j] || typesOf(t).some((x) => U_JOB_TYPES[j].includes(x)));
+  const passiveOk = (p, t) => { const need = passiveTypes(PAL_PASSIVES[p]); return !need || typesOf(t).some((x) => need.includes(x)); };
+  const IVS = [...PAL_IVS];
+  const cat = (name, items, more) => ({ id: uid(), name, items, ...more });
+  return {
+    id: uid(), name: ULTIMATE.name, emoji: ULTIMATE.emoji, description: ULTIMATE.description, type: "multi", labels: ["Fun"], created: Date.now(),
+    cats: [
+      cat("Type", [...types], { pills: true }),
+      cat("Egg Group", [...U_EGGS], { notes: { ...EGG_NOTES }, fit: { Type: structuredClone(POKEMON_FIT["Egg Group"].Type), Rarity: byRarity([EGG_UNDISCOVERED], [...U_EGGS]) } }),
+      cat("Stage", [...U_STAGES], { fit: { "Egg Group": byEgg((g) => [...U_STAGE_SETS[stageSetOf(g)]]), Rarity: byRarity([...U_GROWN], [...U_STAGES]) } }),
+      cat("Size", [...U_SIZES], { grow: { ...PAL_GROW }, fit: { Stage: Object.fromEntries(U_STAGES.map((s) => [s, U_SIZE_BY_STAGE[s] || [...U_SIZES]])) } }),
+      cat("Gender", ["Male", "Female", "Genderless"], { fit: { "Egg Group": byEgg((g) =>
+        ["Mineral", "Amorphous", "Ditto"].map(eggNamed).includes(g) ? ["Genderless"] : g === EGG_UNDISCOVERED ? ["Male", "Female", "Genderless"] : ["Male", "Female"]) } }),
+      cat("Nature", [...POKEMON.cats.Nature], { badges: natureBadges(POKEMON.cats.Nature) }),
+      cat("Hidden Ability", Object.keys(HIDDEN_ABILITIES), { notes: { ...HIDDEN_ABILITIES }, fit: { Type: structuredClone(POKEMON_FIT["Hidden Ability"].Type) } }),
+      cat("Activity", ["Daytime", "Nocturnal"], { fit: { Type: byType((t) => {
+        const day = typesOf(t).some((x) => x === "Grass" || x === "Fairy"), night = typesOf(t).some((x) => x === "Ghost" || x === "Dark");
+        return day === night ? ["Daytime", "Nocturnal"] : day ? ["Daytime"] : ["Nocturnal"];
+      }) } }),
+      cat("Habitat", [...U_HABITATS], { fit: {
+        Type: byType((t) => U_HABITATS.filter((h) => h === "Rare" || typesOf(t).every((x) => (U_TYPE_HABITATS[x] || U_HABITATS).includes(h)))),
+        "Egg Group": withRare({ [eggNamed("Water 1")]: [...U_HABITATS], [eggNamed("Water 2")]: ["Sea", "Wetland", "Water's Edge", "Cave"], [eggNamed("Water 3")]: ["Sea", "Beach", "Wetland", "Water's Edge", "Cave"] }),
+        Region: withRare(U_REGIONS),
+      } }),
+      cat("Region", Object.keys(U_REGIONS)),
+      cat("Work Suitability", works, {
+        fit: { Type: byType((t) => works.filter((w) => jobsOk(w, t))), "Egg Group": byEgg((g) => works.filter((w) => U_HANDS.includes(g) || !w.split(" · ").includes("Handiwork"))) },
+        levels: { by: "Pal", base: {}, max: 10, bonus: { Alpha: "Yes", Prodigy: "Yes" } },
+      }),
+      cat("Passive Skills", [...PAL_COUNTS], { fit: { Prodigy: { Yes: PAL_COUNTS.slice(1), No: [...PAL_COUNTS] } }, starts: { group: "passive", by: { Prodigy: { Yes: ["Lucky"] } } } }),
+      ...[1, 2, 3, 4].map((n) => cat(`Passive Skill ${n}`, [PAL_NONE, ...passives], {
+        notes: { [PAL_NONE]: "No passive skill in this slot", ...PAL_PASSIVES }, badges: structuredClone(PAL_PASSIVE_BADGES), unique: "passive",
+        fit: {
+          "Passive Skills": Object.fromEntries(PAL_COUNTS.map((k) => [k, +k >= n ? [...passives] : [PAL_NONE]])),
+          Prodigy: { Yes: [PAL_NONE, ...passives], No: [PAL_NONE, ...passives.filter((s) => s !== "Lucky")] },
+          Type: byType((t) => [PAL_NONE, ...passives.filter((p) => passiveOk(p, t))]),
+        },
+      })),
+      cat("IV", IVS, { fit: { Alpha: { Yes: IVS.slice(50), No: [...IVS] }, Prodigy: { Yes: IVS.slice(70), No: [...IVS] } }, shine: structuredClone(PAL_IV_SHINE) }),
+      palAlphaCat(),
+      cat("Prodigy", ["No", "Yes"], { ...rareYes(), notes: { Yes: "A rare one: has the Lucky passive, an IV of 70–100% and work levels +1" } }),
+      cat("Rarity", [...U_RARITIES], { off: true }),
+    ],
+  };
+};
+
 /* =========================================================
    2. Saving (everything lives on this phone only)
    ========================================================= */
@@ -3361,12 +3543,21 @@ function load() {
     renameEggGroups(EGG_RENAMES);
     d.eggNames3 = true;
   }
+  // Once: egg groups go back to their game names, and the hint shows as a note under the value.
+  if (!d.eggNotes) {
+    renameEggGroups({"Water 1 (Terrestrial)":"Water 1","Water 2 (Fish)":"Water 2","Water 3 (Invertebrate)":"Water 3","Amorphous (Blob/Gas/Slime/Ghost)":"Amorphous","Field (Beast)":"Field","Monster (Kaiju)":"Monster","Undiscovered (Legendary/Baby)":"Undiscovered"});
+    d.lists.filter((l) => l.type === "multi").forEach((l) => {
+      const eg = l.cats.find((c) => c.name === "Egg Group" && c.items.includes("Water 2"));
+      if (eg) eg.notes = { ...EGG_NOTES, ...eg.notes };
+    });
+    d.eggNotes = true;
+  }
   // Once: Habitat follows the Water egg groups too (fish stay near water).
   // (Found by its categories, so a renamed Pokémon list gets it too.)
   if (!d.waterHabitats) {
     d.lists.filter((l) => l.type === "multi").forEach((l) => {
       const h = l.cats.find((c) => c.name === "Habitat" && c.items.includes("Water's Edge"));
-      const eg = l.cats.find((c) => c.name === "Egg Group" && c.items.includes("Water 2 (Fish)"));
+      const eg = l.cats.find((c) => c.name === "Egg Group" && c.items.includes("Water 2"));
       if (h && eg && !(h.fit && h.fit["Egg Group"])) h.fit = { ...h.fit, "Egg Group": structuredClone(POKEMON_FIT.Habitat["Egg Group"]) };
     });
     d.waterHabitats = true;
@@ -3382,11 +3573,30 @@ function load() {
   // Once: Egg Group follows Type by real-world logic instead of the existing Pokémon.
   if (!d.eggTypeLogic) {
     d.lists.filter((l) => l.type === "multi").forEach((l) => {
-      const eg = l.cats.find((c) => c.name === "Egg Group" && c.items.includes("Water 2 (Fish)"));
+      const eg = l.cats.find((c) => c.name === "Egg Group" && c.items.includes("Water 2"));
       if (eg && eg.fit && eg.fit.Type) eg.fit.Type = structuredClone(POKEMON_FIT["Egg Group"].Type);
     });
     d.eggTypeLogic = true;
   }
+  // Once: Hidden Ability follows Type by real-world logic instead of the existing Pokémon.
+  if (!d.abilityTypeLogic) {
+    d.lists.filter((l) => l.type === "multi").forEach((l) => {
+      const a = l.cats.find((c) => c.name === "Hidden Ability" && c.items.includes("Blaze"));
+      if (a && a.fit && a.fit.Type) a.fit.Type = structuredClone(POKEMON_FIT["Hidden Ability"].Type);
+    });
+    d.abilityTypeLogic = true;
+  }
+  // The Ultimate Pokémon Generator, right after the Pal list. It comes back if deleted; a list
+  // with its name gets any categories it is missing, once.
+  const ult = d.lists.find((l) => l.name === ULTIMATE.name);
+  if (!ult) {
+    const at = d.lists.findIndex((l) => l.type === "multi" && l.cats.some((c) => c.name === "Pal"));
+    d.lists.splice(at + 1, 0, ultimateMulti());
+  } else if (!d.ultimateMerged && ult.type === "multi") {
+    const have = new Set(ult.cats.map((c) => c.name));
+    ult.cats.push(...ultimateMulti().cats.filter((c) => !have.has(c.name)));
+  }
+  d.ultimateMerged = true;
   // Lists made before "Date created" existed count as created in their current order.
   const base = Date.now() - d.lists.length * 1000;
   d.lists.forEach((l, i) => { if (!l.created) l.created = base + i * 1000; });
