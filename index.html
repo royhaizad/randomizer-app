@@ -671,15 +671,17 @@
 /* =========================================================
    1. Starting data: your 9 lists from the backup file
    ========================================================= */
-const BACKUP = {"Seetru makan mana":["Amin","Aslam","Ayam Kunyit (tapaw)","Bidayah","Hasilath","Ijo Moyan","Nasi Mandy","Padang","Palawan","Uncle"],"Balik keje makan luar":["Ayam Gepuk","Sambal Ulek","Rasmeena","LepaQ","Family Mart","Boat Noodle","Sup Irfan","Andan","Kebab dpn SkyAwaniV","Al-Bidayah Sentul Point","Meratah"],"Masak apa":["Ayam goreng","Nasi goreng","Roti telur","Sambal ayam","Sambal telur dadar","Sambal telur rebus","Telur kicap","Sup ayam","Tempe goreng","Daging masak lemak","Tofu sup","Broccoli","Butter chicken","Jagung"],"Breakfast apa":["Cereal","Nugget/Patties/Sosej/Fillet","Roti/toast","Roti canai kedai","Telur","Kuih/nasi lemak","Baked beans","Campbell's Soup","Roti telur","Cucur adabi","Roti canai instant","Karipap instant"],"Lunch apa (maxim)":["Ayam Gepuk","Ayam goreng","Nasi goreng","Rasmeena","Roti telur","Sambal ayam","Sambal telur dadar","Sambal telur rebus","Sambal Ulek","Soto/Mi Kari","Telur kicap"],"Fun activities":["Bowling","Ice skating","Jogging","Game at friend's house","Marathon ","Sketchwalk","Skytrex Shah Alam ","Swimming","Wayang","Roller blading","Tufting/Making art","Mandi sungai","Hiking","Jamming","Karaoke","Baby expo","Bezza event","Figma/UIUX event","Anime/Games event","Kayak","Pantai","Thrifting/Bundle","Go cart","Camping","Ziarah friend's house","Belanja kawan makan","FRIM","Water rafting"],"MyTown makan mana":["Mi Tarik","Richeese","Subway"],"Sahur protein apa":["Goreng/sup (ayam)","Cereal (with susu, oats, honey) 🍔","Nasi kicap (with edamame)","Maggi (with telur) 🍔","Nasi (with telur)","Roti (with telur/cheese)","Tofu sup","Nasi (with tempe goreng)","Nuggets 🍔","Baked beans (with eggs) 🍔","Nasi/roti (with sardin)","Kentang (with cheese)","Bubur (with kacang/ayam/telur)"],"Menunggu?":["Baca BuiltforMars","Susun shopping list","Baca Knowledge Sharing","cantunsee.space","Kern Type ","Color Method","It's centered that","Susun Keep: Free Time dpn comp : which priority"]};
+// New installs start with a few example lists (Random Pokémon, Random Pal and
+// Random country are added by load()). Saved lists are never touched by these.
+const BACKUP = {"Dadu":["1","2","3","4","5","6"],"MyTown makan mana":["Mi Tarik","Richeese","Subway"],"Masak apa":["Ayam goreng","Nasi goreng","Roti telur","Sambal ayam","Sambal telur dadar","Sambal telur rebus","Telur kicap","Sup ayam","Tempe goreng","Daging masak lemak","Tofu sup","Broccoli","Butter chicken","Jagung","Bubur nasi","Miso sup"]};
 
-// Starting order: eat-out lists, then cook/meal lists, then activities.
-const ORDER = ["Seetru makan mana", "Balik keje makan luar", "MyTown makan mana", "Masak apa", "Breakfast apa", "Lunch apa (maxim)", "Sahur protein apa", "Fun activities", "Menunggu?"];
+const ORDER = ["Dadu", "MyTown makan mana", "Masak apa"];
 
-const EMOJI = {
-  "Seetru makan mana": "🍛", "Balik keje makan luar": "🚗", "MyTown makan mana": "🛍️",
-  "Masak apa": "🍳", "Breakfast apa": "🥞", "Lunch apa (maxim)": "🍱",
-  "Sahur protein apa": "🌙", "Fun activities": "🎳", "Menunggu?": "⏳"
+const EMOJI = { "Dadu": "🎲", "MyTown makan mana": "🛍️", "Masak apa": "🍳" };
+// Labels a new install starts with, by list name.
+const DEFAULT_LABELS = {
+  "Random Pokémon": ["Fun"], "Random Pal": ["Fun"], "Random country": ["Fun"], "Dadu": ["Fun"],
+  "MyTown makan mana": ["Makan"], "Masak apa": ["Makan"]
 };
 const DEFAULT_EMOJI = "🎲";
 const MULTI_EMOJI = "🧩";
@@ -3071,6 +3073,7 @@ function load() {
       d = saved;
     }
   } catch (e) {}
+  const fresh = !d;
   d = d || { lists: listsFromBackup(BACKUP, ORDER), history: {} };
   // Add the Pokémon Multiple once; if you delete it, it stays gone.
   if (!d.seeded) {
@@ -3254,6 +3257,8 @@ function load() {
     }
     d.pokemonDualTypes = true;
   }
+  // A new install gets the starter labels (Fun, Makan).
+  if (fresh) d.lists.forEach((l) => { if (DEFAULT_LABELS[l.name] && !l.labels) l.labels = [...DEFAULT_LABELS[l.name]]; });
   // Lists made before "Date created" existed count as created in their current order.
   const base = Date.now() - d.lists.length * 1000;
   d.lists.forEach((l, i) => { if (!l.created) l.created = base + i * 1000; });
