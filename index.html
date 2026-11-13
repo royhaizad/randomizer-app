@@ -683,6 +683,17 @@ const DEFAULT_LABELS = {
   "Random Pokémon": ["Fun"], "Random Pal": ["Fun"], "Random country": ["Fun"], "Dadu": ["Fun"],
   "MyTown makan mana": ["Makan"], "Masak apa": ["Makan"]
 };
+// Category order (and which start switched off) a new install starts with, by list name.
+const DEFAULT_CATS = {
+  "Random Pokémon": {
+    order: ["Type", "Egg Group", "Form", "Rarity", "Stage", "Nature", "Hidden Ability", "Gender", "Region", "Habitat", "Shiny"],
+    off: ["Form", "Rarity"],
+  },
+  "Random Pal": {
+    order: ["Pal", "Type", "Partner Ability", "Rarity", "Work Suitability", "Activity", "Passive Skill 1", "Passive Skill 2", "Passive Skill 3", "Passive Skill 4", "Passive Skills", "Region", "Habitat", "Gender", "Size", "IV", "Alpha", "Lucky"],
+    off: ["Rarity"],
+  },
+};
 const DEFAULT_EMOJI = "🎲";
 const MULTI_EMOJI = "🧩";
 
@@ -3259,6 +3270,14 @@ function load() {
   }
   // A new install gets the starter labels (Fun, Makan).
   if (fresh) d.lists.forEach((l) => { if (DEFAULT_LABELS[l.name] && !l.labels) l.labels = [...DEFAULT_LABELS[l.name]]; });
+  // …and the starter category order; a category not named keeps its place after the named ones.
+  if (fresh) d.lists.filter((l) => l.type === "multi").forEach((l) => {
+    const set = DEFAULT_CATS[l.name];
+    if (!set) return;
+    const at = (c) => { const i = set.order.indexOf(c.name); return i < 0 ? set.order.length : i; };
+    l.cats = l.cats.map((c, i) => [c, i]).sort((a, b) => at(a[0]) - at(b[0]) || a[1] - b[1]).map(([c]) => c);
+    l.cats.forEach((c) => { if (set.off.includes(c.name)) c.off = true; });
+  });
   // Lists made before "Date created" existed count as created in their current order.
   const base = Date.now() - d.lists.length * 1000;
   d.lists.forEach((l, i) => { if (!l.created) l.created = base + i * 1000; });
@@ -5208,6 +5227,7 @@ $("#imgFile").addEventListener("change", async (e) => {
    ========================================================= */
 const backupItems = (v) => (Array.isArray(v) ? v : v && Array.isArray(v.items) ? v.items : null);
 const backupMulti = (v) => v && v.type === "multi" && Array.isArray(v.categories);
+const SETTINGS_KEY = "__settings"; // the home sort mode; not a list
 const isImage = (s) => typeof s === "string" && s.startsWith("data:image/");
 // Option descriptions from a file: { "option": "text" }, anything else dropped.
 function cleanNotes(n) {
@@ -5278,6 +5298,8 @@ function exportBackup() {
       obj[l.name] = Object.keys(extra).length ? { ...extra, items: l.items } : l.items;
     }
   });
+  // App settings ride along under a key that is never read as a list.
+  obj[SETTINGS_KEY] = { sort: db.view.sort || "custom" };
   const blob = new Blob([JSON.stringify(obj)], { type: "text/plain" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -5295,7 +5317,7 @@ $("#file").addEventListener("change", async (e) => {
   if (!file) return;
   let obj;
   try { obj = JSON.parse(await file.text()); } catch (err) {}
-  const names = obj && typeof obj === "object" && !Array.isArray(obj) ? Object.keys(obj).filter((k) => backupItems(obj[k]) || backupMulti(obj[k])) : [];
+  const names = obj && typeof obj === "object" && !Array.isArray(obj) ? Object.keys(obj).filter((k) => k !== SETTINGS_KEY && (backupItems(obj[k]) || backupMulti(obj[k]))) : [];
   if (!names.length) return toast("That file isn't a Randomizer backup");
   if (!(await ask("Restore from backup?", `Your ${plural(db.lists.length, "list")} will be replaced with the ${plural(names.length, "list")} in this backup.`, "Replace"))) return;
 
@@ -5348,6 +5370,9 @@ $("#file").addEventListener("change", async (e) => {
   }));
   const ids = new Set(db.lists.map((l) => l.id));
   for (const k of Object.keys(db.history)) if (!ids.has(k)) delete db.history[k];
+  // The backup's home sort mode; older backups have none, so the current one stays.
+  const set = obj[SETTINGS_KEY];
+  if (set && SORTS[set.sort]) db.view.sort = set.sort;
   save();
   history.replaceState({ d: depth() }, "", "#/");
   render();
