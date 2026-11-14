@@ -707,7 +707,9 @@ const EMOJI = { "Dadu": "🎲", "MyTown makan mana": "🛍️", "Masak apa": "�
 // (Canai → Roti; Ayam and Daging only with rice or noodles). Minum follows "Minum panas ke
 // sejuk": juices and ExtraJoss are labelled Ais, so they always come cold. Tosai, Naan and
 // Chapati are carbs of their own (Tosai telur, Naan cheese, Chapati biasa), and Manis is the sugar.
-const MAMAK = {"name":"Order mamak","emoji":"🧩","labels":["Makan"],"cats":[{"name":"Carbs","items":["Nasi","Roti","Mee","Kuey Teow","Bihun","Maggi","Tosai","Naan","Chapati"]},{"name":"Masak","follow":"Carbs","items":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Lemak","Kandar","Sup","Kari","Biasa","Canai","Telur","Telur bawang","Tisu","Bawang","Susu","Planta","Bakar","Cheese"],"badges":{"Goreng":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng mamak":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng kampung":["Nasi"],"Goreng pattaya":["Nasi","Mee"],"Lemak":["Nasi"],"Kandar":["Nasi"],"Sup":["Mee","Kuey Teow","Bihun","Maggi"],"Kari":["Mee","Maggi"],"Biasa":["Tosai","Naan","Chapati"],"Canai":["Roti"],"Telur":["Roti","Tosai"],"Telur bawang":["Roti"],"Tisu":["Roti"],"Bawang":["Roti","Tosai"],"Susu":["Roti"],"Planta":["Roti"],"Bakar":["Roti"],"Cheese":["Roti","Naan"]}},{"name":"Protein","follow":"Carbs","items":["Ayam","Daging","None"],"badges":{"Ayam":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Daging":["Nasi","Mee","Kuey Teow","Bihun","Maggi"]}},{"name":"Extra request","items":["Tak nak sayur","Kuah banjir","Telur mata","Nasi lebih","Telur separuh masak","None","Ayam Tandoori","Sos cili"]},{"name":"Minum","follow":"Minum panas ke sejuk","badges":{"ExtraJoss Manga":["Ais"],"ExtraJoss Ori":["Ais"],"ExtraJoss Anggur":["Ais"],"Jus Epal":["Ais"],"Jus Oren":["Ais"],"Jus Tembikai":["Ais"]},"items":["Milo","Teh","Teh tarik","Teh O","Milo O","Kopi","Kopi O","Nescafe","Nescafe tarik","Nescafe O","Neslo","ExtraJoss Manga","ExtraJoss Ori","ExtraJoss Anggur","Jus Epal","Jus Oren","Jus Tembikai","Laici","Air Barli","Teh Lemon","Teh Halia","Air Halia","Honey Lemon","Limau","Horlicks"]},{"name":"Minum panas ke sejuk","items":["Ais","Suam","Panas"]},{"name":"Manis","items":["Biasa","Kurang manis","Kosong"]}]};
+// Extra request follows Carbs and Masak (Kuah banjir with roti canai or nasi kandar, Nasi lebih with
+// nasi) and is None about half the time; Ayam tandoori is a Protein that comes with Naan.
+const MAMAK = {"name":"Order mamak","emoji":"🧩","labels":["Makan"],"cats":[{"name":"Carbs","items":["Nasi","Roti","Mee","Kuey Teow","Bihun","Maggi","Tosai","Naan","Chapati"]},{"name":"Masak","follow":"Carbs","items":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Lemak","Kandar","Sup","Kari","Biasa","Canai","Telur","Telur bawang","Tisu","Bawang","Susu","Planta","Bakar","Cheese"],"badges":{"Goreng":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng mamak":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng kampung":["Nasi"],"Goreng pattaya":["Nasi","Mee"],"Lemak":["Nasi"],"Kandar":["Nasi"],"Sup":["Mee","Kuey Teow","Bihun","Maggi"],"Kari":["Mee","Maggi"],"Biasa":["Tosai","Naan","Chapati"],"Canai":["Roti"],"Telur":["Roti","Tosai"],"Telur bawang":["Roti"],"Tisu":["Roti"],"Bawang":["Roti","Tosai"],"Susu":["Roti"],"Planta":["Roti"],"Bakar":["Roti"],"Cheese":["Roti","Naan"]}},{"name":"Protein","follow":"Carbs","items":["Ayam","Daging","Ayam tandoori","None"],"badges":{"Ayam":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Daging":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Ayam tandoori":["Naan"]}},{"name":"Extra request","items":["Tak nak sayur","Kuah banjir","Telur mata","Nasi lebih","Telur separuh masak","None","Sos cili"],"follow":["Carbs","Masak"],"badges":{"Tak nak sayur":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Sup","Kari","Kandar"],"Kuah banjir":["Canai","Telur","Telur bawang","Bawang","Kandar"],"Telur mata":["Goreng","Goreng mamak","Goreng kampung","Lemak"],"Nasi lebih":["Nasi"],"Telur separuh masak":["Bakar"]},"often":{"item":"None","share":0.5}},{"name":"Minum","follow":"Minum panas ke sejuk","badges":{"ExtraJoss Manga":["Ais"],"ExtraJoss Ori":["Ais"],"ExtraJoss Anggur":["Ais"],"Jus Epal":["Ais"],"Jus Oren":["Ais"],"Jus Tembikai":["Ais"]},"items":["Milo","Teh","Teh tarik","Teh O","Milo O","Kopi","Kopi O","Nescafe","Nescafe tarik","Nescafe O","Neslo","ExtraJoss Manga","ExtraJoss Ori","ExtraJoss Anggur","Jus Epal","Jus Oren","Jus Tembikai","Laici","Air Barli","Teh Lemon","Teh Halia","Air Halia","Honey Lemon","Limau","Horlicks"]},{"name":"Minum panas ke sejuk","items":["Ais","Suam","Panas"]},{"name":"Manis","items":["Biasa","Kurang manis","Kosong"]}]};
 const mamakMulti = () => ({
   id: uid(), name: MAMAK.name, emoji: MAMAK.emoji, type: "multi", labels: [...MAMAK.labels], created: Date.now(),
   cats: MAMAK.cats.map((c) => ({ id: uid(), ...structuredClone(c) })),
@@ -3733,6 +3735,30 @@ function load() {
     }
     d.mamakTopFixes = true;
   }
+  // Once: Order mamak's extras go with the right dishes and are None about half the time, and
+  // Ayam tandoori moves from Extra request to Protein (with Naan). Labels you gave stay.
+  if (!d.mamakExtras) {
+    const m = d.lists.find((l) => l.name === MAMAK.name && l.type === "multi");
+    const got = (n) => m && m.cats.find((c) => c.name === n);
+    const ex = got("Extra request"), pr = got("Protein"), want = Object.fromEntries(MAMAK.cats.map((c) => [c.name, c]));
+    if (ex) {
+      const gone = ex.items.filter((x) => /^(ayam )?tandoori$/i.test(x));
+      ex.items = ex.items.filter((x) => !gone.includes(x));
+      gone.forEach((x) => { if (ex.badges) delete ex.badges[x]; if (ex.notes) delete ex.notes[x]; });
+      const names = new Set(m.cats.map((c) => c.name));
+      const fl = [...new Set([...(Array.isArray(ex.follow) ? ex.follow : ex.follow ? [ex.follow] : []), ...want["Extra request"].follow])].filter((n) => names.has(n));
+      if (fl.length) ex.follow = fl.length === 1 ? fl[0] : fl;
+      ex.badges = ex.badges || {};
+      Object.entries(want["Extra request"].badges).forEach(([it, b]) => { if (ex.items.includes(it) && !(ex.badges[it] && ex.badges[it].length)) ex.badges[it] = [...b]; });
+      if (!ex.often && ex.items.includes("None")) ex.often = { ...want["Extra request"].often };
+    }
+    if (pr && !pr.items.some((x) => /tandoori/i.test(x))) {
+      const at = pr.items.indexOf("None");
+      pr.items.splice(at < 0 ? pr.items.length : at, 0, "Ayam tandoori");
+      pr.badges = { ...(pr.badges || {}), "Ayam tandoori": ["Naan"] };
+    }
+    d.mamakExtras = true;
+  }
   // Order mamak, after Masak apa. It comes back if deleted; a list with its name gets, once, any
   // categories and options it is missing, Carbs' "Nasi lemak" becomes "Nasi", and Masak and
   // Protein follow Carbs (labels you already gave an option stay).
@@ -3837,7 +3863,13 @@ function record(list) {
 }
 
 // One option from a category: a rare option has its own odds, the rest share what's left.
+// `often` { item, share }: that option comes up `share` of the time when it fits (Extra request: None,
+// half the time), and the rest share what's left.
 function pickOption(c, o) {
+  if (c.often && o.includes(c.often.item) && o.length > 1) {
+    if (Math.random() < c.often.share) return c.often.item;
+    o = o.filter((x) => x !== c.often.item);
+  }
   const rare = c.rare && o.includes(c.rare.item) ? c.rare : null;
   if (!rare) return o[rand(o.length)];
   const rest = o.filter((x) => x !== rare.item);
@@ -3890,8 +3922,14 @@ function usualVals(list, x, val) {
 // `follow`: "Other category". An option of this one labelled with any of that category's
 // options only goes with those; an option with none of them goes with anything.
 // (Masak follows Carbs: Canai is labelled Roti, so it only comes with Roti.)
+// It can follow several (Extra request follows Carbs and Masak): `follow` is a name or a list.
+const followsOf = (c) => (!c.follow ? [] : Array.isArray(c.follow) ? c.follow : [c.follow]);
+function setFollows(c, names) {
+  if (!names.length) delete c.follow;
+  else c.follow = names.length === 1 ? names[0] : names;
+}
 function followFits(list, a, b, val) {
-  if (a.follow !== b.name) return true;
+  if (!followsOf(a).includes(b.name)) return true;
   const l = linkedList(b), theirs = new Set([...(l ? l.items : []), ...b.items]);
   const keys = optionBadges(list, a, val(a)).filter((x) => theirs.has(x));
   return !keys.length || keys.includes(val(b));
@@ -4876,7 +4914,7 @@ function itemRow(owner, it, i, noun) {
 function renderMultiEdit(list) {
   const rows = list.cats.map((c) => {
     const l = linkedList(c), n = catOptions(c).length;
-    const follows = [...new Set([...(c.follow ? [c.follow] : []), ...Object.keys(c.fit || {})])].filter((name) => list.cats.some((x) => x.name === name));
+    const follows = [...new Set([...followsOf(c), ...Object.keys(c.fit || {})])].filter((name) => list.cats.some((x) => x.name === name));
     const from = l ? `<span>&nbsp;· </span><span class="ellip">${icon(l)} ${esc(l.name)}${c.items.length ? ` + ${c.items.length}` : ""}</span>`
       : follows.length ? `<span>&nbsp;· </span><span class="ellip">Follows ${esc(follows.join(", "))}</span>` : "";
     return `
@@ -4940,15 +4978,15 @@ function renderCatEdit(list, cat) {
           </span>
           <span class="chev">${I.chev}</span>
         </button>
-        ${list.cats.length > 1 ? `
+        ${list.cats.length > 1 ? (() => { const fl = followsOf(cat).filter((n) => list.cats.some((x) => x.name === n)); return `
         <button class="row" data-act="followSheet">
           <span class="menu-icon">${I.follow}</span>
           <span class="row-text">
-            <div class="row-name">${cat.follow ? `Follows ${esc(cat.follow)}` : "Follow a category"}</div>
-            <div class="row-sub">${cat.follow ? `Options labelled with a ${esc(cat.follow)} option only go with it` : "Match options to another category by their labels"}</div>
+            <div class="row-name">${fl.length ? `Follows ${esc(fl.join(", "))}` : "Follow a category"}</div>
+            <div class="row-sub">${fl.length === 1 ? `Options labelled with a ${esc(fl[0])} option only go with it` : fl.length ? "Options labelled with their options only go with them" : "Match options to other categories by their labels"}</div>
           </span>
           <span class="chev">${I.chev}</span>
-        </button>` : ""}
+        </button>`; })() : ""}
       </div>
       ${l ? `
       <div class="label">From ${esc(l.name)} · ${l.items.length}</div>
@@ -5081,15 +5119,21 @@ function renderSheet(again) {
     // Badges un-ticked while the sheet is open stay listed, so they can be ticked again.
     seenBadges = [...new Set([...seenBadges, ...allBadges(owner)])];
     // A category that follows another one: that category's options are offered as labels, in its order.
-    const by = route().view === "cat" && owner.follow && currentList().cats.find((x) => x.name === owner.follow && x !== owner);
-    const byOpts = by ? [...new Set([...((linkedList(by) || {}).items || []), ...by.items])] : [];
+    const bys = route().view === "cat" ? followsOf(owner).map((n) => currentList().cats.find((x) => x.name === n && x !== owner)).filter(Boolean) : [];
+    const listed = new Set();
+    const sections = bys.map((by) => {
+      const opts = [...new Set([...((linkedList(by) || {}).items || []), ...by.items])].filter((x) => !listed.has(x));
+      opts.forEach((x) => listed.add(x));
+      return { by, opts };
+    }).filter((x) => x.opts.length);
+    const byOpts = [...listed];
     const all = [...seenBadges].filter((x) => !byOpts.includes(x)).sort((a, b) => a.localeCompare(b));
     const tick = (x) => `
         <button class="row compact" data-act="toggleBadge" data-v="${esc(x)}">
           <span class="row-text">${badgePills([x])}</span>
           ${mine.includes(x) ? `<span class="check">${I.check}</span>` : ""}
         </button>`;
-    const followRows = byOpts.map(tick).join("");
+    const followRows = sections.map(({ by, opts }) => `<div class="label sheet-label">From ${esc(by.name)} · only comes with the ticked ones</div><div class="group">${opts.map(tick).join("")}</div>`).join("");
     const rows = all.map((s) => `
         <button class="row compact" data-act="toggleBadge" data-v="${esc(s)}">
           <span class="row-text">${badgePills([s])}</span>
@@ -5102,7 +5146,7 @@ function renderSheet(again) {
         <input class="input" id="badgeInput" placeholder="New badge…" maxlength="24" enterkeyhint="done" autocomplete="off">
         <button class="btn primary sm" type="submit">Add</button>
       </form>
-      ${byOpts.length ? `<div class="label sheet-label">From ${esc(by.name)} · only comes with the ticked ones</div><div class="group">${followRows}</div>` : ""}
+      ${followRows}
       ${all.length ? `<div class="label sheet-label">${byOpts.length ? "Other labels" : `Used in this ${route().view === "cat" ? "category" : "list"}`} · tap to add or remove</div><div class="group">${rows}</div>` : ""}`;
   } else if (kind === "hide") {
     const list = cur && findList(cur.id);
@@ -5186,9 +5230,9 @@ function renderSheet(again) {
     const rows = [{ name: "" }, ...others].map((x) => `
         <button class="row compact" data-act="setFollow" data-name="${esc(x.name)}">
           <span class="row-text"><div class="row-name">${x.name ? esc(x.name) : "Don't follow a category"}</div>${x.name ? `<div class="row-sub">${plural(catOptions(x).length, "option")}</div>` : ""}</span>
-          ${(c.follow || "") === x.name ? `<span class="check">${I.check}</span>` : ""}
+          ${(x.name ? followsOf(c).includes(x.name) : !followsOf(c).length) ? `<span class="check">${I.check}</span>` : ""}
         </button>`).join("");
-    body = `<h2 class="sheet-title">Follow a category</h2><p class="hint">Label an option here with that category's options (Canai → Roti) and it only comes up with them. Options without one of those labels go with anything.</p><div class="group">${rows}</div>`;
+    body = `<h2 class="sheet-title">Follow categories</h2><p class="hint">Label an option here with another category's options (Canai → Roti) and it only comes up with them. Options without one of those labels go with anything. Tick as many as you need.</p><div class="group">${rows}</div>`;
   } else if (kind === "link") {
     const c = currentCat();
     if (!c) return noSheet();
@@ -5425,6 +5469,7 @@ const actions = {
       setOffItem(owner, gone, false);
       setBadges(owner, gone, []);
       if (isRare(owner, gone)) delete owner.rare;
+      if (owner.often && owner.often.item === gone) delete owner.often;
       if (owner.notes) delete owner.notes[gone];
     }
     save();
@@ -5455,17 +5500,18 @@ const actions = {
     const list = currentList(), c = currentCat();
     if (c.items.length && !(await ask(`Delete “${c.name}”?`, `Its ${plural(c.items.length, "option")} will be deleted too.`, "Delete"))) return;
     list.cats = list.cats.filter((x) => x !== c);
-    list.cats.forEach((d) => { if (d.follow === c.name) delete d.follow; });
+    list.cats.forEach((d) => { if (followsOf(d).includes(c.name)) setFollows(d, followsOf(d).filter((x) => x !== c.name)); });
     save();
     back("/edit/" + list.id);
   },
   followSheet: () => openSheet("follow"),
   setFollow: (el) => {
     const c = currentCat();
-    if (el.dataset.name) c.follow = el.dataset.name;
-    else delete c.follow;
+    const n = el.dataset.name, now = followsOf(c);
+    setFollows(c, !n ? [] : now.includes(n) ? now.filter((x) => x !== n) : [...now, n]);
     save();
-    closeSheet();
+    render();
+    renderSheet(true);
   },
   linkSheet: () => openSheet("link"),
   setLink: (el) => {
@@ -5566,7 +5612,7 @@ document.addEventListener("change", (e) => {
     // Categories that follow this one keep following it.
     currentList().cats.forEach((d) => {
       if (d.fit && d.fit[old] && c.name !== old) { d.fit[c.name] = d.fit[old]; delete d.fit[old]; }
-      if (d.follow === old) d.follow = c.name;
+      if (c.name !== old && followsOf(d).includes(old)) setFollows(d, followsOf(d).map((x) => (x === old ? c.name : x)));
       const st = d.starts && d.starts.by;
       if (st && st[old] && c.name !== old) { st[c.name] = st[old]; delete st[old]; }
       if (d.grow && d.grow.by === old) d.grow.by = c.name;
@@ -5589,12 +5635,13 @@ document.addEventListener("change", (e) => {
       e.target.value = v;
       if (b.length && v !== old) { setBadges(owner, old, []); setBadges(owner, v, b); } // badges follow the rename
       if (isRare(owner, old)) owner.rare.item = v; // so do its odds
+      if (owner.often && owner.often.item === old) owner.often.item = v;
       if (owner.shine && v !== old) Object.values(owner.shine).forEach((r) => { if (r.includes(old)) r[r.indexOf(old)] = v; }); // and its shine
       if (owner.notes && owner.notes[old] && v !== old) { owner.notes[v] = owner.notes[old]; delete owner.notes[old]; } // and its description
       if (v !== old && isOffItem(owner, old)) { setOffItem(owner, old, false); setOffItem(owner, v, true); } // and whether it's switched off
       if (route().view === "cat") renameInFit(currentList(), owner, old, v); // and what it goes with
       if (route().view === "cat" && v !== old) currentList().cats.forEach((d) => { // and labels in categories that follow it
-        if (d.follow !== owner.name || !d.badges) return;
+        if (!followsOf(d).includes(owner.name) || !d.badges) return;
         Object.values(d.badges).forEach((b) => { const k = b.indexOf(old); if (k >= 0 && !b.includes(v)) b[k] = v; });
       });
     } else {
@@ -5603,6 +5650,7 @@ document.addEventListener("change", (e) => {
         setOffItem(owner, old, false);
         setBadges(owner, old, []);
         if (isRare(owner, old)) delete owner.rare;
+        if (owner.often && owner.often.item === old) delete owner.often;
         if (owner.notes) delete owner.notes[old];
       }
       save();
@@ -5918,7 +5966,7 @@ function exportBackup() {
         type: "multi", ...extra,
         categories: l.cats.map((c) => {
           const k = linkedList(c);
-          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }), ...(c.rare && { rare: c.rare }), ...(c.fit && { fit: c.fit }), ...(c.notes && { notes: c.notes }), ...(c.unique && { unique: c.unique }), ...(c.starts && { starts: c.starts }), ...(c.grow && { grow: c.grow }), ...(c.levels && { levels: c.levels }), ...(c.shine && { shine: c.shine }), ...(c.pills && { pills: true }), ...(c.follow && { follow: c.follow }), ...(c.offItems && { offItems: c.offItems }) };
+          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }), ...(c.rare && { rare: c.rare }), ...(c.fit && { fit: c.fit }), ...(c.notes && { notes: c.notes }), ...(c.unique && { unique: c.unique }), ...(c.starts && { starts: c.starts }), ...(c.grow && { grow: c.grow }), ...(c.levels && { levels: c.levels }), ...(c.shine && { shine: c.shine }), ...(c.pills && { pills: true }), ...(c.follow && { follow: c.follow }), ...(c.often && { often: c.often }), ...(c.offItems && { offItems: c.offItems }) };
         }),
       };
     } else {
@@ -5969,6 +6017,8 @@ $("#file").addEventListener("change", async (e) => {
         ...(cleanShine(c.shine) && { shine: cleanShine(c.shine) }),
         ...(c.pills === true && { pills: true }),
         ...(typeof c.follow === "string" && c.follow.trim() && { follow: c.follow.trim() }),
+        ...(Array.isArray(c.follow) && clean(c.follow).length && { follow: clean(c.follow) }),
+        ...(c.often && typeof c.often.item === "string" && c.often.share > 0 && c.often.share < 1 && { often: { item: c.often.item, share: +c.often.share } }),
         ...(Array.isArray(c.offItems) && c.offItems.length && { offItems: clean(c.offItems) }),
         ...(cleanFit(c.fit) && { fit: cleanFit(c.fit) }),
         ...(cleanNotes(c.notes) && { notes: cleanNotes(c.notes) }),
