@@ -225,6 +225,11 @@
     background: none; border: 0; border-radius: 12px;
   }
   .iconbtn:active { background: var(--surface-2); }
+  .iconbtn[disabled] { opacity: 0.3; pointer-events: none; }
+  .change-list { margin: 0 4px 18px; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.35; }
+  .change-list .more { list-style: none; margin-left: -20px; color: var(--muted); }
+  .btn.danger-text { color: var(--danger); }
+  .undo-btn { width: 40px; color: var(--muted); }
   .iconbtn.sm { width: 40px; height: 40px; color: var(--muted); }
 
   .pill {
@@ -701,11 +706,11 @@
    ========================================================= */
 // New installs start with a few example lists (Random Pokémon, Random Pal and
 // Random country are added by load()). Saved lists are never touched by these.
-const BACKUP = {"Dadu":["1","2","3","4","5","6"],"MyTown makan mana":["Mi Tarik","Richeese","Subway"],"Masak apa":["Ayam goreng","Nasi goreng","Roti telur","Sambal ayam","Sambal telur dadar","Sambal telur rebus","Telur kicap","Sup ayam","Tempe goreng","Daging masak lemak","Tofu sup","Broccoli","Butter chicken","Jagung","Bubur nasi","Miso sup"]};
+const BACKUP = {"Dadu":["1","2","3","4","5","6"],"Masak apa":["Ayam goreng","Nasi goreng","Roti telur","Sambal ayam","Sambal telur dadar","Sambal telur rebus","Telur kicap","Sup ayam","Tempe goreng","Daging masak lemak","Tofu sup","Broccoli","Butter chicken","Jagung","Bubur nasi","Miso sup"]};
 
-const ORDER = ["Dadu", "MyTown makan mana", "Masak apa"];
+const ORDER = ["Dadu", "Masak apa"];
 
-const EMOJI = { "Dadu": "🎲", "MyTown makan mana": "🛍️", "Masak apa": "🍳" };
+const EMOJI = { "Dadu": "🎲", "Masak apa": "🍳" };
 // "Order mamak": what to order at a mamak. Masak and Protein follow Carbs by their labels
 // (Canai → Roti; Ayam and Daging only with rice or noodles). Minum follows "Minum panas ke
 // sejuk": juices and ExtraJoss are labelled Ais, so they always come cold. Tosai, Naan and
@@ -720,7 +725,7 @@ const mamakMulti = () => ({
 // Labels a new install starts with, by list name.
 const DEFAULT_LABELS = {
   "Random Pokémon": ["Fun"], "Random Pal": ["Fun"], "Random country": ["Fun"], "Dadu": ["Fun"],
-  "MyTown makan mana": ["Makan"], "Masak apa": ["Makan"]
+  "Masak apa": ["Makan"]
 };
 // Category order (and which start switched off) a new install starts with, by list name.
 const DEFAULT_CATS = {
@@ -1522,6 +1527,7 @@ const EGG_TYPES = {
   "Grass": ["Grass", "Poison", "Bug", "Fairy", "Water", "Ground"],
   "Field": notType("Bug"),
   "Monster": notType("Bug", "Fairy"),
+  "Fairy": notType("Dragon", "Ground", "Fighting"), // small, cute creatures: no dragons, diggers or fighters
   "Flying": notType("Bug"),
 };
 POKEMON_FIT["Egg Group"].Type = Object.fromEntries(POKEMON.cats.Type.map((t) => [t,
@@ -3650,6 +3656,14 @@ function load() {
     });
     d.eggTypeLogic = true;
   }
+  // Once: the Fairy egg group no longer goes with Dragon, Ground or Fighting types.
+  if (!d.eggFairyTypes) {
+    d.lists.filter((l) => l.type === "multi").forEach((l) => {
+      const eg = l.cats.find((c) => c.name === "Egg Group" && c.items.includes("Water 2"));
+      if (eg && eg.fit && eg.fit.Type) eg.fit.Type = structuredClone(POKEMON_FIT["Egg Group"].Type);
+    });
+    d.eggFairyTypes = true;
+  }
   // Once: Hidden Ability follows Type by real-world logic instead of the existing Pokémon.
   if (!d.abilityTypeLogic) {
     d.lists.filter((l) => l.type === "multi").forEach((l) => {
@@ -3878,7 +3892,127 @@ function load() {
 
 let db = load();
 let fitMentions = new WeakMap(); // see `inFit`; edits always end in a save, which clears it
+// Undo / Redo in Edit: snapshots of the list being edited, taken as each change is saved
+// (up to 40). Leaving for another list's Edit starts a fresh history.
+const UNDO_MAX = 40;
+let editUndo = [], editRedo = [], editBase = null, editStart = null;
+const editingList = () => (["edit", "cat"].includes(route().view) ? db.lists.find((l) => l.id === route().id) : null);
+// Before leaving a list's Edit: if anything changed, ask Save / Discard / Keep editing.
+// Resolves true when it's fine to leave.
+let leaving = false;
+async function confirmLeave() {
+  const list = editStart && db.lists.find((l) => l.id === editStart.id);
+  if (!list) { endEditHistory(); return true; }
+  const lines = editChanges(JSON.parse(editStart.json), list);
+  if (!lines.length) { endEditHistory(); return true; }
+  leaving = true;
+  const a = await ask(`Save changes to “${list.name}”?`, "", "Save", { lines, alt: "Discard", no: "Keep editing", primary: true });
+  leaving = false;
+  if (a === false) return false;
+  if (a === "alt") {
+    const i = db.lists.findIndex((l) => l.id === editStart.id);
+    db.lists[i] = JSON.parse(editStart.json);
+    endEditHistory();
+    save();
+    toast("Changes discarded");
+  } else {
+    endEditHistory();
+    toast("Changes saved");
+  }
+  return true;
+}
+function startEditHistory(list) {
+  if (editBase && editBase.id === list.id) return;
+  editUndo = []; editRedo = [];
+  editBase = editStart = { id: list.id, json: JSON.stringify(list) };
+}
+function endEditHistory() {
+  editUndo = []; editRedo = [];
+  editBase = editStart = null;
+}
+
+// What changed in a list since Edit opened, as short lines for the Save popup.
+function editChanges(b, a) {
+  const out = [], q = (x) => `“${x}”`, few = (xs) => xs.length > 3 ? `${xs.slice(0, 3).map(q).join(", ")} +${xs.length - 3} more` : xs.map(q).join(", ");
+  const J = (x) => JSON.stringify(x || null);
+  if (b.name !== a.name) out.push(`Renamed the list to ${q(a.name)}`);
+  if ((b.emoji || "") !== (a.emoji || "") || (b.image || "") !== (a.image || "")) out.push("Changed the icon");
+  if ((b.description || "") !== (a.description || "")) out.push("Changed the description");
+  if (J(b.labels) !== J(a.labels)) out.push("Changed the labels");
+  // Options of a list or a category: added, removed, renamed, moved, and their settings.
+  const options = (pre, ob, oa) => {
+    const bi = ob.items || [], ai = oa.items || [];
+    const gone = bi.filter((x) => !ai.includes(x)), added = ai.filter((x) => !bi.includes(x));
+    if (gone.length && gone.length === added.length && gone.every((x, i) => bi.indexOf(x) === ai.indexOf(added[i]))) {
+      out.push(`${pre}renamed ${gone.map((x, i) => `${q(x)} → ${q(added[i])}`).slice(0, 3).join(", ")}${gone.length > 3 ? ` +${gone.length - 3} more` : ""}`);
+    } else {
+      if (added.length) out.push(`${pre}added ${few(added)}`);
+      if (gone.length) out.push(`${pre}deleted ${few(gone)}`);
+    }
+    const kept = bi.filter((x) => ai.includes(x));
+    if (J(kept) !== J(ai.filter((x) => bi.includes(x)))) out.push(`${pre}changed the order`);
+    const changed = (key) => ai.filter((x) => bi.includes(x) && J((ob[key] || {})[x]) !== J((oa[key] || {})[x])).length;
+    const nb = changed("badges"), nn = changed("notes"), nw = changed("weights");
+    if (nb) out.push(`${pre}changed badges on ${plural(nb, "option")}`);
+    if (nn) out.push(`${pre}changed ${nn === 1 ? "a description" : `${nn} descriptions`}`);
+    if (nw) out.push(`${pre}changed how often ${plural(nw, "option")} ${nw === 1 ? "comes" : "come"} up`);
+    const offB = ob.offItems || [], offA = oa.offItems || [];
+    const hid = offA.filter((x) => !offB.includes(x) && bi.includes(x)), shown = offB.filter((x) => !offA.includes(x) && ai.includes(x));
+    if (hid.length) out.push(`${pre}switched off ${few(hid)}`);
+    if (shown.length) out.push(`${pre}switched on ${few(shown)}`);
+  };
+  if (!isMulti(a)) options("Items: ", b, a);
+  else {
+    const bc = b.cats || [], ac = a.cats;
+    const byId = (cs) => Object.fromEntries(cs.map((c) => [c.id, c]));
+    const B = byId(bc), A = byId(ac);
+    ac.filter((c) => !B[c.id]).forEach((c) => out.push(`Added the category ${q(c.name)}`));
+    bc.filter((c) => !A[c.id]).forEach((c) => out.push(`Deleted the category ${q(c.name)}`));
+    const keptB = bc.filter((c) => A[c.id]).map((c) => c.id), keptA = ac.filter((c) => B[c.id]).map((c) => c.id);
+    if (J(keptB) !== J(keptA)) out.push("Changed the category order");
+    ac.filter((c) => B[c.id]).forEach((c) => {
+      const o = B[c.id], pre = `${c.name}: `;
+      if (o.name !== c.name) out.push(`Renamed the category ${q(o.name)} to ${q(c.name)}`);
+      if (!!o.off !== !!c.off) out.push(`${c.off ? "Hid" : "Showed"} the category ${q(c.name)}`);
+      if ((o.link || "") !== (c.link || "")) out.push(`${pre}${c.link ? "linked a list" : "unlinked its list"}`);
+      if (J(followsOf(o)) !== J(followsOf(c))) out.push(`${pre}${followsOf(c).length ? `now follows ${followsOf(c).join(", ")}` : "no longer follows a category"}`);
+      options(pre, o, c);
+    });
+  }
+  return out;
+}
+function trackEdit() {
+  const list = editingList();
+  if (!list || !editBase || editBase.id !== list.id) return;
+  const now = JSON.stringify(list);
+  if (now === editBase.json) return;
+  editUndo.push(editBase);
+  if (editUndo.length > UNDO_MAX) editUndo.shift();
+  editRedo = [];
+  editBase = { id: list.id, json: now };
+  // Fields save without a redraw, so update the buttons here.
+  document.querySelectorAll("[data-act=undoEdit]").forEach((b) => { b.disabled = false; });
+  document.querySelectorAll("[data-act=redoEdit]").forEach((b) => { b.disabled = true; });
+}
+function restoreEdit(from, to) {
+  const list = editingList();
+  if (!list || !from.length) return;
+  const snap = from.pop();
+  to.push({ id: list.id, json: JSON.stringify(list) });
+  const i = db.lists.findIndex((l) => l.id === snap.id);
+  if (i < 0) return;
+  db.lists[i] = JSON.parse(snap.json);
+  editBase = snap;
+  save();
+  // A category that the change brought or took away: back to the list's Edit if it's gone.
+  if (route().view === "cat" && !db.lists[i].cats?.some((c) => c.id === route().sub)) history.replaceState(history.state, "", "#/edit/" + snap.id);
+  render();
+}
+const undoBtns = () => `
+        <button class="iconbtn undo-btn" data-act="undoEdit" aria-label="Undo"${editUndo.length ? "" : " disabled"}>${I.undo}</button>
+        <button class="iconbtn undo-btn" data-act="redoEdit" aria-label="Redo"${editRedo.length ? "" : " disabled"}>${I.redo}</button>`;
 function save() {
+  trackEdit();
   fitMentions = new WeakMap();
   try { localStorage.setItem(KEY, JSON.stringify(db)); }
   catch (e) { toast("Couldn't save on this device"); }
@@ -4539,7 +4673,20 @@ function openSheet(kind) {
 }
 const closeSheet = () => history.back();
 
-addEventListener("popstate", render);
+addEventListener("popstate", () => {
+  const r = route(), inside = ["edit", "cat"].includes(r.view) && editStart && r.id === editStart.id;
+  if (editStart && !inside && !leaving && !(history.state && history.state.sheet)) {
+    const list = db.lists.find((l) => l.id === editStart.id);
+    if (list && editChanges(JSON.parse(editStart.json), list).length) {
+      history.pushState({ d: depth() + 1 }, "", "#/edit/" + editStart.id);
+      render();
+      confirmLeave().then((ok) => ok && history.back());
+      return;
+    }
+    endEditHistory();
+  }
+  render();
+});
 if (!history.state) history.replaceState({ d: 0 }, "", location.hash || "#/");
 
 /* =========================================================
@@ -4570,6 +4717,8 @@ const I = {
   trash: ic("M3 6h18|M8 6V4h8v2|M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6|M10 11v6|M14 11v6", 24),
   layers: ic("M12 2L2 7l10 5 10-5-10-5z|M2 17l10 5 10-5|M2 12l10 5 10-5", 20),
   layersSm: ic("M12 2L2 7l10 5 10-5-10-5z|M2 17l10 5 10-5|M2 12l10 5 10-5", 11, 2.6),
+  undo: ic("M9 14L4 9l5-5|M4 9h10.5a5.5 5.5 0 0 1 0 11H11", 20),
+  redo: ic("M15 14l5-5-5-5|M20 9H9.5a5.5 5.5 0 0 0 0 11H13", 20),
   follow: ic("M15 10l5 5-5 5|M4 4v7a4 4 0 0 0 4 4h12", 20),
   link: ic("M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71|M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71", 20),
   lock: ic("M6 11h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z|M8 11V7a4 4 0 0 1 8 0v4", 20),
@@ -4935,6 +5084,7 @@ function renderCombo(list) {
 }
 
 function renderEdit(list) {
+  startEditHistory(list);
   const f = editFilter(list, list.items);
   const items = list.items.map((it, i) => (f.keep(it) ? itemRow(list, it, i, "Item") : "")).join("");
 
@@ -4943,6 +5093,7 @@ function renderEdit(list) {
       <div class="topbar">
         <button class="iconbtn" data-act="back" aria-label="Back">${I.back}</button>
         <div class="top-title">Edit list</div>
+${undoBtns()}
         <button class="pill" data-act="back">Done</button>
       </div>
       <div class="name-row">
@@ -5013,6 +5164,7 @@ function itemRow(owner, it, i, noun) {
 
 // Edit a Multiple: name, description and its categories. Tap a category to edit it.
 function renderMultiEdit(list) {
+  startEditHistory(list);
   const rows = list.cats.map((c) => {
     const l = linkedList(c), n = catOptions(c).length;
     const follows = [...new Set([...followsOf(c), ...Object.keys(c.fit || {})])].filter((name) => list.cats.some((x) => x.name === name));
@@ -5034,6 +5186,7 @@ function renderMultiEdit(list) {
       <div class="topbar">
         <button class="iconbtn" data-act="back" aria-label="Back">${I.back}</button>
         <div class="top-title">Edit multiple</div>
+${undoBtns()}
         <button class="pill" data-act="back">Done</button>
       </div>
       <div class="name-row">
@@ -5055,6 +5208,7 @@ function renderMultiEdit(list) {
 
 // Edit one category of a Multiple: its name, an optional linked list, and its own options.
 function renderCatEdit(list, cat) {
+  startEditHistory(list);
   const l = linkedList(cat);
   const f = editFilter(cat, cat.items);
   const items = cat.items.map((it, i) => (f.keep(it) ? itemRow(cat, it, i, "Option") : "")).join("");
@@ -5065,6 +5219,7 @@ function renderCatEdit(list, cat) {
       <div class="topbar">
         <button class="iconbtn" data-act="back" aria-label="Back">${I.back}</button>
         <div class="top-title"><span class="top-icon">${icon(list)}</span><span class="ellip">${esc(list.name)}</span></div>
+${undoBtns()}
         <button class="pill" data-act="back">Done</button>
       </div>
       <div class="name-row">
@@ -5140,9 +5295,10 @@ function renderManage() {
 // Resolves true for the main button; false for Cancel, a backdrop tap or Back.
 let asking = null;
 const plural = (n, one, many = one + "s") => `${n} ${n === 1 ? one : many}`;
-function ask(title, text, ok) {
+// `more`: { lines: [...] shown as a list, alt: "a third choice" (resolves "alt"), primary: true }.
+function ask(title, text, ok, more = {}) {
   return new Promise((resolve) => {
-    asking = { title, text, ok, resolve };
+    asking = { title, text, ok, resolve, ...more };
     openSheet("confirm");
   });
 }
@@ -5191,10 +5347,12 @@ function renderSheet(again) {
     if (!asking) return noSheet();
     body = `
       <h2 class="sheet-title">${esc(asking.title)}</h2>
-      <p class="hint ask-text">${esc(asking.text)}</p>
+      ${asking.text ? `<p class="hint ask-text">${esc(asking.text)}</p>` : ""}
+      ${asking.lines ? `<ul class="change-list">${asking.lines.slice(0, 8).map((x) => `<li>${esc(x)}</li>`).join("")}${asking.lines.length > 8 ? `<li class="more">+${asking.lines.length - 8} more changes</li>` : ""}</ul>` : ""}
       <div class="btn-row">
-        <button class="btn" data-act="askNo">Cancel</button>
-        <button class="btn danger" data-act="askYes">${esc(asking.ok)}</button>
+        <button class="btn" data-act="askNo">${esc(asking.no || "Cancel")}</button>
+        ${asking.alt ? `<button class="btn danger-text" data-act="askAlt">${esc(asking.alt)}</button>` : ""}
+        <button class="btn ${asking.primary ? "primary" : "danger"}" data-act="askYes">${esc(asking.ok)}</button>
       </div>`;
   } else if (kind === "labels") {
     const list = currentList();
@@ -5392,7 +5550,8 @@ const actions = {
     // Don't lose an item that was typed but not yet added.
     const add = $("#addInput"), r = route();
     if (add && add.value.trim()) { editItems().push(add.value.trim()); save(); }
-    back(r.view === "cat" ? "/edit/" + r.id : "/");
+    if (r.view === "cat") return back("/edit/" + r.id);
+    confirmLeave().then((ok) => ok && back("/"));
   },
   done: () => back("/"),
   edit: () => go("/edit/" + route().id),
@@ -5507,6 +5666,8 @@ const actions = {
     seenBadges = [];
     openSheet("badges");
   },
+  undoEdit: () => restoreEdit(editUndo, editRedo),
+  redoEdit: () => restoreEdit(editRedo, editUndo),
   setWeight: (el) => {
     const owner = editOwner(), v = el.dataset.v;
     owner.weights = owner.weights || {};
@@ -5543,6 +5704,7 @@ const actions = {
   },
   askYes: () => answer(true),
   askNo: () => answer(false),
+  askAlt: () => answer("alt"),
   iconSheet: () => openSheet("icon"),
   uploadImg: () => $("#imgFile").click(),
   removeImg: () => {
@@ -5789,6 +5951,11 @@ document.addEventListener("input", (e) => {
 });
 
 document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && editingList() && !$("#sheet .panel") && !e.target.closest("input, textarea")) {
+    const k = e.key.toLowerCase();
+    if (k === "z" && !e.shiftKey) { e.preventDefault(); return restoreEdit(editUndo, editRedo); }
+    if (k === "y" || (k === "z" && e.shiftKey)) { e.preventDefault(); return restoreEdit(editRedo, editUndo); }
+  }
   if (e.key === "Enter" && e.target.dataset && e.target.dataset.field && e.target.tagName !== "TEXTAREA") e.target.blur();
   if (e.key === "Enter" && e.target.id === "search") e.target.blur(); // hide the keyboard to see results
   if (e.key === "Enter" && e.target.dataset && ["openEdit", "openCat"].includes(e.target.dataset.act)) e.target.click();
