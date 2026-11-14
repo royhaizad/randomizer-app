@@ -521,6 +521,9 @@
     font: inherit; font-size: 13px; line-height: 1.35; color: var(--muted);
   }
   .note-in:focus { outline: none; color: var(--text); }
+  .opt-weight { margin: -2px 0 6px; font-size: 12px; font-weight: 600; color: var(--accent); }
+  .opt-weight.rare { color: var(--muted); }
+  .often-row { margin: 0 0 6px; }
   .note-in::placeholder { color: var(--muted); opacity: 0.5; }
   .item-main .badges:has(+ .note-in) { margin-bottom: 4px; }
   .answer-note { margin: -4px 0 0; max-width: 34ch; text-align: center; font-size: 15px; color: var(--muted); }
@@ -709,7 +712,7 @@ const EMOJI = { "Dadu": "🎲", "MyTown makan mana": "🛍️", "Masak apa": "�
 // Chapati are carbs of their own (Tosai telur, Naan cheese, Chapati biasa), and Manis is the sugar.
 // Extra request follows Carbs and Masak (Kuah banjir with roti canai or nasi kandar, Nasi lebih with
 // nasi) and is None about half the time; Ayam tandoori is a Protein that comes with Naan.
-const MAMAK = {"name":"Order mamak","emoji":"🧩","labels":["Makan"],"cats":[{"name":"Carbs","items":["Nasi","Roti","Mee","Kuey Teow","Bihun","Maggi","Tosai","Naan","Chapati","Murtabak"]},{"name":"Masak","follow":"Carbs","items":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Lemak","Kandar","Sup","Kari","Rebus","Bandung","Biasa","Canai","Telur","Telur bawang","Tisu","Bawang","Susu","Planta","Bakar","Cheese","Sardin","Pisang","Bom","Ayam","Daging"],"badges":{"Goreng":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng mamak":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng kampung":["Nasi"],"Goreng pattaya":["Nasi","Mee"],"Lemak":["Nasi"],"Kandar":["Nasi"],"Sup":["Mee","Kuey Teow","Bihun","Maggi"],"Kari":["Mee","Maggi"],"Biasa":["Tosai","Naan","Chapati"],"Canai":["Roti"],"Telur":["Roti","Tosai"],"Telur bawang":["Roti"],"Tisu":["Roti"],"Bawang":["Roti","Tosai"],"Susu":["Roti"],"Planta":["Roti"],"Bakar":["Roti"],"Cheese":["Roti","Naan"],"Rebus":["Mee"],"Bandung":["Mee"],"Sardin":["Roti"],"Pisang":["Roti"],"Bom":["Roti"],"Ayam":["Murtabak"],"Daging":["Murtabak"]}},{"name":"Protein","follow":["Carbs","Masak"],"items":["Ayam","Daging","Ayam tandoori","Udang","Sotong","None"],"badges":{"Ayam":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Daging":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Ayam tandoori":["Naan"],"Udang":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya"],"Sotong":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya"]}},{"name":"Extra request","items":["Tak nak sayur","Kuah banjir","Telur mata","Nasi lebih","Telur separuh masak","None","Sos cili","Kuah asing","Pedas","Kurang pedas","Double"],"follow":["Carbs","Masak"],"badges":{"Tak nak sayur":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Sup","Kari","Kandar","Rebus","Bandung"],"Kuah banjir":["Canai","Telur","Telur bawang","Bawang","Kandar"],"Telur mata":["Goreng","Goreng mamak","Goreng kampung","Lemak"],"Nasi lebih":["Nasi"],"Telur separuh masak":["Bakar"],"Sos cili":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Telur","Telur bawang","Ayam","Daging"],"Kuah asing":["Canai","Telur","Telur bawang","Bawang","Kandar"],"Pedas":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Kari","Kandar","Lemak"],"Kurang pedas":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Kari","Kandar","Lemak"],"Double":["Maggi","Roti"]},"often":{"item":"None","share":0.5}},{"name":"Minum","follow":"Minum panas ke sejuk","badges":{"ExtraJoss Manga":["Ais"],"ExtraJoss Ori":["Ais"],"ExtraJoss Anggur":["Ais"],"Jus Epal":["Ais"],"Jus Oren":["Ais"],"Jus Tembikai":["Ais"],"Milo Dinosaur":["Ais"]},"items":["Milo","Teh","Teh tarik","Teh O","Teh O limau","Milo O","Milo Dinosaur","Kopi","Kopi O","Nescafe","Nescafe tarik","Nescafe O","Neslo","ExtraJoss Manga","ExtraJoss Ori","ExtraJoss Anggur","Jus Epal","Jus Oren","Jus Tembikai","Laici","Air Barli","Teh Lemon","Teh Halia","Air Halia","Honey Lemon","Limau","Horlicks","Sirap","Sirap bandung","Sirap limau"]},{"name":"Minum panas ke sejuk","items":["Ais","Suam","Panas"]},{"name":"Manis","items":["Biasa","Kurang manis","Kosong"]}]};
+const MAMAK = {"name":"Order mamak","emoji":"🧩","labels":["Makan"],"cats":[{"name":"Carbs","items":["Nasi","Roti","Mee","Kuey Teow","Bihun","Maggi","Tosai","Naan","Chapati","Murtabak"],"weights":{"Nasi":"common","Roti":"common","Mee":"common","Maggi":"common","Naan":"rare","Chapati":"rare","Murtabak":"rare"}},{"name":"Masak","follow":"Carbs","items":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Lemak","Kandar","Sup","Kari","Rebus","Bandung","Biasa","Canai","Telur","Telur bawang","Tisu","Bawang","Susu","Planta","Bakar","Cheese","Sardin","Pisang","Bom","Ayam","Daging"],"badges":{"Goreng":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng mamak":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng kampung":["Nasi"],"Goreng pattaya":["Nasi","Mee"],"Lemak":["Nasi"],"Kandar":["Nasi"],"Sup":["Mee","Kuey Teow","Bihun","Maggi"],"Kari":["Mee","Maggi"],"Biasa":["Tosai","Naan","Chapati"],"Canai":["Roti"],"Telur":["Roti","Tosai"],"Telur bawang":["Roti"],"Tisu":["Roti"],"Bawang":["Roti","Tosai"],"Susu":["Roti"],"Planta":["Roti"],"Bakar":["Roti"],"Cheese":["Roti","Naan"],"Rebus":["Mee"],"Bandung":["Mee"],"Sardin":["Roti"],"Pisang":["Roti"],"Bom":["Roti"],"Ayam":["Murtabak"],"Daging":["Murtabak"]},"weights":{"Goreng":"common","Goreng mamak":"common","Lemak":"common","Kandar":"common","Canai":"common","Telur":"common","Bom":"rare","Pisang":"rare","Susu":"rare"}},{"name":"Protein","follow":["Carbs","Masak"],"items":["Ayam","Daging","Kambing","Ikan","Ayam tandoori","Udang","Sotong","None"],"badges":{"Ayam":["Nasi","Mee","Kuey Teow","Bihun","Maggi","Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Lemak","Kandar","Sup","Kari","Bandung"],"Daging":["Nasi","Mee","Kuey Teow","Bihun","Maggi","Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Lemak","Kandar","Sup","Kari","Bandung"],"Ayam tandoori":["Naan"],"Udang":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya"],"Sotong":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya"],"Kambing":["Kandar","Lemak"],"Ikan":["Kandar","Lemak"]}},{"name":"Extra request","items":["Tak nak sayur","Kuah banjir","Telur mata","Nasi lebih","Telur separuh masak","None","Sos cili","Kuah asing","Pedas","Kurang pedas","Double"],"follow":["Carbs","Masak"],"badges":{"Tak nak sayur":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Sup","Kari","Kandar","Rebus","Bandung"],"Kuah banjir":["Canai","Telur","Telur bawang","Bawang","Kandar","Ayam","Daging"],"Telur mata":["Goreng","Goreng mamak","Goreng kampung","Lemak"],"Nasi lebih":["Nasi"],"Telur separuh masak":["Bakar"],"Sos cili":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Telur","Telur bawang","Ayam","Daging"],"Kuah asing":["Canai","Telur","Telur bawang","Bawang","Kandar","Ayam","Daging"],"Pedas":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Kari","Kandar","Lemak"],"Kurang pedas":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Kari","Kandar","Lemak"],"Double":["Maggi","Roti"]},"often":{"item":"None","share":0.5}},{"name":"Minum","follow":"Minum panas ke sejuk","badges":{"ExtraJoss Manga":["Ais"],"ExtraJoss Ori":["Ais"],"ExtraJoss Anggur":["Ais"],"Jus Epal":["Ais"],"Jus Oren":["Ais"],"Jus Tembikai":["Ais"],"Milo Dinosaur":["Ais"],"Air kosong":["Ais","Suam"],"Teh Halia":["Panas","Suam"],"Air Halia":["Panas","Suam"]},"items":["Air kosong","Milo","Teh","Teh tarik","Teh O","Teh O limau","Milo O","Milo Dinosaur","Kopi","Kopi O","Nescafe","Nescafe tarik","Nescafe O","Neslo","ExtraJoss Manga","ExtraJoss Ori","ExtraJoss Anggur","Jus Epal","Jus Oren","Jus Tembikai","Laici","Air Barli","Teh Lemon","Teh Halia","Air Halia","Honey Lemon","Limau","Horlicks","Sirap","Sirap bandung","Sirap limau"],"weights":{"Teh tarik":"common","Milo":"common","Teh O":"common","Teh O limau":"common","Air kosong":"common","ExtraJoss Manga":"rare","ExtraJoss Ori":"rare","ExtraJoss Anggur":"rare","Jus Epal":"rare","Jus Tembikai":"rare"}},{"name":"Minum panas ke sejuk","items":["Ais","Suam","Panas"]},{"name":"Manis","items":["Biasa","Kurang manis","Kosong"],"follow":"Minum","badges":{"Kurang manis":["Milo","Teh","Teh tarik","Teh O","Teh O limau","Milo O","Kopi","Kopi O","Nescafe","Nescafe tarik","Nescafe O","Neslo","Teh Lemon","Teh Halia","Air Halia","Honey Lemon","Limau","Horlicks","Sirap","Sirap bandung","Sirap limau","Air Barli"],"Kosong":["Milo","Teh","Teh tarik","Teh O","Teh O limau","Milo O","Kopi","Kopi O","Nescafe","Nescafe tarik","Nescafe O","Neslo","Teh Lemon","Teh Halia","Air Halia","Honey Lemon","Limau","Horlicks","Sirap","Sirap bandung","Sirap limau","Air Barli"]}}]};
 const mamakMulti = () => ({
   id: uid(), name: MAMAK.name, emoji: MAMAK.emoji, type: "multi", labels: [...MAMAK.labels], created: Date.now(),
   cats: MAMAK.cats.map((c) => ({ id: uid(), ...structuredClone(c) })),
@@ -3793,6 +3796,42 @@ function load() {
     }
     d.mamakMore = true;
   }
+  // Once: Order mamak tweaks. Manis follows Minum (Kurang manis / Kosong only for drinks made at
+  // the counter); Air kosong (ais or suam); halia drinks hot or warm; popular orders come up more
+  // (weights); Kambing and Ikan with nasi kandar / lemak; no ayam or daging with Mee rebus; gravy
+  // extras with Murtabak. Options and labels are only added; settings you made stay.
+  if (!d.mamakTweaks) {
+    const m = d.lists.find((l) => l.name === MAMAK.name && l.type === "multi");
+    if (m) {
+      const want = Object.fromEntries(MAMAK.cats.map((c) => [c.name, c]));
+      const names = new Set(m.cats.map((c) => c.name));
+      const got = (n) => m.cats.find((c) => c.name === n);
+      const union = (c, it, b) => { if (!c.items.includes(it)) return; c.badges = c.badges || {}; c.badges[it] = [...new Set([...(c.badges[it] || []), ...b])]; };
+      m.cats.forEach((c) => {
+        const w = want[c.name];
+        if (!w) return;
+        w.items.forEach((it, i) => {
+          if (c.items.includes(it)) return;
+          const prev = w.items.slice(0, i).reverse().find((x) => c.items.includes(x));
+          c.items.splice(prev ? c.items.indexOf(prev) + 1 : 0, 0, it);
+        });
+        Object.entries(w.badges || {}).forEach(([it, b]) => {
+          c.badges = c.badges || {};
+          if (c.items.includes(it) && !(c.badges[it] && c.badges[it].length)) c.badges[it] = [...b];
+        });
+        if (w.follow) {
+          const now = Array.isArray(c.follow) ? c.follow : c.follow ? [c.follow] : [];
+          const fl = [...new Set([...now, ...(Array.isArray(w.follow) ? w.follow : [w.follow])])].filter((n) => names.has(n));
+          if (fl.length) c.follow = fl.length === 1 ? fl[0] : fl;
+        }
+        if (w.weights && !c.weights) c.weights = Object.fromEntries(Object.entries(w.weights).filter(([it]) => c.items.includes(it)));
+      });
+      const pr = got("Protein"), ex = got("Extra request");
+      if (pr) ["Ayam", "Daging"].forEach((it) => union(pr, it, want.Protein.badges[it]));
+      if (ex) ["Kuah banjir", "Kuah asing"].forEach((it) => union(ex, it, ["Ayam", "Daging"]));
+    }
+    d.mamakTweaks = true;
+  }
   // Order mamak, after Masak apa. It comes back if deleted; a list with its name gets, once, any
   // categories and options it is missing, Carbs' "Nasi lemak" becomes "Nasi", and Masak and
   // Protein follow Carbs (labels you already gave an option stay).
@@ -3857,6 +3896,18 @@ const catOptions = (c) => {
 /* =========================================================
    3. Random pick, history and the wheel
    ========================================================= */
+// `weights` { "option": "common" | "rare" }: how often an option comes up (common 3×, rare ⅓×).
+const WEIGHT = { common: 3, rare: 1 / 3 };
+const weightOf = (owners, it) => {
+  for (const o of owners) { const w = o && o.weights && o.weights[it]; if (WEIGHT[w]) return WEIGHT[w]; }
+  return 1;
+};
+function weighted(o, w) {
+  const ws = o.map(w), total = ws.reduce((a, b) => a + b, 0);
+  let x = (rand(1e9) / 1e9) * total;
+  for (let i = 0; i < o.length; i++) { x -= ws[i]; if (x < 0) return o[i]; }
+  return o[o.length - 1];
+}
 function rand(n) {
   const a = new Uint32Array(1);
   crypto.getRandomValues(a);
@@ -3881,7 +3932,7 @@ const isOffItem = (owner, it) => !!(owner.offItems && owner.offItems.includes(it
 const activeItems = (list) => list.items.filter((it) => !isOffItem(list, it));
 function roll(list) {
   const p = activeItems(list);
-  cur.item = p.length ? p[rand(p.length)] : null;
+  cur.item = p.length ? weighted(p, (it) => weightOf([list], it)) : null;
   cur.spin = !!db.wheel;
   record(list);
 }
@@ -3904,10 +3955,11 @@ function pickOption(c, o) {
     if (Math.random() < c.often.share) return c.often.item;
     o = o.filter((x) => x !== c.often.item);
   }
+  const w = (it) => weightOf([c, linkedList(c)], it);
   const rare = c.rare && o.includes(c.rare.item) ? c.rare : null;
-  if (!rare) return o[rand(o.length)];
+  if (!rare) return weighted(o, w);
   const rest = o.filter((x) => x !== rare.item);
-  return !rest.length || rand(rare.odds) === 0 ? rare.item : rest[rand(rest.length)];
+  return !rest.length || rand(rare.odds) === 0 ? rare.item : weighted(rest, w);
 }
 
 // Multiple: re-pick every category except the locked ones. With `keepValid`
@@ -4935,6 +4987,7 @@ function itemRow(owner, it, i, noun) {
       ${grip}
       <div class="item-main">
         <input class="item-in" data-field="item" data-i="${i}" value="${esc(it)}" enterkeyhint="done" aria-label="${noun} ${i + 1}">
+        ${owner.weights && WEIGHT[owner.weights[it]] ? `<span class="opt-weight ${owner.weights[it]}">${owner.weights[it] === "common" ? "↑ Common" : "↓ Rare"}</span>` : ""}
         ${badgePills(b)}
         <input class="note-in" data-field="note" data-i="${i}" value="${esc((owner.notes && owner.notes[it]) || "")}" placeholder="Add a description (optional)" enterkeyhint="done" aria-label="Description for ${esc(it)}">
       </div>
@@ -5175,6 +5228,10 @@ function renderSheet(again) {
         </button>`).join("");
     body = `
       <h2 class="sheet-title">Badges · ${esc(badgeItem)}</h2>
+      <div class="label sheet-label">How often it comes up</div>
+      <div class="chips-row often-row">${[["rare", "↓ Rare"], ["normal", "Normal"], ["common", "↑ Common"]].map(([v, t]) => `
+        <button class="chip${((owner.weights && owner.weights[badgeItem]) || "normal") === v ? " on" : ""}" data-act="setWeight" data-v="${v}" aria-pressed="${((owner.weights && owner.weights[badgeItem]) || "normal") === v}">${t}</button>`).join("")}
+      </div>
       <p class="hint">Shown with this option when it's picked. Start with + for green or − for red, e.g. +10% Atk.</p>
       <form class="addbar inline" data-form="badge">
         <input class="input" id="badgeInput" placeholder="New badge…" maxlength="24" enterkeyhint="done" autocomplete="off">
@@ -5436,6 +5493,16 @@ const actions = {
     seenBadges = [];
     openSheet("badges");
   },
+  setWeight: (el) => {
+    const owner = editOwner(), v = el.dataset.v;
+    owner.weights = owner.weights || {};
+    if (WEIGHT[v]) owner.weights[badgeItem] = v;
+    else delete owner.weights[badgeItem];
+    if (!Object.keys(owner.weights).length) delete owner.weights;
+    save();
+    render();
+    renderSheet(true);
+  },
   toggleBadge: (el) => {
     const owner = editOwner(), s = el.dataset.v, b = badgesOf(owner, badgeItem);
     setBadges(owner, badgeItem, b.includes(s) ? b.filter((x) => x !== s) : [...b, s]);
@@ -5505,6 +5572,7 @@ const actions = {
       if (isRare(owner, gone)) delete owner.rare;
       if (owner.often && owner.often.item === gone) delete owner.often;
       if (owner.notes) delete owner.notes[gone];
+      if (owner.weights) delete owner.weights[gone];
     }
     save();
     render();
@@ -5672,6 +5740,7 @@ document.addEventListener("change", (e) => {
       if (owner.often && owner.often.item === old) owner.often.item = v;
       if (owner.shine && v !== old) Object.values(owner.shine).forEach((r) => { if (r.includes(old)) r[r.indexOf(old)] = v; }); // and its shine
       if (owner.notes && owner.notes[old] && v !== old) { owner.notes[v] = owner.notes[old]; delete owner.notes[old]; } // and its description
+      if (v !== old && owner.weights && owner.weights[old]) { owner.weights[v] = owner.weights[old]; delete owner.weights[old]; } // and how often it comes up
       if (v !== old && isOffItem(owner, old)) { setOffItem(owner, old, false); setOffItem(owner, v, true); } // and whether it's switched off
       if (route().view === "cat") renameInFit(currentList(), owner, old, v); // and what it goes with
       if (route().view === "cat" && v !== old) currentList().cats.forEach((d) => { // and labels in categories that follow it
@@ -5686,6 +5755,7 @@ document.addEventListener("change", (e) => {
         if (isRare(owner, old)) delete owner.rare;
         if (owner.often && owner.often.item === old) delete owner.often;
         if (owner.notes) delete owner.notes[old];
+        if (owner.weights) delete owner.weights[old];
       }
       save();
       return render();
@@ -5937,6 +6007,11 @@ const backupMulti = (v) => v && v.type === "multi" && Array.isArray(v.categories
 const SETTINGS_KEY = "__settings"; // the home sort mode; not a list
 const isImage = (s) => typeof s === "string" && s.startsWith("data:image/");
 // Option descriptions from a file: { "option": "text" }, anything else dropped.
+function cleanWeights(w) {
+  if (!w || typeof w !== "object" || Array.isArray(w)) return null;
+  const out = Object.fromEntries(Object.entries(w).filter(([k, v]) => k.trim() && (v === "common" || v === "rare")));
+  return Object.keys(out).length ? out : null;
+}
 function cleanNotes(n) {
   if (!n || typeof n !== "object" || Array.isArray(n)) return null;
   const out = Object.fromEntries(Object.entries(n).filter(([k, v]) => k.trim() && typeof v === "string" && v.trim()));
@@ -5993,6 +6068,7 @@ function exportBackup() {
       ...(l.badges && { badges: l.badges }),
       ...(l.offItems && { offItems: l.offItems }),
       ...(!isMulti(l) && l.notes && { notes: l.notes }),
+      ...(!isMulti(l) && l.weights && { weights: l.weights }),
       ...(l.image && { image: l.image }),
     };
     if (isMulti(l)) {
@@ -6000,7 +6076,7 @@ function exportBackup() {
         type: "multi", ...extra,
         categories: l.cats.map((c) => {
           const k = linkedList(c);
-          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }), ...(c.rare && { rare: c.rare }), ...(c.fit && { fit: c.fit }), ...(c.notes && { notes: c.notes }), ...(c.unique && { unique: c.unique }), ...(c.starts && { starts: c.starts }), ...(c.grow && { grow: c.grow }), ...(c.levels && { levels: c.levels }), ...(c.shine && { shine: c.shine }), ...(c.pills && { pills: true }), ...(c.follow && { follow: c.follow }), ...(c.often && { often: c.often }), ...(c.offItems && { offItems: c.offItems }) };
+          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }), ...(c.rare && { rare: c.rare }), ...(c.fit && { fit: c.fit }), ...(c.notes && { notes: c.notes }), ...(c.unique && { unique: c.unique }), ...(c.starts && { starts: c.starts }), ...(c.grow && { grow: c.grow }), ...(c.levels && { levels: c.levels }), ...(c.shine && { shine: c.shine }), ...(c.pills && { pills: true }), ...(c.follow && { follow: c.follow }), ...(c.often && { often: c.often }), ...(c.weights && { weights: c.weights }), ...(c.offItems && { offItems: c.offItems }) };
         }),
       };
     } else {
@@ -6056,6 +6132,7 @@ $("#file").addEventListener("change", async (e) => {
         ...(Array.isArray(c.offItems) && c.offItems.length && { offItems: clean(c.offItems) }),
         ...(cleanFit(c.fit) && { fit: cleanFit(c.fit) }),
         ...(cleanNotes(c.notes) && { notes: cleanNotes(c.notes) }),
+        ...(cleanWeights(c.weights) && { weights: cleanWeights(c.weights) }),
         ...(typeof c.unique === "string" && { unique: c.unique }),
         ...(c.starts && typeof c.starts.group === "string" && cleanFit(c.starts.by) && { starts: { group: c.starts.group, by: cleanFit(c.starts.by) } }),
         ...(cleanBadges(c.badges) && { badges: cleanBadges(c.badges) }),
@@ -6073,6 +6150,7 @@ $("#file").addEventListener("change", async (e) => {
     const badges = multi ? null : Array.isArray(v) ? prev && prev.badges : cleanBadges(v.badges);
     if (badges) list.badges = badges;
     if (!multi && !Array.isArray(v) && cleanNotes(v.notes)) list.notes = cleanNotes(v.notes);
+    if (!multi && !Array.isArray(v) && cleanWeights(v.weights)) list.weights = cleanWeights(v.weights);
     if (!multi && !Array.isArray(v) && Array.isArray(v.offItems) && v.offItems.length) list.offItems = clean(v.offItems);
     if (Array.isArray(v) ? prev && prev.off : v.off === true) list.off = true;
     list.created = prev ? prev.created : Date.now() + i; // keeps the backup's order for "Date created"
