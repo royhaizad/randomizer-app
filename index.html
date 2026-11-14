@@ -705,8 +705,9 @@ const ORDER = ["Dadu", "MyTown makan mana", "Masak apa"];
 const EMOJI = { "Dadu": "🎲", "MyTown makan mana": "🛍️", "Masak apa": "🍳" };
 // "Order mamak": what to order at a mamak. Masak and Protein follow Carbs by their labels
 // (Canai → Roti; Ayam and Daging only with rice or noodles). Minum follows "Minum panas ke
-// sejuk": juices and ExtraJoss are labelled Ais, so they always come cold.
-const MAMAK = {"name":"Order mamak","emoji":"🧩","labels":["Makan"],"cats":[{"name":"Carbs","items":["Nasi","Roti","Mee","Kuey Teow","Bihun"]},{"name":"Masak","follow":"Carbs","items":["Goreng","Goreng mamak","Lemak","Kandar","Canai","Telur","Tisu","Bawang","Susu","Tosai","Chapati","Planta","Bakar","Naan"],"badges":{"Goreng":["Nasi","Mee","Kuey Teow","Bihun"],"Goreng mamak":["Nasi","Mee","Kuey Teow","Bihun"],"Lemak":["Nasi"],"Kandar":["Nasi"],"Canai":["Roti"],"Telur":["Roti"],"Tisu":["Roti"],"Bawang":["Roti"],"Susu":["Roti"],"Tosai":["Roti"],"Chapati":["Roti"],"Planta":["Roti"],"Bakar":["Roti"],"Naan":["Roti"]}},{"name":"Protein","follow":"Carbs","items":["Ayam","Daging","None"],"badges":{"Ayam":["Nasi","Mee","Kuey Teow","Bihun"],"Daging":["Nasi","Mee","Kuey Teow","Bihun"]}},{"name":"Extra request","items":["Tak nak sayur","Kuah banjir","Telur mata","Nasi lebih","Telur separuh masak","None","Ayam Tandoori","Sos cili"]},{"name":"Minum","follow":"Minum panas ke sejuk","badges":{"ExtraJoss Manga":["Ais"],"ExtraJoss Ori":["Ais"],"ExtraJoss Anggur":["Ais"],"Jus Epal":["Ais"],"Jus Oren":["Ais"],"Jus Tembikai":["Ais"]},"items":["Milo","Teh","Teh O","Milo O","Kopi","Kopi O","Nescafe","Nescafe O","Neslo","ExtraJoss Manga","ExtraJoss Ori","ExtraJoss Anggur","Jus Epal","Jus Oren","Jus Tembikai","Laici","Air Barli","Teh Lemon","Teh Halia","Air Halia","Honey Lemon","Limau","Horlicks"]},{"name":"Minum panas ke sejuk","items":["Ais","Suam","Panas"]}]};
+// sejuk": juices and ExtraJoss are labelled Ais, so they always come cold. Tosai, Naan and
+// Chapati are carbs of their own (Tosai telur, Naan cheese, Chapati biasa), and Manis is the sugar.
+const MAMAK = {"name":"Order mamak","emoji":"🧩","labels":["Makan"],"cats":[{"name":"Carbs","items":["Nasi","Roti","Mee","Kuey Teow","Bihun","Maggi","Tosai","Naan","Chapati"]},{"name":"Masak","follow":"Carbs","items":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Lemak","Kandar","Sup","Kari","Biasa","Canai","Telur","Telur bawang","Tisu","Bawang","Susu","Planta","Bakar","Cheese"],"badges":{"Goreng":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng mamak":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng kampung":["Nasi"],"Goreng pattaya":["Nasi","Mee"],"Lemak":["Nasi"],"Kandar":["Nasi"],"Sup":["Mee","Kuey Teow","Bihun","Maggi"],"Kari":["Mee","Maggi"],"Biasa":["Tosai","Naan","Chapati"],"Canai":["Roti"],"Telur":["Roti","Tosai"],"Telur bawang":["Roti"],"Tisu":["Roti"],"Bawang":["Roti","Tosai"],"Susu":["Roti"],"Planta":["Roti"],"Bakar":["Roti"],"Cheese":["Roti","Naan"]}},{"name":"Protein","follow":"Carbs","items":["Ayam","Daging","None"],"badges":{"Ayam":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Daging":["Nasi","Mee","Kuey Teow","Bihun","Maggi"]}},{"name":"Extra request","items":["Tak nak sayur","Kuah banjir","Telur mata","Nasi lebih","Telur separuh masak","None","Ayam Tandoori","Sos cili"]},{"name":"Minum","follow":"Minum panas ke sejuk","badges":{"ExtraJoss Manga":["Ais"],"ExtraJoss Ori":["Ais"],"ExtraJoss Anggur":["Ais"],"Jus Epal":["Ais"],"Jus Oren":["Ais"],"Jus Tembikai":["Ais"]},"items":["Milo","Teh","Teh tarik","Teh O","Milo O","Kopi","Kopi O","Nescafe","Nescafe tarik","Nescafe O","Neslo","ExtraJoss Manga","ExtraJoss Ori","ExtraJoss Anggur","Jus Epal","Jus Oren","Jus Tembikai","Laici","Air Barli","Teh Lemon","Teh Halia","Air Halia","Honey Lemon","Limau","Horlicks"]},{"name":"Minum panas ke sejuk","items":["Ais","Suam","Panas"]},{"name":"Manis","items":["Biasa","Kurang manis","Kosong"]}]};
 const mamakMulti = () => ({
   id: uid(), name: MAMAK.name, emoji: MAMAK.emoji, type: "multi", labels: [...MAMAK.labels], created: Date.now(),
   cats: MAMAK.cats.map((c) => ({ id: uid(), ...structuredClone(c) })),
@@ -3690,6 +3691,47 @@ function load() {
       Object.entries(want).forEach(([it, b]) => { if (minum.items.includes(it) && !(minum.badges[it] && minum.badges[it].length)) minum.badges[it] = [...b]; });
     }
     d.mamakColdDrinks = true;
+  }
+  // Once: Order mamak's top fixes from what people really order. Maggi, Tosai, Naan and Chapati
+  // join Carbs (the last three leave Masak); Masak gains Goreng kampung, Goreng pattaya, Sup, Kari,
+  // Biasa, Telur bawang and Cheese; Teh tarik and Nescafe tarik; a Manis (sugar) category.
+  if (!d.mamakTopFixes) {
+    const m = d.lists.find((l) => l.name === MAMAK.name && l.type === "multi");
+    if (m) {
+      const want = Object.fromEntries(MAMAK.cats.map((c) => [c.name, c]));
+      const got = (n) => m.cats.find((c) => c.name === n);
+      const addItems = (c, items) => items.forEach((it, i) => {
+        if (c.items.includes(it)) return;
+        const prev = items.slice(0, i).reverse().find((x) => c.items.includes(x)); // keep the new order
+        c.items.splice(prev ? c.items.indexOf(prev) + 1 : c.items.length, 0, it);
+      });
+      const addLabels = (c, badges) => Object.entries(badges).forEach(([it, b]) => {
+        if (!c.items.includes(it)) return;
+        c.badges = c.badges || {};
+        c.badges[it] = [...new Set([...(c.badges[it] || []), ...b])];
+      });
+      const carbs = got("Carbs"), masak = got("Masak"), protein = got("Protein"), minum = got("Minum");
+      if (carbs) addItems(carbs, want.Carbs.items);
+      if (masak) {
+        ["Tosai", "Chapati", "Naan"].forEach((it) => {
+          const i = masak.items.indexOf(it);
+          if (i < 0) return;
+          masak.items.splice(i, 1);
+          if (masak.badges) delete masak.badges[it];
+          if (masak.notes) delete masak.notes[it];
+          if (masak.offItems) masak.offItems = masak.offItems.filter((x) => x !== it);
+        });
+        addItems(masak, want.Masak.items);
+        addLabels(masak, want.Masak.badges);
+      }
+      if (protein) addLabels(protein, want.Protein.badges);
+      if (minum) addItems(minum, want.Minum.items);
+      if (!got("Manis")) {
+        const at = m.cats.findIndex((c) => c.name === "Minum panas ke sejuk");
+        m.cats.splice(at < 0 ? m.cats.length : at + 1, 0, { id: uid(), ...structuredClone(want.Manis) });
+      }
+    }
+    d.mamakTopFixes = true;
   }
   // Order mamak, after Masak apa. It comes back if deleted; a list with its name gets, once, any
   // categories and options it is missing, Carbs' "Nasi lemak" becomes "Nasi", and Masak and
