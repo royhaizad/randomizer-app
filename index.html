@@ -507,7 +507,15 @@
   .combo-count { flex: none; min-width: 24px; text-align: right; font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--muted); }
   .opt-note { display: block; margin-top: 4px; font-size: 13px; font-weight: 400; line-height: 1.35; color: var(--muted); }
   .item-main .item-in { padding-left: 0; padding-right: 0; }
-  .item-main:has(.opt-note) .item-in { height: 30px; margin-top: 8px; }
+  .item-main:has(.opt-note) .item-in, .item-main:has(.note-in) .item-in { height: 30px; margin-top: 8px; }
+  .note-in {
+    width: 100%; height: 22px; margin: 0 0 9px; padding: 0; border: 0; background: none;
+    font: inherit; font-size: 13px; line-height: 1.35; color: var(--muted);
+  }
+  .note-in:focus { outline: none; color: var(--text); }
+  .note-in::placeholder { color: var(--muted); opacity: 0.5; }
+  .item-main .badges:has(+ .note-in) { margin-bottom: 4px; }
+  .answer-note { margin: -4px 0 0; max-width: 34ch; text-align: center; font-size: 15px; color: var(--muted); }
   .item-main .opt-note { margin: 0 0 11px; }
   .item-main .badges:has(+ .opt-note) { margin-bottom: 5px; }
   .combo-hint { margin: 0; min-height: 28px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--muted); }
@@ -580,6 +588,7 @@
   .label { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 4px 8px; }
   .item-row { display: flex; align-items: center; padding-left: 16px; padding-right: 4px; min-height: 52px; }
   .item-row + .item-row { border-top: 1px solid var(--line); }
+  .item-row.off .item-main { opacity: 0.45; }
   .item-row:focus-within { background: var(--accent-soft); }
   .item-in { flex: 1; min-width: 0; height: 50px; background: none; border: 0; font-size: 16px; }
   .dangerbtn { margin: 18px auto 8px; height: 44px; padding: 0 16px; background: none; border: 0; border-radius: 12px; color: var(--danger); font-size: 15px; font-weight: 500; }
@@ -3216,6 +3225,7 @@ const EGG_UNDISCOVERED = eggNamed("Undiscovered");
 // Real-life life stages, by egg group.
 const U_STAGE_SETS = {
   animal: ["Egg", "Baby", "Child", "Adult", "Elder"],
+  mammal: ["Baby", "Child", "Adult", "Elder"], // born, not hatched
   bug: ["Egg", "Larva", "Pupa", "Adult", "Elder"],
   plant: ["Seed", "Sprout", "Sapling", "Tree", "Flower", "Elder"],
   mineral: ["Pebble", "Rock", "Boulder", "Crystal", "Elder"],
@@ -3224,12 +3234,22 @@ const U_STAGE_SETS = {
 };
 const U_STAGES = [...new Set(Object.values(U_STAGE_SETS).flat())];
 const stageSetOf = (g) => (g === eggNamed("Bug") || g === eggNamed("Water 3") ? "bug" : g === eggNamed("Grass") ? "plant"
-  : g === eggNamed("Mineral") ? "mineral" : g === eggNamed("Amorphous") ? "blob" : g === eggNamed("Ditto") ? "ditto" : "animal");
+  : g === eggNamed("Mineral") ? "mineral" : g === eggNamed("Amorphous") ? "blob" : g === eggNamed("Ditto") ? "ditto" : g === eggNamed("Field") || g === eggNamed("Human-Like") ? "mammal" : "animal");
 // The rarer kinds can't breed (Undiscovered egg group) and are fully grown.
 const U_RARITIES = POKEMON.cats.Rarity;
 const U_RARE_KINDS = ["Sub-Legendary", "Legendary", "Mythical", "Ultra Beast"];
 const U_GROWN = ["Adult", "Elder", "Tree", "Flower", "Boulder", "Crystal"];
 const U_SIZES = ["XS", "S", "M", "L", "XL"];
+// Not born or sprouted yet: no work, not Alpha, no passives (a Prodigy one has just Lucky).
+const U_UNHATCHED = ["Egg", "Seed", "Pebble", "Spark"];
+// Young: not Alpha, light work only (levels up to 2); a Pupa (cocoon) does no work.
+const U_YOUNG = ["Baby", "Child", "Larva", "Sprout", "Wisp", "Pupa"];
+const U_LIGHT_JOBS = ["Gathering", "Transporting", "Farming"];
+const U_SWIM = ["Ace Swimmer", "King of the Waves", "Sleek Stroke"];
+const U_WATER_HABITATS = ["Sea", "Beach", "Wetland", "Water's Edge", "Rare"];
+const U_BIG = ["Lightfooted", "Sky Strider", "Eternal Engine", "Fit as a Fiddle", "Infinite Stamina", "Sickly", "Heavyweight"]; // riding needs L or XL
+const U_BREEDING = ["Babysitter", "Philanthropist"];
+const U_FARMING = ["Farmhand", "Ranch Master"];
 const U_SIZE_BY_STAGE = {
   Egg: ["XS", "S"], Seed: ["XS", "S"], Pebble: ["XS", "S"], Spark: ["XS", "S"], Baby: ["XS", "S"],
   Child: ["XS", "S", "M"], Larva: ["XS", "S", "M"], Sprout: ["XS", "S", "M"], Wisp: ["XS", "S", "M"],
@@ -3259,42 +3279,64 @@ const ultimateMulti = () => {
   const passiveOk = (p, t) => { const need = passiveTypes(PAL_PASSIVES[p]); return !need || typesOf(t).some((x) => need.includes(x)); };
   const IVS = [...PAL_IVS];
   const cat = (name, items, more) => ({ id: uid(), name, items, ...more });
+  const slots = [1, 2, 3, 4].map((n) => `Passive Skill ${n}`);
+  // A table on another category, keyed by passive: the "None" row lists every option, so the
+  // passives named go only with theirs and every other passive goes with anything.
+  const byPassive = (all, rows) => Object.fromEntries(slots.map((n) => [n, { [PAL_NONE]: [...all], ...structuredClone(rows) }]));
+  const unhatched = (row) => Object.fromEntries(U_UNHATCHED.map((st) => [st, row]));
+  const young = (row) => Object.fromEntries(U_YOUNG.map((st) => [st, row]));
+  const farming = works.filter((w) => w.split(" · ").includes("Farming"));
+  const light = works.filter((w) => w === PAL_NONE || w.split(" · ").every((j) => U_LIGHT_JOBS.includes(j)));
   return {
     id: uid(), name: ULTIMATE.name, emoji: ULTIMATE.emoji, description: ULTIMATE.description, type: "multi", labels: ["Fun"], created: Date.now(),
     cats: [
-      cat("Type", [...types], { pills: true }),
-      cat("Egg Group", [...U_EGGS], { notes: { ...EGG_NOTES }, fit: { Type: structuredClone(POKEMON_FIT["Egg Group"].Type), Rarity: byRarity([EGG_UNDISCOVERED], [...U_EGGS]) } }),
-      cat("Stage", [...U_STAGES], { fit: { "Egg Group": byEgg((g) => [...U_STAGE_SETS[stageSetOf(g)]]), Rarity: byRarity([...U_GROWN], [...U_STAGES]) } }),
-      cat("Size", [...U_SIZES], { grow: { ...PAL_GROW }, fit: { Stage: Object.fromEntries(U_STAGES.map((s) => [s, U_SIZE_BY_STAGE[s] || [...U_SIZES]])) } }),
+      cat("Type", [...types], { pills: true, fit: {
+        ...byPassive(types, Object.fromEntries(passives.filter((p) => passiveTypes(PAL_PASSIVES[p])).map((p) => [p, types.filter((t) => passiveOk(p, t))]))),
+        "Work Suitability": { [PAL_NONE]: [...types], ...Object.fromEntries(works.filter((w) => w.split(" · ").some((j) => U_JOB_TYPES[j])).map((w) => [w, types.filter((t) => jobsOk(w, t))])) },
+        "Hidden Ability": Object.fromEntries(Object.keys(HIDDEN_ABILITIES).filter((a) => !ABILITY_TYPES[a]).slice(0, 1).map((a) => [a, [...types]])
+          .concat(Object.keys(ABILITY_TYPES).map((a) => [a, types.filter((t) => typesOf(t).some((x) => ABILITY_TYPES[a].includes(x)))]))),
+      } }),
+      cat("Egg Group", [...U_EGGS], { notes: { ...EGG_NOTES }, fit: { Type: structuredClone(POKEMON_FIT["Egg Group"].Type), Rarity: byRarity([EGG_UNDISCOVERED], [...U_EGGS]),
+        ...byPassive(U_EGGS, { "Fine Furs": [eggNamed("Field"), eggNamed("Fairy")], Philanthropist: U_EGGS.filter((g) => g !== EGG_UNDISCOVERED) }) } }),
+      cat("Stage", [...U_STAGES], { fit: { "Egg Group": byEgg((g) => [...U_STAGE_SETS[stageSetOf(g)]]), Rarity: byRarity([...U_GROWN], [...U_STAGES]),
+        ...byPassive(U_STAGES, Object.fromEntries(U_BREEDING.map((p) => [p, [...U_GROWN]]))) } }),
+      cat("Size", [...U_SIZES], { grow: { ...PAL_GROW }, fit: { Stage: Object.fromEntries(U_STAGES.map((s) => [s, U_SIZE_BY_STAGE[s] || [...U_SIZES]])),
+        ...byPassive(U_SIZES, Object.fromEntries(U_BIG.map((p) => [p, ["L", "XL"]]))) } }),
       cat("Gender", ["Male", "Female", "Genderless"], { fit: { "Egg Group": byEgg((g) =>
         ["Mineral", "Amorphous", "Ditto"].map(eggNamed).includes(g) ? ["Genderless"] : g === EGG_UNDISCOVERED ? ["Male", "Female", "Genderless"] : ["Male", "Female"]) } }),
       cat("Nature", [...POKEMON.cats.Nature], { badges: natureBadges(POKEMON.cats.Nature) }),
-      cat("Hidden Ability", Object.keys(HIDDEN_ABILITIES), { notes: { ...HIDDEN_ABILITIES }, fit: { Type: structuredClone(POKEMON_FIT["Hidden Ability"].Type) } }),
+      cat("Hidden Ability", Object.keys(HIDDEN_ABILITIES), { notes: { ...HIDDEN_ABILITIES } }),
       cat("Activity", ["Daytime", "Nocturnal"], { fit: { Type: byType((t) => {
         const day = typesOf(t).some((x) => x === "Grass" || x === "Fairy"), night = typesOf(t).some((x) => x === "Ghost" || x === "Dark");
         return day === night ? ["Daytime", "Nocturnal"] : day ? ["Daytime"] : ["Nocturnal"];
-      }) } }),
+      }), Habitat: { Cave: ["Nocturnal"], Desert: ["Nocturnal"], Grassland: ["Daytime", "Nocturnal"] },
+        ...byPassive(["Daytime", "Nocturnal"], { "Night Owl": ["Nocturnal"] }) } }),
       cat("Habitat", [...U_HABITATS], { fit: {
         Type: byType((t) => U_HABITATS.filter((h) => h === "Rare" || typesOf(t).every((x) => (U_TYPE_HABITATS[x] || U_HABITATS).includes(h)))),
         "Egg Group": withRare({ [eggNamed("Water 1")]: [...U_HABITATS], [eggNamed("Water 2")]: ["Sea", "Wetland", "Water's Edge", "Cave"], [eggNamed("Water 3")]: ["Sea", "Beach", "Wetland", "Water's Edge", "Cave"] }),
         Region: withRare(U_REGIONS),
+        ...byPassive(U_HABITATS, Object.fromEntries(U_SWIM.map((p) => [p, [...U_WATER_HABITATS]]))),
       } }),
       cat("Region", Object.keys(U_REGIONS)),
       cat("Work Suitability", works, {
-        fit: { Type: byType((t) => works.filter((w) => jobsOk(w, t))), "Egg Group": byEgg((g) => works.filter((w) => U_HANDS.includes(g) || !w.split(" · ").includes("Handiwork"))) },
-        levels: { by: "Pal", base: {}, max: 10, bonus: { Alpha: "Yes", Prodigy: "Yes" } },
+        fit: {
+          "Egg Group": byEgg((g) => works.filter((w) => U_HANDS.includes(g) || !w.split(" · ").includes("Handiwork"))),
+          Stage: { ...unhatched([PAL_NONE]), ...young(light), Pupa: [PAL_NONE], Adult: [...works] },
+          ...byPassive(works, Object.fromEntries(U_FARMING.map((p) => [p, farming]))),
+        },
+        levels: { by: "Pal", base: {}, max: 10, bonus: { Alpha: "Yes", Prodigy: "Yes" }, cap: { by: "Stage", max: { ...young(2), Pupa: 1 } } },
       }),
-      cat("Passive Skills", [...PAL_COUNTS], { fit: { Prodigy: { Yes: PAL_COUNTS.slice(1), No: [...PAL_COUNTS] } }, starts: { group: "passive", by: { Prodigy: { Yes: ["Lucky"] } } } }),
+      cat("Passive Skills", [...PAL_COUNTS], { fit: { Prodigy: { Yes: PAL_COUNTS.slice(1), No: [...PAL_COUNTS] }, Stage: { ...unhatched(["0", "1"]), Adult: [...PAL_COUNTS] } }, starts: { group: "passive", by: { Prodigy: { Yes: ["Lucky"] } } } }),
       ...[1, 2, 3, 4].map((n) => cat(`Passive Skill ${n}`, [PAL_NONE, ...passives], {
         notes: { [PAL_NONE]: "No passive skill in this slot", ...PAL_PASSIVES }, badges: structuredClone(PAL_PASSIVE_BADGES), unique: "passive",
         fit: {
           "Passive Skills": Object.fromEntries(PAL_COUNTS.map((k) => [k, +k >= n ? [...passives] : [PAL_NONE]])),
           Prodigy: { Yes: [PAL_NONE, ...passives], No: [PAL_NONE, ...passives.filter((s) => s !== "Lucky")] },
-          Type: byType((t) => [PAL_NONE, ...passives.filter((p) => passiveOk(p, t))]),
+          Stage: { ...unhatched([PAL_NONE, "Lucky"]), Adult: [PAL_NONE, ...passives] },
         },
       })),
       cat("IV", IVS, { fit: { Alpha: { Yes: IVS.slice(50), No: [...IVS] }, Prodigy: { Yes: IVS.slice(70), No: [...IVS] } }, shine: structuredClone(PAL_IV_SHINE) }),
-      palAlphaCat(),
+      { ...palAlphaCat(), fit: { Stage: { ...unhatched(["No"]), ...young(["No"]), Adult: ["No", "Yes"] } } },
       cat("Prodigy", ["No", "Yes"], { ...rareYes(), notes: { Yes: "A rare one: has the Lucky passive, an IV of 70–100% and work levels +1" } }),
       cat("Rarity", [...U_RARITIES], { off: true }),
     ],
@@ -3586,6 +3628,22 @@ function load() {
     });
     d.abilityTypeLogic = true;
   }
+  // Once: the Ultimate list's rules got smarter (stages, young/unhatched, passives by body).
+  if (!d.ultimateRules3) {
+    const u = d.lists.find((l) => l.name === ULTIMATE.name && l.type === "multi");
+    if (u) {
+      const fresh = Object.fromEntries(ultimateMulti().cats.map((c) => [c.name, c]));
+      u.cats.forEach((c) => {
+        const f = fresh[c.name];
+        if (!f) return;
+        for (const k of ["items", "fit", "levels", "notes", "badges", "grow", "starts", "rare", "shine", "unique"]) {
+          if (f[k] === undefined) delete c[k];
+          else c[k] = f[k];
+        }
+      });
+    }
+    d.ultimateRules3 = true;
+  }
   // The Ultimate Pokémon Generator, right after the Pal list. It comes back if deleted; a list
   // with its name gets any categories it is missing, once.
   const ult = d.lists.find((l) => l.name === ULTIMATE.name);
@@ -3633,7 +3691,7 @@ const linkedList = (c) => {
 };
 const catOptions = (c) => {
   const l = linkedList(c);
-  return [...new Set([...(l ? l.items : []), ...c.items])];
+  return [...new Set([...(l ? activeItems(l) : []), ...c.items.filter((it) => !isOffItem(c, it))])];
 };
 
 /* =========================================================
@@ -3652,8 +3710,17 @@ const today = () => new Date().toLocaleDateString("en-CA"); // e.g. 2026-10-17, 
 // `spin` = show the wheel landing on it before showing the answer.
 let cur = null;
 
+// Options switched off in Edit (the eye) stay in the list but are never rolled or offered.
+function setOffItem(owner, it, on) {
+  const off = new Set(owner.offItems || []);
+  on ? off.add(it) : off.delete(it);
+  if (off.size) owner.offItems = [...off];
+  else delete owner.offItems;
+}
+const isOffItem = (owner, it) => !!(owner.offItems && owner.offItems.includes(it));
+const activeItems = (list) => list.items.filter((it) => !isOffItem(list, it));
 function roll(list) {
-  const p = list.items;
+  const p = activeItems(list);
   cur.item = p.length ? p[rand(p.length)] : null;
   cur.spin = !!db.wheel;
   record(list);
@@ -3843,7 +3910,8 @@ function rollLevels(list, fresh) {
         return [s, n];
       }) };
     }
-    lv.shown = lv.rolled.map(([s, n]) => [s, Math.min(L.max, n + bonus)]);
+    const capBy = L.cap && named(L.cap.by), top = (capBy && L.cap.max[cur.picks[capBy.id]]) || L.max;
+    lv.shown = lv.rolled.map(([s, n]) => [s, Math.min(top, n + bonus)]);
     lv.text = lv.shown.length ? lv.shown.map(([s, n]) => `${s} ${n}`).join(" · ") : v;
     cur.levels[c.id] = lv;
   });
@@ -4058,7 +4126,7 @@ function confetti(from) {
 // zoom the wheel out and show the answer.
 function spin(list) {
   const wheel = $(".wheel"), disc = $(".wheel-disc"), pointer = $(".wheel-pointer");
-  const i = list.items.indexOf(cur.item), s = 360 / list.items.length;
+  const items = activeItems(list), i = items.indexOf(cur.item), s = 360 / items.length;
   // Slice centers are measured clockwise from 12 o'clock; the pointer is at 3 o'clock (90°).
   const turn = 360 * 6 + 90 - (i + 0.5) * s + (Math.random() - 0.5) * 0.7 * s;
   const me = cur, token = (cur.spinToken = {});
@@ -4268,7 +4336,23 @@ I.sort = ic("M7 4v16|M3 8l4-4 4 4|M17 20V4|M13 16l4 4 4-4", 18);
 // Labels: your own tags on a list (e.g. "Food", "Weekend"), shown as little
 // colored pills. Each label always gets the same color, picked from its name.
 const labelHue = (s) => [...s.toLowerCase()].reduce((h, c) => (h * 31 + c.charCodeAt(0)) % 360, 7);
-const labelPill = (s) => `<span class="pill-label" style="--h:${labelHue(s)}">${esc(s)}</span>`;
+// List labels each get their own colour from a set of well-spread hues (pink, blue, orange, green,
+// purple, yellow, teal, magenta, lime, indigo), handed out A–Z and kept once given, so no two
+// labels look alike. Past ten labels, the rest are spread by the golden angle.
+const LABEL_PALETTE = [350, 210, 28, 145, 275, 52, 185, 310, 100, 245];
+function listLabelHue(s) {
+  const m = db.labelHues || (db.labelHues = {});
+  if (m[s] == null) {
+    const names = [...new Set([...allLabels(), s])];
+    names.forEach((n) => {
+      if (m[n] != null) return;
+      const used = new Set(names.filter((x) => x !== n && m[x] != null).map((x) => m[x]));
+      m[n] = LABEL_PALETTE.find((h) => !used.has(h)) ?? Math.round((used.size * 137.508) % 360);
+    });
+  }
+  return m[s];
+}
+const labelPill = (s) => `<span class="pill-label" style="--h:${listLabelHue(s)}">${esc(s)}</span>`;
 const allLabels = (lists = db.lists) => [...new Set(lists.flatMap((l) => l.labels || []))].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
 const labelsField = (l) => `
   <div class="label">Labels</div>
@@ -4380,7 +4464,7 @@ function renderHome() {
   const chips = labels.length ? `
     <div class="chips-row" role="toolbar" aria-label="Filter by label">
       <button class="chip${db.view.label ? "" : " on"}" data-act="filterLabel" data-v="">All</button>
-      ${labels.map((s) => `<button class="chip${db.view.label === s ? " on" : ""}" data-act="filterLabel" data-v="${esc(s)}" style="--h:${labelHue(s)}"><i></i>${esc(s)}</button>`).join("")}
+      ${labels.map((s) => `<button class="chip${db.view.label === s ? " on" : ""}" data-act="filterLabel" data-v="${esc(s)}" style="--h:${listLabelHue(s)}"><i></i>${esc(s)}</button>`).join("")}
     </div>` : "";
 
   app.innerHTML = `
@@ -4415,26 +4499,31 @@ function renderResult(list) {
   if (!cur || cur.id !== list.id) {
     cur = { id: list.id, item: null, rec: false };
     roll(list);
-  } else if (cur.item && !list.items.includes(cur.item)) {
-    roll(list); // item was renamed or deleted while editing
+  } else if (cur.item && !activeItems(list).includes(cur.item)) {
+    roll(list); // item was renamed, deleted or switched off while editing
   }
+  const on = activeItems(list);
 
   // No point spinning a wheel with one slice, and skip it if the phone asks for less motion.
-  if (cur.spin && (list.items.length < 2 || reducedMotion())) cur.spin = false;
+  if (cur.spin && (on.length < 2 || reducedMotion())) cur.spin = false;
   const spinning = cur.spin;
   const size = (s) => (s.length <= 12 ? "s" : s.length <= 26 ? "m" : "l");
 
   let stage;
-  if (!list.items.length) {
-    stage = `
+  if (!on.length) {
+    stage = list.items.length ? `
+      <p class="empty-title">All items are switched off</p>
+      <p class="empty-text">Turn some back on in Edit.</p>
+      <button class="btn primary sm" data-act="edit">Edit list</button>` : `
       <p class="empty-title">This list is empty</p>
       <p class="empty-text">Add a few options first.</p>
       <button class="btn primary sm" data-act="edit">Add items</button>`;
   } else if (spinning) {
-    stage = wheelSVG(list.items);
+    stage = wheelSVG(on);
   } else {
     stage = `<button class="answer ${size(cur.item)}${cur.reveal ? " reveal" : ""}" data-act="copyResult">${esc(cur.item)}</button>` +
       badgePills(badgesOf(list, cur.item), `answer-badges${cur.reveal ? " reveal" : ""}`) +
+      (list.notes && list.notes[cur.item] ? `<p class="answer-note">${esc(list.notes[cur.item])}</p>` : "") +
       `<p class="copy-hint">Tap to copy</p>`;
     cur.reveal = false;
   }
@@ -4447,7 +4536,7 @@ function renderResult(list) {
         <button class="iconbtn" data-act="edit" aria-label="Edit list">${I.edit}</button>
       </div>
       <section class="stage${spinning ? " spin" : ""}" aria-live="polite">${stage}</section>
-      ${list.items.length ? `
+      ${on.length ? `
       <div class="actions">
         <button class="linkbtn" data-act="pick" ${spinning ? 'aria-disabled="true"' : ""}>${I.hand} Pick by hand</button>
         <div class="btn-row">
@@ -4597,7 +4686,8 @@ function renderCombo(list) {
 }
 
 function renderEdit(list) {
-  const items = list.items.map((it, i) => itemRow(list, it, i, "Item")).join("");
+  const f = editFilter(list, list.items);
+  const items = list.items.map((it, i) => (f.keep(it) ? itemRow(list, it, i, "Item") : "")).join("");
 
   app.innerHTML = `
     <main class="view">
@@ -4612,8 +4702,9 @@ function renderEdit(list) {
       </div>
       <textarea class="input desc-in" data-field="description" rows="1" placeholder="Add a description…" aria-label="Description">${esc(list.description || "")}</textarea>
       ${labelsField(list)}
-      <div class="label">Items · <span id="itemCount">${list.items.length}</span></div>
-      ${list.items.length ? `<div class="group" data-sort="items">${items}</div>` : `<p class="hint">No items yet. Add your first one below.</p>`}
+      <div class="label">Items · <span id="itemCount">${list.items.length}</span>${f.on ? ` · ${f.n} shown` : ""}</div>
+      ${f.html}
+      ${list.items.length ? (f.n ? `<div class="group"${f.on ? "" : ' data-sort="items"'}>${items}</div>` : `<p class="hint filter-none">No item has all of these labels.</p>`) : `<p class="hint">No items yet. Add your first one below.</p>`}
       <button class="dangerbtn" data-act="deleteList">Delete this list</button>
       <form class="addbar" data-form="add">
         <input class="input" id="addInput" placeholder="Add an item…" enterkeyhint="send" autocomplete="off">
@@ -4624,17 +4715,47 @@ function renderEdit(list) {
 }
 
 // One editable option: drag handle, its text, its badges, then badge and delete buttons.
+// Edit's label filter: kept while you stay on the same list or category.
+let editLabels = { key: null, pick: [], open: false };
+function editFilter(owner, items) {
+  if (editLabels.key !== owner.id) editLabels = { key: owner.id, pick: [], open: false };
+  const tier = (s) => ["Gold", "Diamond", "Rainbow"].indexOf(s) + 1 || 9; // tiers first, in order
+  const labels = [...new Set(items.flatMap((it) => badgesOf(owner, it)))].sort((a, b) => tier(a) - tier(b) || a.localeCompare(b));
+  const pick = editLabels.pick.filter((x) => labels.includes(x));
+  const keep = (it) => { const b = badgesOf(owner, it); return pick.every((x) => b.includes(x)); };
+  const n = items.filter(keep).length;
+  const html = labels.length ? `
+      <div class="pick-filter edit-filter">
+        <button class="filter-btn${pick.length ? " on" : ""}" data-act="editFilter" aria-expanded="${editLabels.open}" aria-haspopup="true">
+          <span class="filter-txt">${pick.length ? esc(pick.join(", ")) : "Filter by label"}</span>
+          ${pick.length ? `<span class="filter-n">${n}</span>` : ""}<span class="filter-chev">${I.chevDown}</span>
+        </button>
+        ${editLabels.open ? `
+        <div class="filter-menu" role="dialog" aria-label="Filter by label">
+          <div class="filter-list">${labels.map((x) => `
+            <label class="filter-opt"><input type="checkbox" value="${esc(x)}"${pick.includes(x) ? " checked" : ""}><span class="pill-label${x === "Rainbow" ? " rainbow" : ""}" style="--h:${badgeHue(x)}">${esc(x)}</span></label>`).join("")}
+          </div>
+          <div class="filter-foot">
+            <button class="btn sm" data-act="pickFilterClear">Clear</button>
+            <button class="btn primary sm" data-act="editFilterApply">Apply</button>
+          </div>
+        </div>` : ""}
+      </div>` : "";
+  return { html, keep, on: pick.length > 0, n };
+}
+
 // `owner` holds the options: a list, or a Multiple's category.
 function itemRow(owner, it, i, noun) {
-  const b = badgesOf(owner, it);
+  const b = badgesOf(owner, it), off = isOffItem(owner, it);
   return `
-    <div class="item-row">
+    <div class="item-row${off ? " off" : ""}">
       ${grip}
       <div class="item-main">
         <input class="item-in" data-field="item" data-i="${i}" value="${esc(it)}" enterkeyhint="done" aria-label="${noun} ${i + 1}">
         ${badgePills(b)}
-        ${optionNote(owner, it)}
+        <input class="note-in" data-field="note" data-i="${i}" value="${esc((owner.notes && owner.notes[it]) || "")}" placeholder="Add a description (optional)" enterkeyhint="done" aria-label="Description for ${esc(it)}">
       </div>
+      <button class="iconbtn sm eyebtn${off ? " is-off" : ""}" data-act="itemActive" data-i="${i}" aria-pressed="${!off}" aria-label="Include ${esc(it)} in the roll">${off ? I.eyeOff : I.eye}</button>
       <button class="iconbtn sm${b.length ? " has-badges" : ""}" data-act="badgeSheet" data-i="${i}" aria-label="Badges for ${esc(it)}">${I.tag}</button>
       <button class="iconbtn sm" data-act="delItem" data-i="${i}" aria-label="Delete ${esc(it)}">${I.x}</button>
     </div>`;
@@ -4685,7 +4806,8 @@ function renderMultiEdit(list) {
 // Edit one category of a Multiple: its name, an optional linked list, and its own options.
 function renderCatEdit(list, cat) {
   const l = linkedList(cat);
-  const items = cat.items.map((it, i) => itemRow(cat, it, i, "Option")).join("");
+  const f = editFilter(cat, cat.items);
+  const items = cat.items.map((it, i) => (f.keep(it) ? itemRow(cat, it, i, "Option") : "")).join("");
   const linked = l ? l.items.map((it) => `<div class="item-row ro"><span>${esc(it)}</span>${badgePills(badgesOf(l, it))}</div>`).join("") : "";
 
   app.innerHTML = `
@@ -4711,9 +4833,10 @@ function renderCatEdit(list, cat) {
       ${l ? `
       <div class="label">From ${esc(l.name)} · ${l.items.length}</div>
       ${l.items.length ? `<div class="group stack">${linked}</div>` : `<p class="hint">That list is empty.</p>`}` : ""}
-      <div class="label">${l ? "Extra options" : "Options"} · ${cat.items.length}</div>
+      <div class="label">${l ? "Extra options" : "Options"} · ${cat.items.length}${f.on ? ` · ${f.n} shown` : ""}</div>
+      ${f.html}
       ${cat.items.length
-        ? `<div class="group" data-sort="items">${items}</div>`
+        ? (f.n ? `<div class="group"${f.on ? "" : ' data-sort="items"'}>${items}</div>` : `<p class="hint filter-none">No option has all of these labels.</p>`)
         : `<p class="hint">${l ? "Add options that only this category has." : "No options yet. Add your first one below, or link a list."}</p>`}
       <form class="addbar inline" data-form="add">
         <input class="input" id="addInput" placeholder="Add an option…" enterkeyhint="send" autocomplete="off">
@@ -4799,9 +4922,9 @@ function renderSheet(again) {
   } else if (kind === "pick") {
     const list = cur && findList(cur.id);
     if (!list) return noSheet();
-    const rows = list.items.map((it, i) => `
+    const rows = activeItems(list).map((it, i) => `
         <button class="row compact" data-act="choose" data-i="${i}">
-          <span class="row-text"><div class="row-name">${esc(it)}</div>${badgePills(badgesOf(list, it))}</span>
+          <span class="row-text"><div class="row-name">${esc(it)}</div>${badgePills(badgesOf(list, it))}${optionNote(list, it)}</span>
           ${it === cur.item ? `<span class="check">${I.check}</span>` : ""}
         </button>`).join("");
     body = `<h2 class="sheet-title">${icon(list)} Pick by hand</h2><div class="group">${rows}</div>`;
@@ -5031,6 +5154,15 @@ const actions = {
   pickFilterClear: () => {
     document.querySelectorAll(".filter-menu input:checked").forEach((x) => { x.checked = false; });
   },
+  editFilter: () => {
+    editLabels.open = !editLabels.open;
+    render();
+  },
+  editFilterApply: () => {
+    editLabels.pick = [...document.querySelectorAll(".edit-filter .filter-menu input:checked")].map((x) => x.value);
+    editLabels.open = false;
+    render();
+  },
   pickFilterApply: () => {
     cur.pickLabels = [...document.querySelectorAll(".filter-menu input:checked")].map((x) => x.value);
     cur.pickOpen = false;
@@ -5056,7 +5188,7 @@ const actions = {
   pick: () => openSheet("pick"),
   choose: (el) => {
     const list = findList(cur.id);
-    const item = list.items[+el.dataset.i];
+    const item = activeItems(list)[+el.dataset.i];
     cur.item = item;
     record(list);
     closeSheet();
@@ -5138,9 +5270,19 @@ const actions = {
     name.focus();
     name.select();
   },
+  itemActive: (el) => {
+    const owner = editOwner(), it = editItems()[+el.dataset.i];
+    const off = new Set(owner.offItems || []);
+    off.has(it) ? off.delete(it) : off.add(it);
+    if (off.size) owner.offItems = [...off];
+    else delete owner.offItems;
+    save();
+    render();
+  },
   delItem: (el) => {
     const items = editItems(), owner = editOwner(), [gone] = items.splice(+el.dataset.i, 1);
     if (!items.includes(gone)) {
+      setOffItem(owner, gone, false);
       setBadges(owner, gone, []);
       if (isRare(owner, gone)) delete owner.rare;
       if (owner.notes) delete owner.notes[gone];
@@ -5281,6 +5423,14 @@ document.addEventListener("change", (e) => {
       if (d.levels && d.levels.by === old) d.levels.by = c.name;
       if (d.levels && d.levels.bonus && old in d.levels.bonus && c.name !== old) { d.levels.bonus[c.name] = d.levels.bonus[old]; delete d.levels.bonus[old]; }
     });
+  } else if (f === "note") {
+    const owner = editOwner(), it = editItems()[+e.target.dataset.i];
+    if (v) owner.notes = { ...(owner.notes || {}), [it]: v };
+    else if (owner.notes) {
+      delete owner.notes[it];
+      if (!Object.keys(owner.notes).length) delete owner.notes;
+    }
+    e.target.value = v;
   } else if (f === "item") {
     const i = +e.target.dataset.i, items = editItems(), owner = editOwner(), old = items[i];
     const b = badgesOf(owner, old);
@@ -5291,10 +5441,12 @@ document.addEventListener("change", (e) => {
       if (isRare(owner, old)) owner.rare.item = v; // so do its odds
       if (owner.shine && v !== old) Object.values(owner.shine).forEach((r) => { if (r.includes(old)) r[r.indexOf(old)] = v; }); // and its shine
       if (owner.notes && owner.notes[old] && v !== old) { owner.notes[v] = owner.notes[old]; delete owner.notes[old]; } // and its description
+      if (v !== old && isOffItem(owner, old)) { setOffItem(owner, old, false); setOffItem(owner, v, true); } // and whether it's switched off
       if (route().view === "cat") renameInFit(currentList(), owner, old, v); // and what it goes with
     } else {
       items.splice(i, 1);
       if (!items.includes(old)) {
+        setOffItem(owner, old, false);
         setBadges(owner, old, []);
         if (isRare(owner, old)) delete owner.rare;
         if (owner.notes) delete owner.notes[old];
@@ -5603,6 +5755,8 @@ function exportBackup() {
       ...(l.description && { description: l.description }),
       ...(l.labels && { labels: l.labels }),
       ...(l.badges && { badges: l.badges }),
+      ...(l.offItems && { offItems: l.offItems }),
+      ...(!isMulti(l) && l.notes && { notes: l.notes }),
       ...(l.image && { image: l.image }),
     };
     if (isMulti(l)) {
@@ -5610,7 +5764,7 @@ function exportBackup() {
         type: "multi", ...extra,
         categories: l.cats.map((c) => {
           const k = linkedList(c);
-          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }), ...(c.rare && { rare: c.rare }), ...(c.fit && { fit: c.fit }), ...(c.notes && { notes: c.notes }), ...(c.unique && { unique: c.unique }), ...(c.starts && { starts: c.starts }), ...(c.grow && { grow: c.grow }), ...(c.levels && { levels: c.levels }), ...(c.shine && { shine: c.shine }), ...(c.pills && { pills: true }) };
+          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }), ...(c.rare && { rare: c.rare }), ...(c.fit && { fit: c.fit }), ...(c.notes && { notes: c.notes }), ...(c.unique && { unique: c.unique }), ...(c.starts && { starts: c.starts }), ...(c.grow && { grow: c.grow }), ...(c.levels && { levels: c.levels }), ...(c.shine && { shine: c.shine }), ...(c.pills && { pills: true }), ...(c.offItems && { offItems: c.offItems }) };
         }),
       };
     } else {
@@ -5660,6 +5814,7 @@ $("#file").addEventListener("change", async (e) => {
         ...(cleanLevels(c.levels) && { levels: cleanLevels(c.levels) }),
         ...(cleanShine(c.shine) && { shine: cleanShine(c.shine) }),
         ...(c.pills === true && { pills: true }),
+        ...(Array.isArray(c.offItems) && c.offItems.length && { offItems: clean(c.offItems) }),
         ...(cleanFit(c.fit) && { fit: cleanFit(c.fit) }),
         ...(cleanNotes(c.notes) && { notes: cleanNotes(c.notes) }),
         ...(typeof c.unique === "string" && { unique: c.unique }),
@@ -5678,6 +5833,8 @@ $("#file").addEventListener("change", async (e) => {
     if (labels && labels.length) list.labels = labels;
     const badges = multi ? null : Array.isArray(v) ? prev && prev.badges : cleanBadges(v.badges);
     if (badges) list.badges = badges;
+    if (!multi && !Array.isArray(v) && cleanNotes(v.notes)) list.notes = cleanNotes(v.notes);
+    if (!multi && !Array.isArray(v) && Array.isArray(v.offItems) && v.offItems.length) list.offItems = clean(v.offItems);
     if (Array.isArray(v) ? prev && prev.off : v.off === true) list.off = true;
     list.created = prev ? prev.created : Date.now() + i; // keeps the backup's order for "Date created"
     return list;
