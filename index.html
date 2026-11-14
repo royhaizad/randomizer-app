@@ -703,6 +703,14 @@ const BACKUP = {"Dadu":["1","2","3","4","5","6"],"MyTown makan mana":["Mi Tarik"
 const ORDER = ["Dadu", "MyTown makan mana", "Masak apa"];
 
 const EMOJI = { "Dadu": "🎲", "MyTown makan mana": "🛍️", "Masak apa": "🍳" };
+// "Order mamak": what to order at a mamak. Masak and Protein follow Carbs by their labels
+// (Canai → Roti; Ayam and Daging only with rice or noodles). Minum follows "Minum panas ke
+// sejuk": juices and ExtraJoss are labelled Ais, so they always come cold.
+const MAMAK = {"name":"Order mamak","emoji":"🧩","labels":["Makan"],"cats":[{"name":"Carbs","items":["Nasi","Roti","Mee","Kuey Teow","Bihun"]},{"name":"Masak","follow":"Carbs","items":["Goreng","Goreng mamak","Lemak","Kandar","Canai","Telur","Tisu","Bawang","Susu","Tosai","Chapati","Planta","Bakar","Naan"],"badges":{"Goreng":["Nasi","Mee","Kuey Teow","Bihun"],"Goreng mamak":["Nasi","Mee","Kuey Teow","Bihun"],"Lemak":["Nasi"],"Kandar":["Nasi"],"Canai":["Roti"],"Telur":["Roti"],"Tisu":["Roti"],"Bawang":["Roti"],"Susu":["Roti"],"Tosai":["Roti"],"Chapati":["Roti"],"Planta":["Roti"],"Bakar":["Roti"],"Naan":["Roti"]}},{"name":"Protein","follow":"Carbs","items":["Ayam","Daging","None"],"badges":{"Ayam":["Nasi","Mee","Kuey Teow","Bihun"],"Daging":["Nasi","Mee","Kuey Teow","Bihun"]}},{"name":"Extra request","items":["Tak nak sayur","Kuah banjir","Telur mata","Nasi lebih","Telur separuh masak","None","Ayam Tandoori","Sos cili"]},{"name":"Minum","follow":"Minum panas ke sejuk","badges":{"ExtraJoss Manga":["Ais"],"ExtraJoss Ori":["Ais"],"ExtraJoss Anggur":["Ais"],"Jus Epal":["Ais"],"Jus Oren":["Ais"],"Jus Tembikai":["Ais"]},"items":["Milo","Teh","Teh O","Milo O","Kopi","Kopi O","Nescafe","Nescafe O","Neslo","ExtraJoss Manga","ExtraJoss Ori","ExtraJoss Anggur","Jus Epal","Jus Oren","Jus Tembikai","Laici","Air Barli","Teh Lemon","Teh Halia","Air Halia","Honey Lemon","Limau","Horlicks"]},{"name":"Minum panas ke sejuk","items":["Ais","Suam","Panas"]}]};
+const mamakMulti = () => ({
+  id: uid(), name: MAMAK.name, emoji: MAMAK.emoji, type: "multi", labels: [...MAMAK.labels], created: Date.now(),
+  cats: MAMAK.cats.map((c) => ({ id: uid(), ...structuredClone(c) })),
+});
 // Labels a new install starts with, by list name.
 const DEFAULT_LABELS = {
   "Random Pokémon": ["Fun"], "Random Pal": ["Fun"], "Random country": ["Fun"], "Dadu": ["Fun"],
@@ -3671,6 +3679,40 @@ function load() {
     ult.cats.push(...ultimateMulti().cats.filter((c) => !have.has(c.name)));
   }
   d.ultimateMerged = true;
+  // Once: in a saved Order mamak, juices and ExtraJoss must be cold (labels you gave a drink stay).
+  if (!d.mamakColdDrinks) {
+    const m = d.lists.find((l) => l.name === MAMAK.name && l.type === "multi");
+    const minum = m && m.cats.find((c) => c.name === "Minum");
+    if (minum && m.cats.some((c) => c.name === "Minum panas ke sejuk")) {
+      if (!minum.follow) minum.follow = "Minum panas ke sejuk";
+      const want = MAMAK.cats.find((c) => c.name === "Minum").badges;
+      minum.badges = minum.badges || {};
+      Object.entries(want).forEach(([it, b]) => { if (minum.items.includes(it) && !(minum.badges[it] && minum.badges[it].length)) minum.badges[it] = [...b]; });
+    }
+    d.mamakColdDrinks = true;
+  }
+  // Order mamak, after Masak apa. It comes back if deleted; a list with its name gets, once, any
+  // categories and options it is missing, Carbs' "Nasi lemak" becomes "Nasi", and Masak and
+  // Protein follow Carbs (labels you already gave an option stay).
+  const mamak = d.lists.find((l) => l.name === MAMAK.name);
+  if (!mamak) {
+    const at = d.lists.findIndex((l) => l.name === "Masak apa");
+    d.lists.splice(at < 0 ? d.lists.length : at + 1, 0, mamakMulti());
+  } else if (!d.mamakMerged && mamak.type === "multi") {
+    MAMAK.cats.forEach((m) => {
+      const c = mamak.cats.find((x) => x.name === m.name);
+      if (!c) return mamak.cats.push({ id: uid(), ...structuredClone(m) });
+      if (m.name === "Carbs" && c.items.includes("Nasi lemak") && !c.items.includes("Nasi")) c.items[c.items.indexOf("Nasi lemak")] = "Nasi";
+      m.items.forEach((it) => { if (!c.items.includes(it)) c.items.push(it); });
+      if (m.follow && !c.follow) c.follow = m.follow;
+      Object.entries(m.badges || {}).forEach(([it, b]) => {
+        c.badges = c.badges || {};
+        if (!(c.badges[it] && c.badges[it].length)) c.badges[it] = [...b];
+      });
+    });
+    if (!mamak.labels) mamak.labels = [...MAMAK.labels];
+  }
+  d.mamakMerged = true;
   // Lists made before "Date created" existed count as created in their current order.
   const base = Date.now() - d.lists.length * 1000;
   d.lists.forEach((l, i) => { if (!l.created) l.created = base + i * 1000; });
@@ -3803,8 +3845,18 @@ function usualVals(list, x, val) {
   const o = x.items, i = o.indexOf(p);
   return i < 0 ? [p] : i === o.length - 1 ? o.slice(-2) : i ? [o[i - 1]] : [];
 }
-// Does `a` go with `b` by a's table for b?
+// `follow`: "Other category". An option of this one labelled with any of that category's
+// options only goes with those; an option with none of them goes with anything.
+// (Masak follows Carbs: Canai is labelled Roti, so it only comes with Roti.)
+function followFits(list, a, b, val) {
+  if (a.follow !== b.name) return true;
+  const l = linkedList(b), theirs = new Set([...(l ? l.items : []), ...b.items]);
+  const keys = optionBadges(list, a, val(a)).filter((x) => theirs.has(x));
+  return !keys.length || keys.includes(val(b));
+}
+// Does `a` go with `b` by a's table for b (and by what it follows)?
 function pairFits(list, a, b, val) {
+  if (!followFits(list, a, b, val)) return false;
   const t = a.fit && a.fit[b.name];
   if (!t) return true;
   if (!a.grow && !b.grow) return inFit(t, val(b), val(a));
@@ -4338,6 +4390,7 @@ const I = {
   trash: ic("M3 6h18|M8 6V4h8v2|M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6|M10 11v6|M14 11v6", 24),
   layers: ic("M12 2L2 7l10 5 10-5-10-5z|M2 17l10 5 10-5|M2 12l10 5 10-5", 20),
   layersSm: ic("M12 2L2 7l10 5 10-5-10-5z|M2 17l10 5 10-5|M2 12l10 5 10-5", 11, 2.6),
+  follow: ic("M15 10l5 5-5 5|M4 4v7a4 4 0 0 0 4 4h12", 20),
   link: ic("M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71|M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71", 20),
   lock: ic("M6 11h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z|M8 11V7a4 4 0 0 1 8 0v4", 20),
   unlock: ic("M6 11h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1z|M8 11V7a4 4 0 0 1 7.75-1.4", 20),
@@ -4781,7 +4834,7 @@ function itemRow(owner, it, i, noun) {
 function renderMultiEdit(list) {
   const rows = list.cats.map((c) => {
     const l = linkedList(c), n = catOptions(c).length;
-    const follows = Object.keys(c.fit || {}).filter((name) => list.cats.some((x) => x.name === name));
+    const follows = [...new Set([...(c.follow ? [c.follow] : []), ...Object.keys(c.fit || {})])].filter((name) => list.cats.some((x) => x.name === name));
     const from = l ? `<span>&nbsp;· </span><span class="ellip">${icon(l)} ${esc(l.name)}${c.items.length ? ` + ${c.items.length}` : ""}</span>`
       : follows.length ? `<span>&nbsp;· </span><span class="ellip">Follows ${esc(follows.join(", "))}</span>` : "";
     return `
@@ -4845,6 +4898,15 @@ function renderCatEdit(list, cat) {
           </span>
           <span class="chev">${I.chev}</span>
         </button>
+        ${list.cats.length > 1 ? `
+        <button class="row" data-act="followSheet">
+          <span class="menu-icon">${I.follow}</span>
+          <span class="row-text">
+            <div class="row-name">${cat.follow ? `Follows ${esc(cat.follow)}` : "Follow a category"}</div>
+            <div class="row-sub">${cat.follow ? `Options labelled with a ${esc(cat.follow)} option only go with it` : "Match options to another category by their labels"}</div>
+          </span>
+          <span class="chev">${I.chev}</span>
+        </button>` : ""}
       </div>
       ${l ? `
       <div class="label">From ${esc(l.name)} · ${l.items.length}</div>
@@ -4976,7 +5038,16 @@ function renderSheet(again) {
     const mine = badgesOf(owner, badgeItem);
     // Badges un-ticked while the sheet is open stay listed, so they can be ticked again.
     seenBadges = [...new Set([...seenBadges, ...allBadges(owner)])];
-    const all = [...seenBadges].sort((a, b) => a.localeCompare(b));
+    // A category that follows another one: that category's options are offered as labels, in its order.
+    const by = route().view === "cat" && owner.follow && currentList().cats.find((x) => x.name === owner.follow && x !== owner);
+    const byOpts = by ? [...new Set([...((linkedList(by) || {}).items || []), ...by.items])] : [];
+    const all = [...seenBadges].filter((x) => !byOpts.includes(x)).sort((a, b) => a.localeCompare(b));
+    const tick = (x) => `
+        <button class="row compact" data-act="toggleBadge" data-v="${esc(x)}">
+          <span class="row-text">${badgePills([x])}</span>
+          ${mine.includes(x) ? `<span class="check">${I.check}</span>` : ""}
+        </button>`;
+    const followRows = byOpts.map(tick).join("");
     const rows = all.map((s) => `
         <button class="row compact" data-act="toggleBadge" data-v="${esc(s)}">
           <span class="row-text">${badgePills([s])}</span>
@@ -4989,7 +5060,8 @@ function renderSheet(again) {
         <input class="input" id="badgeInput" placeholder="New badge…" maxlength="24" enterkeyhint="done" autocomplete="off">
         <button class="btn primary sm" type="submit">Add</button>
       </form>
-      ${all.length ? `<div class="label sheet-label">Used in this ${route().view === "cat" ? "category" : "list"} · tap to add or remove</div><div class="group">${rows}</div>` : ""}`;
+      ${byOpts.length ? `<div class="label sheet-label">From ${esc(by.name)} · only comes with the ticked ones</div><div class="group">${followRows}</div>` : ""}
+      ${all.length ? `<div class="label sheet-label">${byOpts.length ? "Other labels" : `Used in this ${route().view === "cat" ? "category" : "list"}`} · tap to add or remove</div><div class="group">${rows}</div>` : ""}`;
   } else if (kind === "hide") {
     const list = cur && findList(cur.id);
     if (!list || !isMulti(list)) return noSheet();
@@ -5065,6 +5137,16 @@ function renderSheet(again) {
         </button>`).join("");
     const note = shown.length < o.length ? " Only options that go with your locked results are shown." : "";
     body = `<h2 class="sheet-title">${esc(c.name)}</h2><p class="hint">Your choice stays locked when you reroll.${note}</p>${chips}${rows.trim() ? `<div class="group">${rows}</div>` : `<p class="hint filter-none">No option has all of these labels.</p>`}`;
+  } else if (kind === "follow") {
+    const list = currentList(), c = currentCat();
+    if (!c) return noSheet();
+    const others = list.cats.filter((x) => x !== c);
+    const rows = [{ name: "" }, ...others].map((x) => `
+        <button class="row compact" data-act="setFollow" data-name="${esc(x.name)}">
+          <span class="row-text"><div class="row-name">${x.name ? esc(x.name) : "Don't follow a category"}</div>${x.name ? `<div class="row-sub">${plural(catOptions(x).length, "option")}</div>` : ""}</span>
+          ${(c.follow || "") === x.name ? `<span class="check">${I.check}</span>` : ""}
+        </button>`).join("");
+    body = `<h2 class="sheet-title">Follow a category</h2><p class="hint">Label an option here with that category's options (Canai → Roti) and it only comes up with them. Options without one of those labels go with anything.</p><div class="group">${rows}</div>`;
   } else if (kind === "link") {
     const c = currentCat();
     if (!c) return noSheet();
@@ -5331,8 +5413,17 @@ const actions = {
     const list = currentList(), c = currentCat();
     if (c.items.length && !(await ask(`Delete “${c.name}”?`, `Its ${plural(c.items.length, "option")} will be deleted too.`, "Delete"))) return;
     list.cats = list.cats.filter((x) => x !== c);
+    list.cats.forEach((d) => { if (d.follow === c.name) delete d.follow; });
     save();
     back("/edit/" + list.id);
+  },
+  followSheet: () => openSheet("follow"),
+  setFollow: (el) => {
+    const c = currentCat();
+    if (el.dataset.name) c.follow = el.dataset.name;
+    else delete c.follow;
+    save();
+    closeSheet();
   },
   linkSheet: () => openSheet("link"),
   setLink: (el) => {
@@ -5433,6 +5524,7 @@ document.addEventListener("change", (e) => {
     // Categories that follow this one keep following it.
     currentList().cats.forEach((d) => {
       if (d.fit && d.fit[old] && c.name !== old) { d.fit[c.name] = d.fit[old]; delete d.fit[old]; }
+      if (d.follow === old) d.follow = c.name;
       const st = d.starts && d.starts.by;
       if (st && st[old] && c.name !== old) { st[c.name] = st[old]; delete st[old]; }
       if (d.grow && d.grow.by === old) d.grow.by = c.name;
@@ -5459,6 +5551,10 @@ document.addEventListener("change", (e) => {
       if (owner.notes && owner.notes[old] && v !== old) { owner.notes[v] = owner.notes[old]; delete owner.notes[old]; } // and its description
       if (v !== old && isOffItem(owner, old)) { setOffItem(owner, old, false); setOffItem(owner, v, true); } // and whether it's switched off
       if (route().view === "cat") renameInFit(currentList(), owner, old, v); // and what it goes with
+      if (route().view === "cat" && v !== old) currentList().cats.forEach((d) => { // and labels in categories that follow it
+        if (d.follow !== owner.name || !d.badges) return;
+        Object.values(d.badges).forEach((b) => { const k = b.indexOf(old); if (k >= 0 && !b.includes(v)) b[k] = v; });
+      });
     } else {
       items.splice(i, 1);
       if (!items.includes(old)) {
@@ -5780,7 +5876,7 @@ function exportBackup() {
         type: "multi", ...extra,
         categories: l.cats.map((c) => {
           const k = linkedList(c);
-          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }), ...(c.rare && { rare: c.rare }), ...(c.fit && { fit: c.fit }), ...(c.notes && { notes: c.notes }), ...(c.unique && { unique: c.unique }), ...(c.starts && { starts: c.starts }), ...(c.grow && { grow: c.grow }), ...(c.levels && { levels: c.levels }), ...(c.shine && { shine: c.shine }), ...(c.pills && { pills: true }), ...(c.offItems && { offItems: c.offItems }) };
+          return { name: c.name, ...(c.off && { off: true }), ...(k && { link: k.name }), items: c.items, ...(c.badges && { badges: c.badges }), ...(c.rare && { rare: c.rare }), ...(c.fit && { fit: c.fit }), ...(c.notes && { notes: c.notes }), ...(c.unique && { unique: c.unique }), ...(c.starts && { starts: c.starts }), ...(c.grow && { grow: c.grow }), ...(c.levels && { levels: c.levels }), ...(c.shine && { shine: c.shine }), ...(c.pills && { pills: true }), ...(c.follow && { follow: c.follow }), ...(c.offItems && { offItems: c.offItems }) };
         }),
       };
     } else {
@@ -5830,6 +5926,7 @@ $("#file").addEventListener("change", async (e) => {
         ...(cleanLevels(c.levels) && { levels: cleanLevels(c.levels) }),
         ...(cleanShine(c.shine) && { shine: cleanShine(c.shine) }),
         ...(c.pills === true && { pills: true }),
+        ...(typeof c.follow === "string" && c.follow.trim() && { follow: c.follow.trim() }),
         ...(Array.isArray(c.offItems) && c.offItems.length && { offItems: clean(c.offItems) }),
         ...(cleanFit(c.fit) && { fit: cleanFit(c.fit) }),
         ...(cleanNotes(c.notes) && { notes: cleanNotes(c.notes) }),
