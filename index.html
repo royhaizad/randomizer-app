@@ -570,6 +570,12 @@
 
   /* ---------- Edit list screen ---------- */
   .name-row { display: flex; gap: 10px; margin: 8px 0 10px; }
+  /* In Edit, the name stays pinned under the top bar, with the same background. */
+  .topbar + .name-row {
+    position: sticky; top: calc(64px + env(safe-area-inset-top)); z-index: 4;
+    margin: 0 -16px 2px; padding: 8px 16px 10px;
+    background: radial-gradient(120% 50% at 50% -10%, var(--accent-soft), transparent 60%) fixed, var(--bg);
+  }
   .input {
     width: 100%; height: 50px; padding: 0 14px;
     background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
@@ -608,8 +614,10 @@
     background: linear-gradient(to bottom, transparent, var(--bg) 30%);
   }
   .addbar .btn { box-shadow: none; }
-  /* Category editor: the add field sits right under the options instead of the bottom. */
+  /* Sheets: the add field sits right under the list instead of the bottom. */
   .addbar.inline { position: static; margin: 12px 0 0; padding: 0; background: none; }
+  /* Category editor: right under the options, and pinned to the bottom while they scroll. */
+  .addbar.cat-add { margin-top: 0; padding-top: 14px; padding-bottom: calc(14px + env(safe-area-inset-bottom)); z-index: 4; }
 
   /* ---------- Manage (edit lists) ---------- */
   .row.off .emoji { opacity: 0.45; }
@@ -4846,7 +4854,7 @@ function renderCatEdit(list, cat) {
       ${cat.items.length
         ? (f.n ? `<div class="group"${f.on ? "" : ' data-sort="items"'}>${items}</div>` : `<p class="hint filter-none">No option has all of these labels.</p>`)
         : `<p class="hint">${l ? "Add options that only this category has." : "No options yet. Add your first one below, or link a list."}</p>`}
-      <form class="addbar inline" data-form="add">
+      <form class="addbar cat-add" data-form="add">
         <input class="input" id="addInput" placeholder="Add an option…" enterkeyhint="send" autocomplete="off">
         <button class="btn primary sm" type="submit">Add</button>
       </form>
