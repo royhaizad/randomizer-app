@@ -709,7 +709,7 @@ const EMOJI = { "Dadu": "🎲", "MyTown makan mana": "🛍️", "Masak apa": "�
 // Chapati are carbs of their own (Tosai telur, Naan cheese, Chapati biasa), and Manis is the sugar.
 // Extra request follows Carbs and Masak (Kuah banjir with roti canai or nasi kandar, Nasi lebih with
 // nasi) and is None about half the time; Ayam tandoori is a Protein that comes with Naan.
-const MAMAK = {"name":"Order mamak","emoji":"🧩","labels":["Makan"],"cats":[{"name":"Carbs","items":["Nasi","Roti","Mee","Kuey Teow","Bihun","Maggi","Tosai","Naan","Chapati"]},{"name":"Masak","follow":"Carbs","items":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Lemak","Kandar","Sup","Kari","Biasa","Canai","Telur","Telur bawang","Tisu","Bawang","Susu","Planta","Bakar","Cheese"],"badges":{"Goreng":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng mamak":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng kampung":["Nasi"],"Goreng pattaya":["Nasi","Mee"],"Lemak":["Nasi"],"Kandar":["Nasi"],"Sup":["Mee","Kuey Teow","Bihun","Maggi"],"Kari":["Mee","Maggi"],"Biasa":["Tosai","Naan","Chapati"],"Canai":["Roti"],"Telur":["Roti","Tosai"],"Telur bawang":["Roti"],"Tisu":["Roti"],"Bawang":["Roti","Tosai"],"Susu":["Roti"],"Planta":["Roti"],"Bakar":["Roti"],"Cheese":["Roti","Naan"]}},{"name":"Protein","follow":"Carbs","items":["Ayam","Daging","Ayam tandoori","None"],"badges":{"Ayam":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Daging":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Ayam tandoori":["Naan"]}},{"name":"Extra request","items":["Tak nak sayur","Kuah banjir","Telur mata","Nasi lebih","Telur separuh masak","None","Sos cili"],"follow":["Carbs","Masak"],"badges":{"Tak nak sayur":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Sup","Kari","Kandar"],"Kuah banjir":["Canai","Telur","Telur bawang","Bawang","Kandar"],"Telur mata":["Goreng","Goreng mamak","Goreng kampung","Lemak"],"Nasi lebih":["Nasi"],"Telur separuh masak":["Bakar"]},"often":{"item":"None","share":0.5}},{"name":"Minum","follow":"Minum panas ke sejuk","badges":{"ExtraJoss Manga":["Ais"],"ExtraJoss Ori":["Ais"],"ExtraJoss Anggur":["Ais"],"Jus Epal":["Ais"],"Jus Oren":["Ais"],"Jus Tembikai":["Ais"]},"items":["Milo","Teh","Teh tarik","Teh O","Milo O","Kopi","Kopi O","Nescafe","Nescafe tarik","Nescafe O","Neslo","ExtraJoss Manga","ExtraJoss Ori","ExtraJoss Anggur","Jus Epal","Jus Oren","Jus Tembikai","Laici","Air Barli","Teh Lemon","Teh Halia","Air Halia","Honey Lemon","Limau","Horlicks"]},{"name":"Minum panas ke sejuk","items":["Ais","Suam","Panas"]},{"name":"Manis","items":["Biasa","Kurang manis","Kosong"]}]};
+const MAMAK = {"name":"Order mamak","emoji":"🧩","labels":["Makan"],"cats":[{"name":"Carbs","items":["Nasi","Roti","Mee","Kuey Teow","Bihun","Maggi","Tosai","Naan","Chapati","Murtabak"]},{"name":"Masak","follow":"Carbs","items":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Lemak","Kandar","Sup","Kari","Rebus","Bandung","Biasa","Canai","Telur","Telur bawang","Tisu","Bawang","Susu","Planta","Bakar","Cheese","Sardin","Pisang","Bom","Ayam","Daging"],"badges":{"Goreng":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng mamak":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Goreng kampung":["Nasi"],"Goreng pattaya":["Nasi","Mee"],"Lemak":["Nasi"],"Kandar":["Nasi"],"Sup":["Mee","Kuey Teow","Bihun","Maggi"],"Kari":["Mee","Maggi"],"Biasa":["Tosai","Naan","Chapati"],"Canai":["Roti"],"Telur":["Roti","Tosai"],"Telur bawang":["Roti"],"Tisu":["Roti"],"Bawang":["Roti","Tosai"],"Susu":["Roti"],"Planta":["Roti"],"Bakar":["Roti"],"Cheese":["Roti","Naan"],"Rebus":["Mee"],"Bandung":["Mee"],"Sardin":["Roti"],"Pisang":["Roti"],"Bom":["Roti"],"Ayam":["Murtabak"],"Daging":["Murtabak"]}},{"name":"Protein","follow":["Carbs","Masak"],"items":["Ayam","Daging","Ayam tandoori","Udang","Sotong","None"],"badges":{"Ayam":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Daging":["Nasi","Mee","Kuey Teow","Bihun","Maggi"],"Ayam tandoori":["Naan"],"Udang":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya"],"Sotong":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya"]}},{"name":"Extra request","items":["Tak nak sayur","Kuah banjir","Telur mata","Nasi lebih","Telur separuh masak","None","Sos cili","Kuah asing","Pedas","Kurang pedas","Double"],"follow":["Carbs","Masak"],"badges":{"Tak nak sayur":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Sup","Kari","Kandar","Rebus","Bandung"],"Kuah banjir":["Canai","Telur","Telur bawang","Bawang","Kandar"],"Telur mata":["Goreng","Goreng mamak","Goreng kampung","Lemak"],"Nasi lebih":["Nasi"],"Telur separuh masak":["Bakar"],"Sos cili":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Telur","Telur bawang","Ayam","Daging"],"Kuah asing":["Canai","Telur","Telur bawang","Bawang","Kandar"],"Pedas":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Kari","Kandar","Lemak"],"Kurang pedas":["Goreng","Goreng mamak","Goreng kampung","Goreng pattaya","Kari","Kandar","Lemak"],"Double":["Maggi","Roti"]},"often":{"item":"None","share":0.5}},{"name":"Minum","follow":"Minum panas ke sejuk","badges":{"ExtraJoss Manga":["Ais"],"ExtraJoss Ori":["Ais"],"ExtraJoss Anggur":["Ais"],"Jus Epal":["Ais"],"Jus Oren":["Ais"],"Jus Tembikai":["Ais"],"Milo Dinosaur":["Ais"]},"items":["Milo","Teh","Teh tarik","Teh O","Teh O limau","Milo O","Milo Dinosaur","Kopi","Kopi O","Nescafe","Nescafe tarik","Nescafe O","Neslo","ExtraJoss Manga","ExtraJoss Ori","ExtraJoss Anggur","Jus Epal","Jus Oren","Jus Tembikai","Laici","Air Barli","Teh Lemon","Teh Halia","Air Halia","Honey Lemon","Limau","Horlicks","Sirap","Sirap bandung","Sirap limau"]},{"name":"Minum panas ke sejuk","items":["Ais","Suam","Panas"]},{"name":"Manis","items":["Biasa","Kurang manis","Kosong"]}]};
 const mamakMulti = () => ({
   id: uid(), name: MAMAK.name, emoji: MAMAK.emoji, type: "multi", labels: [...MAMAK.labels], created: Date.now(),
   cats: MAMAK.cats.map((c) => ({ id: uid(), ...structuredClone(c) })),
@@ -3758,6 +3758,40 @@ function load() {
       pr.badges = { ...(pr.badges || {}), "Ayam tandoori": ["Naan"] };
     }
     d.mamakExtras = true;
+  }
+  // Once: more of what people order at a mamak: Murtabak; Mee rebus, Mee bandung; Roti sardin,
+  // pisang, bom; Udang and Sotong (with goreng dishes); Kuah asing, Pedas, Kurang pedas, Double;
+  // Milo Dinosaur (cold), Teh O limau, Sirap drinks. Sos cili only comes with goreng dishes and roti
+  // telur / murtabak. Options and labels are only added; labels you gave an option stay.
+  if (!d.mamakMore) {
+    const m = d.lists.find((l) => l.name === MAMAK.name && l.type === "multi");
+    if (m) {
+      const want = Object.fromEntries(MAMAK.cats.map((c) => [c.name, c]));
+      const names = new Set(m.cats.map((c) => c.name));
+      m.cats.forEach((c) => {
+        const w = want[c.name];
+        if (!w) return;
+        w.items.forEach((it, i) => {
+          if (c.items.includes(it)) return;
+          const prev = w.items.slice(0, i).reverse().find((x) => c.items.includes(x)); // keep the new order
+          c.items.splice(prev ? c.items.indexOf(prev) + 1 : c.items.length, 0, it);
+        });
+        Object.entries(w.badges || {}).forEach(([it, b]) => {
+          c.badges = c.badges || {};
+          if (c.items.includes(it) && !(c.badges[it] && c.badges[it].length)) c.badges[it] = [...b];
+        });
+        if (w.follow) {
+          const now = Array.isArray(c.follow) ? c.follow : c.follow ? [c.follow] : [];
+          const fl = [...new Set([...now, ...(Array.isArray(w.follow) ? w.follow : [w.follow])])].filter((n) => names.has(n));
+          if (fl.length) c.follow = fl.length === 1 ? fl[0] : fl;
+        }
+      });
+      // Tak nak sayur also goes with Mee rebus and Mee bandung.
+      const ex = m.cats.find((c) => c.name === "Extra request");
+      const tns = ex && ex.badges && ex.badges["Tak nak sayur"];
+      if (tns) ["Rebus", "Bandung"].forEach((x) => { if (!tns.includes(x)) tns.push(x); });
+    }
+    d.mamakMore = true;
   }
   // Order mamak, after Masak apa. It comes back if deleted; a list with its name gets, once, any
   // categories and options it is missing, Carbs' "Nasi lemak" becomes "Nasi", and Masak and
