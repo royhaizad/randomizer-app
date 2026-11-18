@@ -722,6 +722,135 @@ const mamakMulti = () => ({
   id: uid(), name: MAMAK.name, emoji: MAMAK.emoji, type: "multi", labels: [...MAMAK.labels], created: Date.now(),
   cats: MAMAK.cats.map((c) => ({ id: uid(), ...structuredClone(c) })),
 });
+// "Game Idea Generator": a game idea to vibecode, made only from the games, flash games, anime and
+// films you like, and only from the parts of each you like.
+// Game is one of your games; its description gives its genre and the mechanics you like in it.
+// Camera Angle and Art style follow Dimension.
+// Your games, each with its genre and the mechanics and loops you like in it.
+const GI_GAMES = {
+  "Flappy Bird": "Endless runner. One-tap control: easy to learn, hard to master.",
+  "Temple Run / Subway Surfers": "Endless runner. Swipe to turn, jump and slide.",
+  "Tank Trouble": "Arena duel. Bullets bounce off walls, even back at you; a new random maze every round; power-ups on the floor (laser, gatling, homing missile); 2-3 players on one keyboard.",
+  "Territory War Online": "Artillery turns. Walk, then aim with angle and power; pick your loadout; win matches to unlock weapons and outfits.",
+  "Tanks": "Artillery turns. Turn-based tank artillery with angle and power over hills.",
+  "Fleabag vs. Mutt": "Artillery turns. Throw over a wall with power and wind; quick 1v1 rounds against the computer or a friend.",
+  "Animal Wars": "Artillery turns. Teams of animals battle in turns, Worms-style.",
+  "Arcanists": "Spell artillery duel. Pick a spellbook before the match, aim spells with power, summon minions and reshape the land; win to unlock new spellbooks.",
+  "Vampire Survivors": "Survivors-like. Weapons attack on their own; pick 1 of 3 upgrades every level; a weapon plus the right passive evolves it; unlock characters and permanent power-ups.",
+  "Brotato": "Survivors-like. Shop between waves; hold 6 weapons and merge copies to upgrade them; weird characters change the whole run.",
+  "Risk of Rain": "Survivors-like. Items stack endlessly and their effects chain; unlock survivors, each with 4 skills.",
+  "Boxhead": "Survivors-like. Endless zombie waves with devils that shoot back; kill combos unlock new weapons; barricades and explosive barrels; 2 players.",
+  "Ori and the Blind Forest": "Platformer / metroidvania. Bash off enemies and their shots, wall jump and double jump; new abilities open new paths.",
+  "Hollow Knight": "Platformer / metroidvania. Explore, map the world, beat tough bosses.",
+  "Armed with Wings": "Platformer. Steer your eagle partner to hit switches and enemies; fight through the story level by level.",
+  "Level Up!": "Platformer. Level yourself up step by step to reach your goal.",
+  "Chaos Faction 2": "Platform fighter. Platform deathmatch with weapon pickups, a big roster with their own moves, and a story campaign.",
+  "Stick Fight: The Game": "Platform fighter. Wobbly physics fighting; the level itself kills (spikes, lava, falling blocks); quick rounds with local friends.",
+  "Metal Mayhem": "Platform fighter. Deathmatch with jetpacks and weapon pickups; win rounds to unlock maps and weapons.",
+  "Raze": "Platform shooter. Abilities and grenades; earn credits for weapons, perks and armour.",
+  "The Fight for Glorton": "Platform fighter. Special moves in a platform brawl.",
+  "Capoeira Fighter": "1v1 fighting. Kick combos and special moves.",
+  "Dragon Fist": "1v1 fighting. Combos and special moves; a story mode that unlocks fighters.",
+  "Bullet Time Fighting": "1v1 fighting. Slow motion: dodge bullets, then strike.",
+  "Electricman 2": "1v1 fighting. Slow-motion counters, throws and kicks; climb a tournament bracket.",
+  "Kingdom Rush": "Tower defence. 4 tower types, each upgrading into 2 specials; earn stars per level for a permanent upgrade tree.",
+  "Pokémon Tower Defense": "Tower defence. Your creatures are the towers and their types matter; weaken enemies on the path, then catch them; towers level up and evolve; a story through regions.",
+  "Plants vs Zombies": "Lane defence. Unlock a new unit every level and pick your loadout.",
+  "Speedrunners": "Platform race. Race on one shared screen, and fall off it and you're out; items to sabotage rivals.",
+  "Fishy": "Eat-to-grow. Eat smaller fish, avoid bigger ones, grow until you're the biggest in the sea.",
+  "Effing Worms": "Eat-to-grow. Burrow underground, then burst out to eat; grow longer and unlock upgrades.",
+  "Monster Evolution": "Eat-to-grow. Eat things to grow, then rampage; spend points to evolve body parts.",
+  "Habitica": "Habit RPG. Real-life tasks give XP and gold; missed daily tasks hurt you; friends' progress damages a shared boss; hatch pets and collect gear.",
+  "Stick RPG": "Life sim. Each day has limited time and energy (work, study, gym or fun); raise stats, earn money, buy things, reach goals.",
+  "Virtual Villagers": "Village sim. Drag villagers onto jobs: farm, build, research, heal.",
+  "Magicka": "Spell brawler. Combine elements into spells; elements react with the world like in Noita (fire spreads, water conducts, ice melts); friendly fire chaos; silly parody humour.",
+  "Haunt the House": "Possession puzzle. Possess objects to make them move.",
+  "Riddle School": "Point-and-click. Point, click and combine items to solve riddles; escape room by room as the story continues.",
+  "Samorost": "Point-and-click. One dreamy scene after another.",
+  "Aether": "Exploration puzzle. Solve each planet's riddle to change it, then fly on.",
+  "Incredibots": "Physics builder. Build machines from shapes, joints and motors, then test them; solve build challenges.",
+  "Happy Wheels": "Ragdoll physics. Limbs fly off on deadly courses; make and share your own levels.",
+  "Interactive Buddy": "Physics toy box. Earn money to buy more toys to use.",
+  "Classic Minecraft": "Sandbox. Break and place blocks freely and build with no goals, in a procedurally generated world with biomes, like Terraria.",
+  "Scuba": "Dive & craft. Dive deeper on limited oxygen as it gets darker; craft upgrades to dive deeper.",
+  "The Island: Castaway": "Survival crafting. Gather, craft tools, build shelter, manage hunger; quests from other survivors slowly uncover the island.",
+  "Castaway": "Action RPG. Tame pets that level up and fight beside you.",
+  "Arcuz": "Action RPG. Hack-and-slash with skills on hotkeys; quests, skill points, loot and gear.",
+  "Bookworm": "Word puzzle. Link letter tiles into words.",
+  "Gold Miner": "Claw grab. Hit the money target each level, buy boosts in the shop.",
+  "A Break in the Road": "Music mixing. Record sounds around a city, then mix them into a track.",
+  "Martians from Mars": "Resource & defend. Get more people, dig gold, build weapons, hold off waves of invaders.",
+  "Civilizations Wars": "Map strategy. Win maps to unlock civilisations and spells.",
+  "Coma / Nevermore": "Atmospheric adventure. A short, moody journey from scene to scene.",
+};
+// Art styles by Dimension: Risk of Rain 2's low-poly and INSIDE's foggy silhouettes are 3D; the
+// rest are 2D.
+const GI_ART_3D = ["Clean low-poly 3D (Risk of Rain 2)", "3D silhouettes in a grey, foggy world (INSIDE, by the makers of Limbo)"];
+const GI_ART = [
+  "Scratchy, dark hand-drawn storybook (Don't Starve)", "GBA pixel art (Pokémon FireRed / LeafGreen)", "Cosy farm pixel art (Stardew Valley)",
+  "Hand-drawn gothic 2D (Hollow Knight)", "Glowing painterly forest in hand-painted layers (Ori and the Blind Forest)", "Tiny pixel sprites (Risk of Rain)",
+  "Detailed pixel soldiers and big explosions (Metal Slug)", "Soft, moody pixel art (Sheepy: A Short Adventure)", "Bright, chunky cartoon island (Castaway)",
+  "Mossy photo-collage fairy tale (Samorost)", "Clean, colourful strategy map (Civilizations Wars)", "Dark, dreamy painted scenes (Coma / Nevermore)",
+  "Bright tiki-jungle look (Zuma's Revenge)", "Cartoon Martian invasion (Martians from Mars)", "Soft, sketchy pastel art (Aether)",
+  "Black silhouettes in grainy fog (Limbo)", "Black silhouettes over a glowing, colourful sky (Badland / Armed with Wings)", ...GI_ART_3D,
+];
+const GAME_IDEA = {
+  name: "Game Idea Generator", emoji: "🎮", labels: ["Fun"],
+  description: "Dimension, camera angle, art style, game, lore and world map",
+  cats: [
+    { name: "Dimension", items: ["2D", "3D"] },
+    // 1st and 3rd person need 3D; UI only (no game world, just screens and cards) is 2D.
+    { name: "Camera Angle", follow: "Dimension", items: ["Top down", "Side Scrolling", "1st Person", "3rd Person", "UI Only"], badges: { "1st Person": ["3D"], "3rd Person": ["3D"], "UI Only": ["2D"] } },
+    { name: "Art style", follow: "Dimension", items: [...GI_ART], badges: Object.fromEntries(GI_ART.map((a) => [a, [GI_ART_3D.includes(a) ? "3D" : "2D"]])) },
+    { name: "Game", items: Object.keys(GI_GAMES), notes: { ...GI_GAMES } },
+    { name: "Lore", items: [
+      "Only the Avatar can bend all four elements and keep the balance (Avatar: The Last Airbender)", "One nation started a 100-year war (Fire Nation, Avatar: The Last Airbender)", "Bending comes from martial arts and nature (Avatar: The Last Airbender)",
+      "A hidden wizarding world right next to ours (Harry Potter)", "A dark lord split his soul into hidden objects (Horcruxes, Harry Potter)", "Four school houses compete all year (Harry Potter)",
+      "The boy who lived, marked by a curse (Harry Potter)", "Almost everyone has a superpower except you (My Hero Academia)", "A power passed down from hero to hero (One For All, My Hero Academia)",
+      "Heroes are ranked and paid like celebrities (My Hero Academia)", "A league of villains wants to tear hero society down (My Hero Academia)", "Equivalent exchange: to gain anything, you must give something of equal value (FMAB)",
+      "A stone made of human souls grants any power (Philosopher's Stone, FMAB)", "Monsters named after the 7 deadly sins rule from the shadows (Homunculi, FMAB)", "Two brothers paid with their bodies and must get them back (FMAB)",
+      "A Hero Association ranks heroes from C to S class (One Punch Man)", "Monsters are rated by disaster level, from Wolf to God (One Punch Man)", "The strongest hero is bored because nothing challenges him (One Punch Man)",
+      "Toys come alive when no one is watching (Toy Story)", "Old toys fear being replaced or thrown away (Toy Story)", "Fairy tales are real, and the hero is the ogre (Shrek)",
+      "True love's kiss breaks curses, in an unexpected way (Shrek)", "Ninja villages in an uneasy peace after great wars (Naruto)", "A beast is sealed inside the hero (Nine-Tails, Naruto)",
+      "Your best friend chose the dark side (Sasuke, Naruto)", "Life energy flows through everyone and can be trained (Chakra, Naruto)", "Humans and creatures are partners, and battles are the world's biggest sport (Pokémon)",
+      "Legendary creatures rule time and space (Dialga and Palkia, Pokémon)", "An evil team wants to control a legendary creature (Team Rocket, Pokémon)", "A professor gives you a starter and a dex to fill (Pokémon)",
+      "Creatures from another world fall through rifts (Ultra Beasts, Pokémon)", "An ancient empire rises and falls (real history: Egypt, Rome, the Melaka Sultanate)", "Myths come true: dragons, djinn, Malay spirits (real myths)",
+      "Ordinary life: school, work, bills and friends (everyday life)", "Mars keeps trying to invade Earth (Martians from Mars)", "Plane-crash survivors on an island that hides a secret (The Island: Castaway)",
+      "Ancient civilisations fight for the map (Civilizations Wars)", "Champions battle in arenas around the world (Metal Mayhem)", "A girl levels herself up to help a boy who crash-landed (Level Up!)",
+      "Jump between dimensions to bring back the future (Undo the End)", "A small boy faces bullies and a strange mountain world (Nevermore)",
+    ] },
+    { name: "World map", items: [
+      "Four nations: water tribes, earth kingdom, fire nation, air nomads (Avatar: The Last Airbender)", "Air temples on mountain peaks (Avatar: The Last Airbender)", "A huge walled earth city with a secret (Ba Sing Se, Avatar: The Last Airbender)",
+      "Icy water tribe village (Avatar: The Last Airbender)", "Volcanic fire nation islands (Avatar: The Last Airbender)", "Castle school with moving stairs (Hogwarts, Harry Potter)",
+      "Hidden magic shopping street (Diagon Alley, Harry Potter)", "Dark forest at the edge of school (Forbidden Forest, Harry Potter)", "Wizard prison on a stormy sea (Azkaban, Harry Potter)",
+      "Hero academy campus (U.A., My Hero Academia)", "Disaster training zone: flood, landslide, fire (USJ, My Hero Academia)", "Steampunk military capital (Central City, FMAB)",
+      "Desert ruins of a lost alchemy nation (Xerxes, FMAB)", "Snowy fortress on the northern border (Fort Briggs, FMAB)", "A city monsters keep wrecking (City Z, One Punch Man)",
+      "Monster lair under the city (Monster Association, One Punch Man)", "A kid's bedroom where toys come alive (Toy Story)", "Arcade restaurant full of claw machines (Pizza Planet, Toy Story)",
+      "Daycare ruled by a cruel toy (Sunnyside, Toy Story 3)", "Ogre's swamp (Shrek)", "Glitzy fairy-tale kingdom (Far Far Away, Shrek)",
+      "Dragon's castle over a lava moat (Shrek)", "Ninja villages in the forest or the desert (Hidden Leaf / Sand, Naruto)", "The valley where rivals clash (Valley of the End, Naruto)",
+      "Towns linked by tall-grass routes and caves (Kanto, Pokémon)", "Mountain road to the League (Victory Road, Pokémon)", "Open plains with changing weather (Wild Area, Pokémon Sword & Shield)",
+      "Feudal-era frontier (Hisui, Pokémon Legends: Arceus)", "Haunted tower in a quiet town (Lavender Town, Pokémon)", "A safari park full of rare creatures (Safari Zone, Pokémon)",
+      "Upside-down floating islands (Distortion World, Pokémon Platinum)", "A real city you know (Kuala Lumpur, Tokyo, New York)", "Real wonders: Amazon jungle, Sahara, Himalayas (real places)",
+      "Pyramids and the Nile (Ancient Egypt, real history)", "Castle town of samurai (feudal Japan, real history)", "Kampung at the edge of a haunted rainforest (Malay folklore)",
+      "Your school after dark (everyday life)", "A shopping mall after closing (everyday life)", "Your own house, room by room (everyday life)",
+      "A tropical island after a plane crash (The Island: Castaway)", "Battle arenas around the world (Metal Mayhem)", "A strange mountain village (Nevermore)",
+    ] },
+  ],
+};
+// Each option names its source in brackets above; on the list the source is the option's
+// description instead, so the name stays short ("Clean low-poly 3D" / "Risk of Rain 2").
+const giSource = (s) => /^(.+) \(([^()]+)\)$/.exec(s);
+GAME_IDEA.cats.forEach((c) => {
+  if (!["Art style", "Lore", "World map"].includes(c.name)) return;
+  const name = (s) => (giSource(s) ? giSource(s)[1] : s);
+  c.notes = Object.fromEntries(c.items.filter(giSource).map((s) => [name(s), giSource(s)[2]]));
+  if (c.badges) c.badges = Object.fromEntries(Object.entries(c.badges).map(([k, v]) => [name(k), v]));
+  c.items = c.items.map(name);
+});
+const gameIdeaMulti = () => ({
+  id: uid(), name: GAME_IDEA.name, emoji: GAME_IDEA.emoji, description: GAME_IDEA.description, type: "multi", labels: [...GAME_IDEA.labels], created: Date.now(),
+  cats: GAME_IDEA.cats.map((c) => ({ id: uid(), ...structuredClone(c) })),
+});
 // Labels a new install starts with, by list name.
 const DEFAULT_LABELS = {
   "Random Pokémon": ["Fun"], "Random Pal": ["Fun"], "Random country": ["Fun"], "Dadu": ["Fun"],
@@ -3882,6 +4011,25 @@ function load() {
     if (!mamak.labels) mamak.labels = [...MAMAK.labels];
   }
   d.mamakMerged = true;
+  // Game Idea Generator, at the end. It comes back if deleted; a list with its name gets, once,
+  // any categories and options it is missing (notes you gave an option stay).
+  const gameIdea = d.lists.find((l) => l.name === GAME_IDEA.name);
+  if (!gameIdea) d.lists.push(gameIdeaMulti());
+  else if (!d.gameIdeaMerged && gameIdea.type === "multi") {
+    GAME_IDEA.cats.forEach((g) => {
+      const c = gameIdea.cats.find((x) => x.name === g.name);
+      if (!c) return gameIdea.cats.push({ id: uid(), ...structuredClone(g) });
+      g.items.forEach((it) => { if (!c.items.includes(it)) c.items.push(it); });
+      if (g.follow && !c.follow) c.follow = structuredClone(g.follow);
+      if (g.fit && !c.fit) c.fit = structuredClone(g.fit);
+      for (const k of ["badges", "notes", "weights"]) Object.entries(g[k] || {}).forEach(([it, v]) => {
+        c[k] = c[k] || {};
+        if (c[k][it] === undefined || (Array.isArray(c[k][it]) && !c[k][it].length)) c[k][it] = structuredClone(v);
+      });
+    });
+    if (!gameIdea.labels) gameIdea.labels = [...GAME_IDEA.labels];
+  }
+  d.gameIdeaMerged = true;
   // Lists made before "Date created" existed count as created in their current order.
   const base = Date.now() - d.lists.length * 1000;
   d.lists.forEach((l, i) => { if (!l.created) l.created = base + i * 1000; });
