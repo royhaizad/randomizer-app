@@ -747,7 +747,7 @@ const GI_LOOPS = {
   "Word puzzle": "Bookworm",
   "Claw grab": "Gold Miner",
   "Music mixing": "A Break in the Road",
-  "Map strategy": "Civilizations Wars"
+  "Base conquest": "Civilizations Wars"
 };
 // Twists: a unique mechanic from a game you like, added on top of the gameplay loop (the game
 // is the description).
@@ -783,7 +783,7 @@ const GI_MECH = {
 const GI_MECH_FIT = {
   "Endless runner": ["Random maze each round", "Items stack and chain", "Kill combos unlock weapons", "Procedurally generated biomes", "Bash off enemies and their shots", "Make and share levels", "Deadly level hazards", "Jetpacks", "Slow motion", "Items to sabotage rivals", "Burrow and burst out", "Limited oxygen, darker the deeper"],
   "Artillery turns": ["Bouncing bullets + 1-hit KO", "Element magic", "Friendly-fire chaos", "Summon minions", "Reshape the land", "Combine to upgrade", "Barricades and explosive barrels", "Ragdoll physics", "Slow motion"],
-  "Survivors-like": ["Bouncing bullets + 1-hit KO", "Random maze each round", "Element magic", "Friendly-fire chaos", "Summon minions", "Combine to upgrade", "Items stack and chain", "Kill combos unlock weapons", "Barricades and explosive barrels", "Evolve body parts", "Procedurally generated biomes", "Bash off enemies and their shots", "Deadly level hazards", "Slow motion", "Ragdoll physics", "Catch and raise allies", "Burrow and burst out", "Friends damage a shared boss", "Limited oxygen, darker the deeper"],
+  "Survivors-like": ["Random maze each round", "Element magic", "Friendly-fire chaos", "Summon minions", "Combine to upgrade", "Items stack and chain", "Kill combos unlock weapons", "Barricades and explosive barrels", "Evolve body parts", "Procedurally generated biomes", "Bash off enemies and their shots", "Deadly level hazards", "Slow motion", "Ragdoll physics", "Catch and raise allies", "Burrow and burst out", "Friends damage a shared boss", "Limited oxygen, darker the deeper"],
   "Arena duel": ["Bouncing bullets + 1-hit KO", "Random maze each round", "Possess objects", "Element magic", "Friendly-fire chaos", "Reshape the land", "Combine to upgrade", "Items stack and chain", "Kill combos unlock weapons", "Barricades and explosive barrels", "Ragdoll physics", "Deadly level hazards", "Jetpacks", "Slow motion", "Items to sabotage rivals"],
   "Metroidvania": ["Possess objects", "Element magic", "Items stack and chain", "Procedurally generated biomes", "Bash off enemies and their shots", "Steer a partner", "Deadly level hazards", "Jetpacks", "Catch and raise allies", "Burrow and burst out", "Solve a planet's riddle to change it", "Limited oxygen, darker the deeper"],
   "Story platformer": ["Possess objects", "Bash off enemies and their shots", "Steer a partner", "Make and share levels", "Ragdoll physics", "Deadly level hazards", "Jetpacks", "Slow motion"],
@@ -800,14 +800,15 @@ const GI_MECH_FIT = {
   "Word puzzle": ["Element magic", "Combine to upgrade", "Items to sabotage rivals", "Friends damage a shared boss"],
   "Claw grab": ["Items stack and chain", "Items to sabotage rivals", "Catch and raise allies", "Limited oxygen, darker the deeper"],
   "Music mixing": ["Possess objects", "Make and share levels"],
-  "Map strategy": ["Random maze each round", "Summon minions", "Reshape the land", "Combine to upgrade", "Procedurally generated biomes", "Catch and raise allies", "Solve a planet's riddle to change it"],
+  "Base conquest": ["Random maze each round", "Summon minions", "Reshape the land", "Combine to upgrade", "Procedurally generated biomes", "Catch and raise allies", "Solve a planet's riddle to change it"],
 };
 // Twist 3 by Twist 2: none after "None"; after a twist, anything. Every twist is named, since a
 // rule leaves an option it never names free to go with anything.
 const giTwist3Fit = () => ({ None: ["None"], ...Object.fromEntries(Object.keys(GI_MECH).map((t) => [t, ["None", ...Object.keys(GI_MECH)]])) });
-// Art styles: Risk of Rain 2's low-poly and INSIDE's foggy silhouettes are 3D; the
-// rest are 2D.
-const GI_ART_3D = ["Clean low-poly 3D (Risk of Rain 2)", "3D silhouettes in a grey, foggy world (INSIDE, by the makers of Limbo)"];
+// Art styles: Risk of Rain 2's low-poly, A Short Hike's pixelated 3D and INSIDE's foggy
+// silhouettes are 3D; the rest are 2D.
+const GI_ART_3D = ["Clean low-poly 3D (Risk of Rain 2)", "Cosy low-res pixelated 3D (A Short Hike)",
+  "3D silhouettes in a grey, foggy world (INSIDE, by the makers of Limbo)"];
 const GI_ART = [
   "Scratchy, dark hand-drawn storybook (Don't Starve)", "GBA pixel art (Pokémon FireRed / LeafGreen)", "Cosy farm pixel art (Stardew Valley)",
   "Hand-drawn gothic 2D (Hollow Knight)", "Glowing painterly forest in hand-painted layers (Ori and the Blind Forest)", "Tiny pixel sprites (Risk of Rain)",
@@ -818,13 +819,23 @@ const GI_ART = [
 ];
 // The camera angle each art style's own game uses, by that game (the source in brackets).
 const GI_ART_ANGLES = {
-  "Top down": ["Don't Starve", "Pokémon FireRed / LeafGreen", "Stardew Valley"],
-  "Side Scrolling": ["Hollow Knight", "Ori and the Blind Forest", "Risk of Rain", "Metal Slug", "Sheepy: A Short Adventure", "Samorost",
+  "Top-down": ["Don't Starve", "Pokémon FireRed / LeafGreen", "Stardew Valley"],
+  "Side-scrolling": ["Hollow Knight", "Ori and the Blind Forest", "Risk of Rain", "Metal Slug", "Sheepy: A Short Adventure", "Samorost",
     "Coma / Nevermore", "Martians from Mars", "Aether", "Limbo, Badland / Armed with Wings: grey fog or a glowing, colourful sky", "INSIDE, by the makers of Limbo"],
-  "3rd Person": ["Risk of Rain 2"],
-  "UI Only": ["Stardew Valley", "Pokémon FireRed / LeafGreen"],
+  "Third person": ["Risk of Rain 2", "A Short Hike"],
+  "UI only": ["Stardew Valley", "Pokémon FireRed / LeafGreen"],
 };
 const giArtAngles = (a) => Object.keys(GI_ART_ANGLES).filter((k) => GI_ART_ANGLES[k].includes(/\(([^()]+)\)$/.exec(a)[1]));
+// Camera angle's old option names (renamed once on your phone).
+const GI_CAM_RENAMED = { "Top down": "Top-down", "Side Scrolling": "Side-scrolling", "3rd Person": "Third person", "UI Only": "UI only" };
+// Which gameplay loops go with each camera angle: the camera each loop's own games use.
+const GI_LOOP_BY_CAM = {
+  "Top-down": ["Survivors-like", "Arena duel", "Tower defence", "Eat-to-grow", "Life / village sim", "Survival crafting", "Action RPG", "Base conquest"],
+  "Side-scrolling": ["Endless runner", "Artillery turns", "Survivors-like", "Metroidvania", "Story platformer", "Platform fighter", "Platform race",
+    "Eat-to-grow", "Life / village sim", "Point-and-click", "Physics sandbox", "Survival crafting", "Action RPG", "Claw grab", "Music mixing"],
+  "Third person": ["Endless runner", "Survivors-like", "Survival crafting", "Action RPG"],
+  "UI only": ["Habit RPG", "Life / village sim", "Point-and-click", "Word puzzle", "Music mixing"],
+};
 // Game maps you're nostalgic for, with their game as the description.
 const GI_MAPS = {
   "None": "No map this time",
@@ -852,17 +863,31 @@ const GI_WORLDS = {
   "Shrek": "Every fairy-tale creature is real and lives side by side: ogres, dragons, fairies, talking animals. Magic comes from potions, wands and curses.",
   "Real world": "No superpowers: here, power comes from money. People differ by wealth, skills, jobs and background."
 };
+// Maps by world: Kanto and Hoenn only with Pokémon; San Andreas, Bullworth and Real world only
+// with the real world; the rest with any world. Every map is named in each table, since a rule
+// leaves an option it never names free to go with anything.
+const GI_MAP_OWN = { "Pokémon": ["Kanto", "Hoenn"], "Real world": ["San Andreas", "Bullworth", "Real world"] };
+const giMapByWorld = () => {
+  const own = Object.values(GI_MAP_OWN).flat(), any = Object.keys(GI_MAPS).filter((m) => !own.includes(m));
+  return Object.fromEntries(Object.keys(GI_WORLDS).map((w) => [w, [...any, ...(GI_MAP_OWN[w] || [])]]));
+};
+// Twists that make a new map every time leave no fixed map.
+const GI_RANDOM_MAP = ["Procedurally generated biomes", "Random maze each round"];
+const giMapByTwist = (none) => Object.fromEntries([...(none ? ["None"] : []), ...Object.keys(GI_MECH)]
+  .map((t) => [t, GI_RANDOM_MAP.includes(t) ? ["None"] : Object.keys(GI_MAPS)]));
+const giMapFit = () => ({ "World & powers": giMapByWorld(), "Twist 1": giMapByTwist(false), "Twist 2": giMapByTwist(true), "Twist 3": giMapByTwist(true) });
 const GAME_IDEA = {
   name: "Game Idea Generator", emoji: "🎮", labels: ["Fun"],
-  description: "Camera angle, art style, gameplay loop, twists, worldbuilding/lore and specific world map",
+  description: "Camera angle, art style, gameplay loop, twists, world & powers and specific world map",
   cats: [
     // UI only: no game world, just screens and cards.
     // The description says 2D or 3D, by the art styles each angle goes with.
-    { name: "Camera Angle", items: ["Top down", "Side Scrolling", "3rd Person", "UI Only"],
-      notes: { "Top down": "2D", "Side Scrolling": "2D or 3D", "3rd Person": "3D", "UI Only": "2D" } },
+    { name: "Camera angle", items: Object.values(GI_CAM_RENAMED),
+      notes: { "Top-down": "2D", "Side-scrolling": "2D or 3D", "Third person": "3D", "UI only": "2D" } },
     // Each art style goes with its own game's camera angle (the style itself says 2D or 3D).
-    { name: "Art style", follow: "Camera Angle", items: [...GI_ART], badges: Object.fromEntries(GI_ART.map((a) => [a, giArtAngles(a)])) },
-    { name: "Gameplay loop", items: Object.keys(GI_LOOPS), notes: { ...GI_LOOPS } },
+    { name: "Art style", follow: "Camera angle", items: [...GI_ART], badges: Object.fromEntries(GI_ART.map((a) => [a, giArtAngles(a)])) },
+    // Each loop goes with the camera angles its own games use.
+    { name: "Gameplay loop", items: Object.keys(GI_LOOPS), notes: { ...GI_LOOPS }, fit: { "Camera angle": GI_LOOP_BY_CAM } },
     // Up to 3 twists: Twist 2 and 3 are often "None" (about 60% of rolls get 1 twist, 30% get 2,
     // 10% get 3), Twist 3 only comes when Twist 2 has one, and a twist never comes twice.
     { name: "Twist 1", items: Object.keys(GI_MECH), notes: { ...GI_MECH }, unique: "twist", fit: { "Gameplay loop": GI_MECH_FIT } },
@@ -870,9 +895,9 @@ const GAME_IDEA = {
       often: { item: "None", share: 0.6 }, fit: { "Gameplay loop": GI_MECH_FIT } },
     { name: "Twist 3", items: ["None", ...Object.keys(GI_MECH)], notes: { None: "No third twist", ...GI_MECH }, unique: "twist",
       often: { item: "None", share: 0.75 }, fit: { "Gameplay loop": GI_MECH_FIT, "Twist 2": giTwist3Fit() } },
-    { name: "Worldbuilding/Lore", items: Object.keys(GI_WORLDS), notes: { ...GI_WORLDS } },
-    // A bonus: most rolls get no map.
-    { name: "Specific world map", items: Object.keys(GI_MAPS), notes: { ...GI_MAPS }, often: { item: "None", share: 0.7 } },
+    { name: "World & powers", items: Object.keys(GI_WORLDS), notes: { ...GI_WORLDS } },
+    // A bonus: most rolls get no map. It goes with the world, and with no random-map twist.
+    { name: "Specific world map", items: Object.keys(GI_MAPS), notes: { ...GI_MAPS }, often: { item: "None", share: 0.7 }, fit: giMapFit() },
   ],
 };
 // Each option names its source in brackets above; on the list the source is the option's
@@ -892,8 +917,8 @@ const GI_DROPPED = {
   "Gameplay loop": ["Flappy Bird","Temple Run / Subway Surfers","Tank Trouble","Territory War Online","Tanks","Fleabag vs. Mutt","Animal Wars","Arcanists","Vampire Survivors","Brotato","Risk of Rain","Boxhead","Ori and the Blind Forest","Hollow Knight","Armed with Wings","Level Up!","Chaos Faction 2","Stick Fight: The Game","Metal Mayhem","Raze","The Fight for Glorton","Capoeira Fighter","Dragon Fist","Bullet Time Fighting","Electricman 2","Kingdom Rush","Pokémon Tower Defense","Plants vs Zombies","Speedrunners","Fishy","Effing Worms","Monster Evolution","Habitica","Stick RPG","Virtual Villagers","Magicka","Haunt the House","Riddle School","Samorost","Aether","Incredibots","Happy Wheels","Interactive Buddy","Classic Minecraft","Scuba","The Island: Castaway","Castaway","Arcuz","Bookworm","Gold Miner","A Break in the Road","Martians from Mars","Civilizations Wars","Coma / Nevermore"],
   "Art style": ["Bright, chunky cartoon island", "Clean, colourful strategy map", "Bright tiki-jungle look", "Black silhouettes in grainy fog",
     "Black silhouettes over a glowing, colourful sky"],
-  "Camera Angle": ["1st Person"],
-  "Worldbuilding/Lore": [
+  "Camera angle": ["1st Person"],
+  "World & powers": [
     "Bending comes from martial arts and nature",
     "A hidden wizarding world right next to ours",
     "Four school houses compete all year",
@@ -4125,6 +4150,22 @@ function load() {
   // Game Idea Generator, at the end. It comes back if deleted; a list with its name gets, once,
   // any categories and options it is missing (notes you gave an option stay).
   const gameIdea = d.lists.find((l) => l.name === GAME_IDEA.name);
+  // Once: Camera Angle becomes "Camera angle" (Top-down, Side-scrolling, Third person, UI only),
+  // Worldbuilding/Lore becomes "World & powers", and Map strategy becomes "Base conquest". A name
+  // you gave yourself stays. Done first, since the updates below find categories by these names.
+  if (gameIdea && !d.gameIdeaCamLoop && gameIdea.type === "multi") {
+    const cat = (n) => gameIdea.cats.find((x) => x.name === n);
+    [["Camera Angle", "Camera angle"], ["Worldbuilding/Lore", "World & powers"]].forEach(([was, now]) => {
+      if (cat(was) && !cat(now)) renameCat(gameIdea, cat(was), now);
+    });
+    const opt = (c, was, now) => {
+      if (!c || !c.items.includes(was) || c.items.includes(now)) return;
+      c.items[c.items.indexOf(was)] = now;
+      renameOption(gameIdea, c, was, now);
+    };
+    Object.entries(GI_CAM_RENAMED).forEach(([was, now]) => opt(cat("Camera angle"), was, now));
+    opt(cat("Gameplay loop"), "Map strategy", "Base conquest");
+  }
   if (!gameIdea) d.lists.push(gameIdeaMulti());
   else if (!d.gameIdeaMerged && gameIdea.type === "multi") {
     GAME_IDEA.cats.forEach((g) => {
@@ -4142,7 +4183,7 @@ function load() {
   }
   d.gameIdeaMerged = true;
   // Once: Game becomes "Gameplay loop" (games with the same loop are one option) with a new
-  // Twist 1, 2 and 3 after it; Lore becomes "Worldbuilding/Lore" (one option per world); World
+  // Twist 1, 2 and 3 after it; Lore becomes "World & powers" (one option per world); World
   // map becomes game maps you're nostalgic for, with "None" most of the time; Camera Angle drops
   // 1st Person; Dimension goes; Art style drops the 3 styles you deleted and follows Camera Angle.
   // Options you added yourself stay; the new ones come with their description.
@@ -4166,7 +4207,7 @@ function load() {
       for (const k of ["badges", "notes", "weights"]) gone.forEach((it) => { if (c[k]) delete c[k][it]; });
       if (c.often && gone.includes(c.often.item)) delete c.often;
       // Only these get new options; elsewhere an option you deleted stays deleted.
-      if (!["Gameplay loop", "Twist 1", "Worldbuilding/Lore", "Specific world map"].includes(cat)) return;
+      if (!["Gameplay loop", "Twist 1", "World & powers", "Specific world map"].includes(cat)) return;
       g.items.forEach((it) => {
         if (c.items.includes(it)) return;
         c.items.push(it);
@@ -4178,7 +4219,7 @@ function load() {
     });
     // Dimension goes: the art style already says 2D or 3D, so nothing follows it any more.
     gameIdea.cats = gameIdea.cats.filter((x) => x.name !== "Dimension");
-    ["Camera Angle", "Art style"].forEach((cat) => {
+    ["Camera angle", "Art style"].forEach((cat) => {
       const c = gameIdea.cats.find((x) => x.name === cat);
       const g = GAME_IDEA.cats.find((x) => x.name === cat);
       if (!c) return;
@@ -4217,6 +4258,33 @@ function load() {
       || gameIdea.description === "Camera angle, art style, gameplay loop, mechanic, worldbuilding/lore and specific world map") gameIdea.description = GAME_IDEA.description;
   }
   d.gameIdeaTwist3 = true;
+  // Once: Gameplay loop follows Camera angle; the map goes with the world and with no
+  // random-map twist; Third person gets A Short Hike's art; Survivors-like no longer gets
+  // bouncing bullets with 1-hit KOs (too hard against a horde). Rules you set yourself stay.
+  if (gameIdea && !d.gameIdeaCamLoop && gameIdea.type === "multi") {
+    const cat = (n) => gameIdea.cats.find((x) => x.name === n);
+    const want = (n) => GAME_IDEA.cats.find((x) => x.name === n);
+    ["Twist 1", "Twist 2", "Twist 3"].forEach((n) => {
+      const row = cat(n) && cat(n).fit && cat(n).fit["Gameplay loop"] && cat(n).fit["Gameplay loop"]["Survivors-like"];
+      if (row && row.includes("Bouncing bullets + 1-hit KO")) row.splice(row.indexOf("Bouncing bullets + 1-hit KO"), 1);
+    });
+    [["Gameplay loop", "Camera angle"], ["Specific world map", "World & powers"], ["Specific world map", "Twist 1"],
+      ["Specific world map", "Twist 2"], ["Specific world map", "Twist 3"]].forEach(([n, by]) => {
+      const c = cat(n);
+      if (!c || !cat(by) || (c.fit && c.fit[by])) return;
+      c.fit = { ...(c.fit || {}), [by]: structuredClone(want(n).fit[by]) };
+    });
+    const art = cat("Art style"), g = want("Art style");
+    const hike = g.items.find((it) => g.notes[it] === "A Short Hike");
+    if (art && !art.items.includes(hike)) {
+      const at = art.items.indexOf("Clean low-poly 3D"); // next to the other Third person style
+      art.items.splice(at < 0 ? art.items.length : at + 1, 0, hike);
+      art.notes = { ...(art.notes || {}), [hike]: g.notes[hike] };
+      setBadges(art, hike, [...g.badges[hike]]);
+    }
+    if (gameIdea.description === "Camera angle, art style, gameplay loop, twists, worldbuilding/lore and specific world map") gameIdea.description = GAME_IDEA.description;
+  }
+  d.gameIdeaCamLoop = true;
   // Lists made before "Date created" existed count as created in their current order.
   const base = Date.now() - d.lists.length * 1000;
   d.lists.forEach((l, i) => { if (!l.created) l.created = base + i * 1000; });
@@ -4382,7 +4450,7 @@ const findList = (id) => db.lists.find((l) => l.id === id);
 // `fit` { "Other category": { "its option": ["options of this one that go with it"] } }.
 // `notes` { "option": "what it means" }: shown with the option.
 const isMulti = (l) => l.type === "multi";
-const isRare = (c, v) => !!c.rare && c.rare.item === v;
+function isRare(c, v) { return !!c.rare && c.rare.item === v; }
 // Rare enough for the gold celebration (`quiet` odds, like Alpha's 1 in 5, get none).
 const isGold = (c, v) => isRare(c, v) && !c.rare.quiet;
 const linkedList = (c) => {
@@ -4429,7 +4497,7 @@ function setOffItem(owner, it, on) {
   if (off.size) owner.offItems = [...off];
   else delete owner.offItems;
 }
-const isOffItem = (owner, it) => !!(owner.offItems && owner.offItems.includes(it));
+function isOffItem(owner, it) { return !!(owner.offItems && owner.offItems.includes(it)); }
 const activeItems = (list) => list.items.filter((it) => !isOffItem(list, it));
 function roll(list) {
   const p = activeItems(list);
@@ -4510,7 +4578,7 @@ function usualVals(list, x, val) {
 // options only goes with those; an option with none of them goes with anything.
 // (Masak follows Carbs: Canai is labelled Roti, so it only comes with Roti.)
 // It can follow several (Extra request follows Carbs and Masak): `follow` is a name or a list.
-const followsOf = (c) => (!c.follow ? [] : Array.isArray(c.follow) ? c.follow : [c.follow]);
+function followsOf(c) { return !c.follow ? [] : Array.isArray(c.follow) ? c.follow : [c.follow]; }
 function setFollows(c, names) {
   if (!names.length) delete c.follow;
   else c.follow = names.length === 1 ? names[0] : names;
@@ -4603,6 +4671,39 @@ function fitOrder(cats) {
     left = left.filter((c) => !next.includes(c));
   }
   return order;
+}
+// A category's new name: what follows it, or goes with it, keeps doing so.
+function renameCat(list, c, name) {
+  const old = c.name;
+  c.name = name;
+  if (name === old) return;
+  list.cats.forEach((d) => {
+    if (d.fit && d.fit[old]) { d.fit[name] = d.fit[old]; delete d.fit[old]; }
+    if (followsOf(d).includes(old)) setFollows(d, [...new Set(followsOf(d).map((x) => (x === old ? name : x)))]);
+    const st = d.starts && d.starts.by;
+    if (st && st[old]) { st[name] = st[old]; delete st[old]; }
+    if (d.grow && d.grow.by === old) d.grow.by = name;
+    if (d.levels && d.levels.by === old) d.levels.by = name;
+    if (d.levels && d.levels.bonus && old in d.levels.bonus) { d.levels.bonus[name] = d.levels.bonus[old]; delete d.levels.bonus[old]; }
+  });
+}
+// An option's new name (already in `owner.items`): everything about it moves along. In a
+// multi list (`list`), so does what it goes with in other categories.
+function renameOption(list, owner, old, v) {
+  const b = badgesOf(owner, old);
+  if (b.length && v !== old) { setBadges(owner, old, []); setBadges(owner, v, b); } // badges follow the rename
+  if (isRare(owner, old)) owner.rare.item = v; // so do its odds
+  if (owner.often && owner.often.item === old) owner.often.item = v;
+  if (owner.shine && v !== old) Object.values(owner.shine).forEach((r) => { if (r.includes(old)) r[r.indexOf(old)] = v; }); // and its shine
+  if (owner.notes && owner.notes[old] && v !== old) { owner.notes[v] = owner.notes[old]; delete owner.notes[old]; } // and its description
+  if (v !== old && owner.weights && owner.weights[old]) { owner.weights[v] = owner.weights[old]; delete owner.weights[old]; } // and how often it comes up
+  if (v !== old && isOffItem(owner, old)) { setOffItem(owner, old, false); setOffItem(owner, v, true); } // and whether it's switched off
+  if (!list) return;
+  renameInFit(list, owner, old, v); // and what it goes with
+  if (v !== old) list.cats.forEach((d) => { // and labels in categories that follow it
+    if (!followsOf(d).includes(owner.name) || !d.badges) return;
+    Object.values(d.badges).forEach((bs) => { const k = bs.indexOf(old); if (k >= 0 && !bs.includes(v)) bs[k] = v; });
+  });
 }
 function renameInFit(list, c, old, v) {
   Object.values(c.fit || {}).forEach((t) => Object.values(t).forEach((r) => {
@@ -5117,7 +5218,7 @@ I.tag = ic("M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L2 12V2h10l8.6 8.6a2 2 0 0 1 0 2.
 // Kept on whatever holds the options (a list, or a Multiple's category) as
 // `badges: { "Adamant": ["+10% Atk", "−10% SpA"] }`.
 // Badges starting with + are green and with − red; others get a color from their text.
-const badgesOf = (owner, item) => (owner && owner.badges && owner.badges[item]) || [];
+function badgesOf(owner, item) { return (owner && owner.badges && owner.badges[item]) || []; }
 // A category's option can also carry badges from its linked list.
 const optionBadges = (list, cat, item) =>
   cat ? [...new Set([...badgesOf(cat, item), ...badgesOf(linkedList(cat), item)])] : badgesOf(list, item);
@@ -6237,19 +6338,9 @@ document.addEventListener("change", (e) => {
     e.target.value = v;
     autoGrow(e.target);
   } else if (f === "catName") {
-    const c = currentCat(), old = c.name;
-    c.name = v || "Category";
+    const c = currentCat();
+    renameCat(currentList(), c, v || "Category");
     e.target.value = c.name;
-    // Categories that follow this one keep following it.
-    currentList().cats.forEach((d) => {
-      if (d.fit && d.fit[old] && c.name !== old) { d.fit[c.name] = d.fit[old]; delete d.fit[old]; }
-      if (c.name !== old && followsOf(d).includes(old)) setFollows(d, followsOf(d).map((x) => (x === old ? c.name : x)));
-      const st = d.starts && d.starts.by;
-      if (st && st[old] && c.name !== old) { st[c.name] = st[old]; delete st[old]; }
-      if (d.grow && d.grow.by === old) d.grow.by = c.name;
-      if (d.levels && d.levels.by === old) d.levels.by = c.name;
-      if (d.levels && d.levels.bonus && old in d.levels.bonus && c.name !== old) { d.levels.bonus[c.name] = d.levels.bonus[old]; delete d.levels.bonus[old]; }
-    });
   } else if (f === "note") {
     const owner = editOwner(), it = editItems()[+e.target.dataset.i];
     if (v) owner.notes = { ...(owner.notes || {}), [it]: v };
@@ -6260,22 +6351,10 @@ document.addEventListener("change", (e) => {
     e.target.value = v;
   } else if (f === "item") {
     const i = +e.target.dataset.i, items = editItems(), owner = editOwner(), old = items[i];
-    const b = badgesOf(owner, old);
     if (v) {
       items[i] = v;
       e.target.value = v;
-      if (b.length && v !== old) { setBadges(owner, old, []); setBadges(owner, v, b); } // badges follow the rename
-      if (isRare(owner, old)) owner.rare.item = v; // so do its odds
-      if (owner.often && owner.often.item === old) owner.often.item = v;
-      if (owner.shine && v !== old) Object.values(owner.shine).forEach((r) => { if (r.includes(old)) r[r.indexOf(old)] = v; }); // and its shine
-      if (owner.notes && owner.notes[old] && v !== old) { owner.notes[v] = owner.notes[old]; delete owner.notes[old]; } // and its description
-      if (v !== old && owner.weights && owner.weights[old]) { owner.weights[v] = owner.weights[old]; delete owner.weights[old]; } // and how often it comes up
-      if (v !== old && isOffItem(owner, old)) { setOffItem(owner, old, false); setOffItem(owner, v, true); } // and whether it's switched off
-      if (route().view === "cat") renameInFit(currentList(), owner, old, v); // and what it goes with
-      if (route().view === "cat" && v !== old) currentList().cats.forEach((d) => { // and labels in categories that follow it
-        if (!followsOf(d).includes(owner.name) || !d.badges) return;
-        Object.values(d.badges).forEach((b) => { const k = b.indexOf(old); if (k >= 0 && !b.includes(v)) b[k] = v; });
-      });
+      renameOption(route().view === "cat" ? currentList() : null, owner, old, v);
     } else {
       items.splice(i, 1);
       if (!items.includes(old)) {
