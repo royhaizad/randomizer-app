@@ -11,9 +11,11 @@ self.addEventListener('install', (e) => {
   self.skipWaiting();
 });
 
+// Only this copy's old saved copies are cleared: /roy, /adam and /default keep their own.
+const MINE = /^randomizer-v\d+$/;
 self.addEventListener('activate', (e) => {
   e.waitUntil(
-    caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+    caches.keys().then((keys) => Promise.all(keys.filter((k) => MINE.test(k) && k !== CACHE).map((k) => caches.delete(k))))
   );
   self.clients.claim();
 });

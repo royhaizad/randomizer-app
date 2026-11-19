@@ -1,0 +1,45 @@
+# Builds the site from 4 branches and publishes it to GitHub Pages:
+#   main    -> randomizer-app/           (the old link, kept as it is)
+#   roy     -> randomizer-app/roy/       (your phone)
+#   adam    -> randomizer-app/adam/      (to show your friend)
+#   default -> randomizer-app/default/   (to show anyone)
+# A push to any of them rebuilds the whole site. This file is the same on every branch.
+name: Deploy site
+
+on:
+  push:
+    branches: [main, roy, adam, default]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; a newer push waits for the one before it.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main, path: site }
+      - uses: actions/checkout@v4
+        with: { ref: roy, path: site/roy }
+      - uses: actions/checkout@v4
+        with: { ref: adam, path: site/adam }
+      - uses: actions/checkout@v4
+        with: { ref: default, path: site/default }
+      - name: Leave out git files
+        run: rm -rf site/.git site/.github site/*/.git site/*/.github
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+      - id: deployment
+        uses: actions/deploy-pages@v4
