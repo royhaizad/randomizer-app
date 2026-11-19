@@ -1,6 +1,6 @@
 // Offline support. Opens instantly from the saved copy, then quietly
 // downloads any newer version in the background for next time.
-const CACHE = 'randomizer-roy-v1';
+const CACHE = 'randomizer-adam-v1';
 const FILES = [
   './', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png',
   './fonts/plus-jakarta-sans-latin.woff2',
@@ -12,7 +12,7 @@ self.addEventListener('install', (e) => {
 });
 
 // Only this copy's old saved copies are cleared: /roy, /adam and /default keep their own.
-const MINE = /^randomizer-roy-v\d+$/;
+const MINE = /^randomizer-adam-v\d+$/;
 self.addEventListener('activate', (e) => {
   e.waitUntil(
     caches.keys().then((keys) => Promise.all(keys.filter((k) => MINE.test(k) && k !== CACHE).map((k) => caches.delete(k))))
