@@ -3606,7 +3606,13 @@ const ultimateMulti = () => {
 /* =========================================================
    2. Saving (everything lives on this phone only)
    ========================================================= */
-const KEY = "randomizer.v1";
+// Which version of the app this is. Each has its own branch and link (randomizer-app/roy,
+// /adam, /default), and only this block differs between them.
+// - key: where its lists are saved. "randomizer.v1" is shared with the old link.
+// - lists: the starting lists it keeps (null: all of them).
+// - keepDeleted: a starting list someone deletes stays deleted, instead of coming back.
+const EDITION = { name: "roy", key: "randomizer.v1", lists: null, keepDeleted: false };
+const KEY = EDITION.key;
 const uid = () => Math.random().toString(36).slice(2, 9);
 const clean = (items) => items.map((s) => String(s).trim()).filter(Boolean);
 
@@ -3627,6 +3633,7 @@ function load() {
     }
   } catch (e) {}
   const fresh = !d;
+  const hadIds = new Set(fresh ? [] : d.lists.map((l) => l.id));
   d = d || { lists: listsFromBackup(BACKUP, ORDER), history: {} };
   // Add the Pokémon Multiple once; if you delete it, it stays gone.
   if (!d.seeded) {
@@ -4206,7 +4213,17 @@ function load() {
   d.lists.forEach((l, i) => { if (!l.created) l.created = base + i * 1000; });
   // Home: how lists are sorted, and which label they're filtered by.
   d.view = d.view || { sort: "custom", label: null };
+  editionLists(d, hadIds);
   return d;
+}
+// Lists the code just added (not saved before) go if this version doesn't start with them, or if
+// someone deleted them here before and deleted ones stay deleted.
+function editionLists(d, hadIds) {
+  if (!EDITION.lists && !EDITION.keepDeleted) return;
+  const seen = (d.editionSeen = d.editionSeen || []);
+  d.lists = d.lists.filter((l) => hadIds.has(l.id)
+    || ((!EDITION.lists || EDITION.lists.includes(l.name)) && !(EDITION.keepDeleted && seen.includes(l.name))));
+  d.lists.forEach((l) => { if (!seen.includes(l.name)) seen.push(l.name); });
 }
 
 let db = load();
