@@ -704,7 +704,7 @@
 /* =========================================================
    1. Starting data: your 9 lists from the backup file
    ========================================================= */
-// New installs start with a few example lists (Random Pokémon, Random Pal and
+// New installs start with a few example lists (Pokémon Generator, Pal Picker and
 // Random country are added by load()). Saved lists are never touched by these.
 const BACKUP = {"Dadu":["1","2","3","4","5","6"],"Masak apa":["Ayam goreng","Nasi goreng","Roti telur","Sambal ayam","Sambal telur dadar","Sambal telur rebus","Telur kicap","Sup ayam","Tempe goreng","Daging masak lemak","Tofu sup","Broccoli","Butter chicken","Jagung","Bubur nasi","Miso sup"]};
 
@@ -948,16 +948,16 @@ const gameIdeaMulti = () => ({
 });
 // Labels a new install starts with, by list name.
 const DEFAULT_LABELS = {
-  "Random Pokémon": ["Fun"], "Random Pal": ["Fun"], "Random country": ["Fun"], "Dadu": ["Fun"],
+  "Pokémon Generator": ["Fun"], "Pal Picker": ["Fun"], "Random country": ["Fun"], "Dadu": ["Fun"],
   "Masak apa": ["Makan"]
 };
 // Category order (and which start switched off) a new install starts with, by list name.
 const DEFAULT_CATS = {
-  "Random Pokémon": {
+  "Pokémon Generator": {
     order: ["Type", "Egg Group", "Form", "Rarity", "Stage", "Nature", "Hidden Ability", "Gender", "Region", "Habitat", "Shiny"],
     off: ["Form", "Rarity"],
   },
-  "Random Pal": {
+  "Pal Picker": {
     order: ["Pal", "Type", "Partner Ability", "Rarity", "Work Suitability", "Activity", "Passive Skill 1", "Passive Skill 2", "Passive Skill 3", "Passive Skill 4", "Passive Skills", "Region", "Habitat", "Gender", "Size", "IV", "Alpha", "Lucky"],
     off: ["Rarity"],
   },
@@ -1138,7 +1138,7 @@ const HIDDEN_ABILITIES = {
 };
 
 const POKEMON = {
-  name: "Random Pokémon",
+  name: "Pokémon Generator",
   emoji: "⚡",
   description: "Region, type, rarity, stage, form, nature, gender, habitat, egg group, hidden ability and shiny",
   cats: {
@@ -2965,7 +2965,7 @@ const PALS = {
   "Panthalus": [["Water"], "Epic", "XL", "Daytime", "Resonant Guardian", ["None"], ["No wild spawn"]],
 };
 const PALWORLD = {
-  name: "Random Pal",
+  name: "Pal Picker",
   emoji: "🐾",
   description: "Pal, region, type, rarity, size, activity, gender, work suitability, partner ability, passive skills, alpha, IV and lucky",
 };
@@ -3430,10 +3430,10 @@ const palworldMulti = () => {
   };
 };
 
-// The Ultimate Pokémon Generator: Pokémon and Pal categories in one list, for inventing your own
+// The Ultimate Poké/Pal Generator: Pokémon and Pal categories in one list, for inventing your own
 // Pokémon. Every link between categories follows real-world logic, not existing Pokémon or Pals.
 const ULTIMATE = {
-  name: "Ultimate Pokémon Generator",
+  name: "Ultimate Poké/Pal Generator",
   emoji: "🌟",
   description: "Type, egg group, stage, size, gender, nature, hidden ability, activity, habitat, region, work, passive skills, IV, alpha and prodigy",
 };
@@ -3635,6 +3635,15 @@ function load() {
   const fresh = !d;
   const hadIds = new Set(fresh ? [] : d.lists.map((l) => l.id));
   d = d || { lists: listsFromBackup(BACKUP, ORDER), history: {} };
+  // Once: three lists got new names (a list you renamed yourself keeps your name).
+  if (!d.listOrder2) {
+    const RENAMED = { "Random Pokémon": POKEMON.name, "Random Pal": PALWORLD.name, "Ultimate Pokémon Generator": ULTIMATE.name };
+    Object.entries(RENAMED).forEach(([was, now]) => {
+      const l = d.lists.find((x) => x.name === was);
+      if (l && !d.lists.some((x) => x.name === now)) l.name = now;
+      if (d.editionSeen) d.editionSeen = d.editionSeen.map((n) => (n === was ? now : n));
+    });
+  }
   // Add the Pokémon Multiple once; if you delete it, it stays gone.
   if (!d.seeded) {
     if (!d.lists.some((l) => l.name === POKEMON.name)) d.lists.unshift(pokemonMulti());
@@ -3919,7 +3928,7 @@ function load() {
     }
     d.ultimateRules3 = true;
   }
-  // The Ultimate Pokémon Generator, right after the Pal list. It comes back if deleted; a list
+  // The Ultimate Poké/Pal Generator, right after the Pal list. It comes back if deleted; a list
   // with its name gets any categories it is missing, once.
   const ult = d.lists.find((l) => l.name === ULTIMATE.name);
   if (!ult) {
@@ -4211,6 +4220,14 @@ function load() {
   // Lists made before "Date created" existed count as created in their current order.
   const base = Date.now() - d.lists.length * 1000;
   d.lists.forEach((l, i) => { if (!l.created) l.created = base + i * 1000; });
+  // Once (and on new installs): the lists in this order; lists you made go after them.
+  // After that, dragging sets the order.
+  if (!d.listOrder2) {
+    const ORDER_ALL = [POKEMON.name, PALWORLD.name, ULTIMATE.name, GAME_IDEA.name, MAMAK.name, "Masak apa", COUNTRIES.name, "Dadu"];
+    const at = (l) => { const i = ORDER_ALL.indexOf(l.name); return i < 0 ? ORDER_ALL.length : i; };
+    d.lists.sort((a, b) => at(a) - at(b));
+  }
+  d.listOrder2 = true;
   // Home: how lists are sorted, and which label they're filtered by.
   d.view = d.view || { sort: "custom", label: null };
   editionLists(d, hadIds);
