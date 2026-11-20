@@ -3669,7 +3669,7 @@ const ultimateMulti = () => {
 // - key: where its lists are saved. "randomizer.v1" is shared with the old link.
 // - lists: the starting lists it keeps (null: all of them).
 // - keepDeleted: a starting list someone deletes stays deleted, instead of coming back.
-const EDITION = { name: "roy", key: "randomizer.v1", lists: null, keepDeleted: false };
+const EDITION = { name: "main", key: "randomizer.v1", lists: null, keepDeleted: false };
 const KEY = EDITION.key;
 const uid = () => Math.random().toString(36).slice(2, 9);
 const clean = (items) => items.map((s) => String(s).trim()).filter(Boolean);
