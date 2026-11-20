@@ -739,73 +739,80 @@ const GI_LOOPS = {
   "Eat-to-grow": "Fishy, Effing Worms, Monster Evolution",
   "Habit RPG": "Habitica",
   "Point-and-click": "Riddle School, Samorost, Haunt the House, Aether, Coma / Nevermore",
-  "Survival crafting": "The Island: Castaway, Scuba, Classic Minecraft",
 };
 // Twists: a unique mechanic from a game you like, added on top of the gameplay loop (the game
 // is the description).
 const GI_MECH = {
   "Bouncing bullets + 1-hit KO": "Tank Trouble",
-  "Random maze each round": "Tank Trouble",
   "Possess objects": "Haunt the House",
   "Element magic": "Magicka, Noita: combine elements into spells that react with the world",
   "Friendly-fire chaos": "Magicka",
-  "Summon minions": "Arcanists",
-  "Reshape the land": "Arcanists",
-  "Combine to upgrade": "Vampire Survivors, Brotato: evolve a weapon, or merge copies into a stronger one",
-  "Items stack and chain": "Risk of Rain",
+  "Destructible terrain": "Arcanists, Effing Worms: raise, destroy or tunnel through the ground, and burst out to attack",
+  "Stack and evolve items": "Vampire Survivors, Brotato, Risk of Rain: stack items so effects chain, evolve a weapon, or merge copies into a stronger one",
   "Kill combos unlock weapons": "Boxhead",
-  "Barricades and explosive barrels": "Boxhead",
+  "Dangerous arena": "Stick Fight, Boxhead: explosive barrels, saws, spikes and falling blocks hurt anyone nearby; place barricades to block enemies",
   "Evolve body parts": "Monster Evolution",
-  "Procedurally generated biomes": "Classic Minecraft, Terraria",
   "Bash off enemies and their shots": "Ori and the Blind Forest",
   "Steer a partner": "Armed with Wings",
-  "Make and share levels": "Happy Wheels",
+  "Level editor": "Happy Wheels",
   "Ragdoll physics": "Stick Fight, Happy Wheels: wobbly bodies, and limbs fly off",
-  "Deadly level hazards": "Stick Fight: The Game",
   "Jetpacks": "Metal Mayhem",
   "Slow motion": "Bullet Time Fighting, Electricman 2",
   "Items to sabotage rivals": "Speedrunners",
-  "Catch and raise allies": "Pokémon Tower Defense, Castaway: catch or tame creatures that level up, evolve and fight with you",
-  "Burrow and burst out": "Effing Worms",
+  "Catch and raise allies": "Arcanists, Pokémon Tower Defense, Castaway: summon, catch or tame creatures that fight with you, level up and evolve",
   "Friends damage a shared boss": "Habitica",
   "Solve a planet's riddle to change it": "Aether",
   "Limited oxygen, darker the deeper": "Scuba"
 };
 // Which twists go with each gameplay loop: the loops each one could work in.
 const GI_MECH_FIT = {
-  "Endless runner": ["Random maze each round", "Items stack and chain", "Kill combos unlock weapons", "Procedurally generated biomes", "Bash off enemies and their shots", "Make and share levels", "Deadly level hazards", "Jetpacks", "Slow motion", "Items to sabotage rivals", "Burrow and burst out", "Limited oxygen, darker the deeper"],
-  "Artillery turns": ["Bouncing bullets + 1-hit KO", "Element magic", "Friendly-fire chaos", "Summon minions", "Reshape the land", "Combine to upgrade", "Barricades and explosive barrels", "Ragdoll physics", "Slow motion"],
-  "Survivors-like": ["Random maze each round", "Element magic", "Friendly-fire chaos", "Summon minions", "Combine to upgrade", "Items stack and chain", "Kill combos unlock weapons", "Barricades and explosive barrels", "Evolve body parts", "Procedurally generated biomes", "Bash off enemies and their shots", "Deadly level hazards", "Slow motion", "Ragdoll physics", "Catch and raise allies", "Burrow and burst out", "Friends damage a shared boss", "Limited oxygen, darker the deeper"],
-  "Arena duel": ["Bouncing bullets + 1-hit KO", "Random maze each round", "Possess objects", "Element magic", "Friendly-fire chaos", "Reshape the land", "Combine to upgrade", "Items stack and chain", "Kill combos unlock weapons", "Barricades and explosive barrels", "Ragdoll physics", "Deadly level hazards", "Jetpacks", "Slow motion", "Items to sabotage rivals"],
-  "Metroidvania": ["Possess objects", "Element magic", "Items stack and chain", "Procedurally generated biomes", "Bash off enemies and their shots", "Steer a partner", "Make and share levels", "Ragdoll physics", "Deadly level hazards", "Jetpacks", "Slow motion", "Catch and raise allies", "Burrow and burst out", "Solve a planet's riddle to change it", "Limited oxygen, darker the deeper"],
-  "Platform fighter": ["Bouncing bullets + 1-hit KO", "Possess objects", "Element magic", "Friendly-fire chaos", "Summon minions", "Reshape the land", "Combine to upgrade", "Items stack and chain", "Kill combos unlock weapons", "Barricades and explosive barrels", "Evolve body parts", "Bash off enemies and their shots", "Make and share levels", "Ragdoll physics", "Deadly level hazards", "Jetpacks", "Slow motion", "Items to sabotage rivals", "Burrow and burst out"],
-  "Tower defence": ["Random maze each round", "Element magic", "Friendly-fire chaos", "Summon minions", "Reshape the land", "Combine to upgrade", "Barricades and explosive barrels", "Evolve body parts", "Steer a partner", "Make and share levels", "Catch and raise allies", "Friends damage a shared boss"],
-  "Platform race": ["Bouncing bullets + 1-hit KO", "Random maze each round", "Items stack and chain", "Procedurally generated biomes", "Bash off enemies and their shots", "Steer a partner", "Make and share levels", "Ragdoll physics", "Deadly level hazards", "Jetpacks", "Items to sabotage rivals"],
-  "Eat-to-grow": ["Evolve body parts", "Procedurally generated biomes", "Catch and raise allies", "Burrow and burst out", "Limited oxygen, darker the deeper"],
+  "Endless runner": ["Destructible terrain", "Stack and evolve items", "Kill combos unlock weapons", "Dangerous arena", "Bash off enemies and their shots", "Level editor", "Jetpacks", "Slow motion", "Items to sabotage rivals", "Limited oxygen, darker the deeper"],
+  "Artillery turns": ["Bouncing bullets + 1-hit KO", "Element magic", "Friendly-fire chaos", "Destructible terrain", "Stack and evolve items", "Dangerous arena", "Ragdoll physics", "Catch and raise allies"],
+  "Survivors-like": ["Element magic", "Friendly-fire chaos", "Destructible terrain", "Stack and evolve items", "Kill combos unlock weapons", "Dangerous arena", "Evolve body parts", "Bash off enemies and their shots", "Ragdoll physics", "Slow motion", "Catch and raise allies", "Friends damage a shared boss", "Limited oxygen, darker the deeper"],
+  "Arena duel": ["Bouncing bullets + 1-hit KO", "Possess objects", "Element magic", "Friendly-fire chaos", "Destructible terrain", "Stack and evolve items", "Kill combos unlock weapons", "Dangerous arena", "Slow motion", "Items to sabotage rivals"],
+  "Metroidvania": ["Possess objects", "Element magic", "Destructible terrain", "Stack and evolve items", "Dangerous arena", "Bash off enemies and their shots", "Steer a partner", "Level editor", "Ragdoll physics", "Jetpacks", "Slow motion", "Catch and raise allies", "Solve a planet's riddle to change it", "Limited oxygen, darker the deeper"],
+  "Platform fighter": ["Bouncing bullets + 1-hit KO", "Possess objects", "Element magic", "Friendly-fire chaos", "Destructible terrain", "Stack and evolve items", "Kill combos unlock weapons", "Dangerous arena", "Evolve body parts", "Bash off enemies and their shots", "Level editor", "Ragdoll physics", "Jetpacks", "Slow motion", "Items to sabotage rivals", "Catch and raise allies"],
+  "Tower defence": ["Element magic", "Friendly-fire chaos", "Destructible terrain", "Stack and evolve items", "Dangerous arena", "Evolve body parts", "Steer a partner", "Level editor", "Catch and raise allies", "Friends damage a shared boss"],
+  "Platform race": ["Bouncing bullets + 1-hit KO", "Stack and evolve items", "Dangerous arena", "Bash off enemies and their shots", "Steer a partner", "Level editor", "Ragdoll physics", "Jetpacks", "Items to sabotage rivals"],
+  "Eat-to-grow": ["Destructible terrain", "Evolve body parts", "Catch and raise allies", "Limited oxygen, darker the deeper"],
   "Habit RPG": ["Catch and raise allies", "Friends damage a shared boss"],
-  "Point-and-click": ["Possess objects", "Steer a partner", "Make and share levels", "Solve a planet's riddle to change it"],
-  "Survival crafting": ["Element magic", "Reshape the land", "Procedurally generated biomes", "Catch and raise allies", "Solve a planet's riddle to change it", "Limited oxygen, darker the deeper"],
+  "Point-and-click": ["Possess objects", "Steer a partner", "Level editor", "Solve a planet's riddle to change it"],
 };
 // Twist 3 by Twist 2: none after "None"; after a twist, anything. Every twist is named, since a
 // rule leaves an option it never names free to go with anything.
-const giTwist3Fit = () => ({ None: ["None"], ...Object.fromEntries(Object.keys(GI_MECH).map((t) => [t, ["None", ...Object.keys(GI_MECH)]])) });
+const giTwist3Fit = () => ({ None: ["None"], ...giTwistPairs(true) });
+// Twists that never come together: bouncing bullets already make your own shots hit you.
+const GI_TWIST_CLASH = [["Bouncing bullets + 1-hit KO", "Friendly-fire chaos"]];
+const giClash = (a, b) => GI_TWIST_CLASH.some(([x, y]) => (a === x && b === y) || (a === y && b === x));
+// What another twist can be, by this one (with "None" when that one can be empty).
+const giTwistPairs = (none) => Object.fromEntries(Object.keys(GI_MECH).map((t) =>
+  [t, [...(none ? ["None"] : []), ...Object.keys(GI_MECH).filter((x) => !giClash(t, x))]]));
+// Twists that only make sense in some camera angles; the rest go with any.
+const GI_TWIST_CAMS = {
+  "Jetpacks": ["2D side-scrolling", "3D side-scrolling", "Third person"],
+  "Limited oxygen, darker the deeper": ["2D side-scrolling", "3D side-scrolling"],
+  "Destructible terrain": ["Top-down", "2D side-scrolling", "3D side-scrolling"],
+  "Ragdoll physics": ["2D side-scrolling", "3D side-scrolling", "Third person", "UI only"],
+};
+const giTwistByCam = (none) => Object.fromEntries(Object.keys(GI_LOOP_BY_CAM).map((cam) =>
+  [cam, [...(none ? ["None"] : []), ...Object.keys(GI_MECH).filter((t) => !GI_TWIST_CAMS[t] || GI_TWIST_CAMS[t].includes(cam))]]));
 // Art styles: Risk of Rain 2's low-poly, A Short Hike's pixelated 3D and INSIDE's foggy
 // silhouettes are 3D; the rest are 2D.
 const GI_ART_3D = ["Clean low-poly 3D (Risk of Rain 2)", "Cosy low-res pixelated 3D (A Short Hike)",
-  "3D silhouettes in a grey, foggy world, by the makers of Limbo (INSIDE)"];
+  "3D silhouettes in a grey, foggy world, by the makers of Limbo (INSIDE)", "Soft, painterly 3D with cinematic light (Planet of Lana)"];
 const GI_ART = [
   "Scratchy, dark hand-drawn storybook (Don't Starve)", "GBA pixel art (Pokémon FireRed / LeafGreen)", "Cosy farm pixel art (Stardew Valley)",
   "Hand-drawn gothic 2D (Hollow Knight)", "Glowing painterly forest in hand-painted layers (Ori and the Blind Forest)", "Tiny pixel sprites (Risk of Rain)",
   "Detailed pixel soldiers and big explosions (Metal Slug)", "Soft, moody pixel art (Sheepy: A Short Adventure)",
-  "Mossy photo-collage fairy tale (Samorost)", "Dark, dreamy painted scenes (Coma / Nevermore)",
-  "Cartoon Martian invasion (Martians from Mars)", "Soft, sketchy pastel art (Aether)",
+  "Dark, dreamy painted scenes (Coma / Nevermore)", "Soft, sketchy pastel art (Aether)",
   "Black silhouettes in grey fog or under a glowing, colourful sky (Limbo, Badland, Armed with Wings)", ...GI_ART_3D,
 ];
 // The camera angle each art style's own game uses, by that game (the source in brackets).
 const GI_ART_ANGLES = {
   "Top-down": ["Don't Starve", "Pokémon FireRed / LeafGreen", "Stardew Valley"],
-  "Side-scrolling": ["Hollow Knight", "Ori and the Blind Forest", "Risk of Rain", "Metal Slug", "Sheepy: A Short Adventure", "Samorost",
-    "Coma / Nevermore", "Martians from Mars", "Aether", "Limbo, Badland, Armed with Wings", "INSIDE"],
+  "2D side-scrolling": ["Hollow Knight", "Ori and the Blind Forest", "Risk of Rain", "Metal Slug", "Sheepy: A Short Adventure",
+    "Coma / Nevermore", "Aether", "Limbo, Badland, Armed with Wings"],
+  "3D side-scrolling": ["INSIDE", "Planet of Lana"],
   "Third person": ["Risk of Rain 2", "A Short Hike"],
   "UI only": ["Stardew Valley", "Pokémon FireRed / LeafGreen"],
 };
@@ -814,10 +821,12 @@ const giArtAngles = (a) => Object.keys(GI_ART_ANGLES).filter((k) => GI_ART_ANGLE
 const GI_CAM_RENAMED = { "Top down": "Top-down", "Side Scrolling": "Side-scrolling", "3rd Person": "Third person", "UI Only": "UI only" };
 // Which gameplay loops go with each camera angle: the camera each loop's own games use.
 const GI_LOOP_BY_CAM = {
-  "Top-down": ["Survivors-like", "Arena duel", "Tower defence", "Eat-to-grow", "Survival crafting"],
-  "Side-scrolling": ["Endless runner", "Artillery turns", "Survivors-like", "Metroidvania", "Platform fighter", "Platform race",
-    "Eat-to-grow", "Point-and-click", "Survival crafting"],
-  "Third person": ["Endless runner", "Survivors-like", "Survival crafting"],
+  "Top-down": ["Survivors-like", "Arena duel", "Tower defence", "Eat-to-grow"],
+  "2D side-scrolling": ["Endless runner", "Artillery turns", "Survivors-like", "Metroidvania", "Platform fighter", "Platform race",
+    "Eat-to-grow", "Point-and-click"],
+  "3D side-scrolling": ["Endless runner", "Artillery turns", "Survivors-like", "Metroidvania", "Platform fighter", "Platform race",
+    "Eat-to-grow", "Point-and-click"],
+  "Third person": ["Endless runner", "Survivors-like"],
   "UI only": ["Habit RPG", "Point-and-click"],
 };
 // Game maps you're nostalgic for, with their game as the description.
@@ -832,7 +841,8 @@ const GI_MAPS = {
   "Teyvat": "Genshin Impact",
   "Bullworth": "Bully",
   "Palpagos Islands": "Palworld",
-  "The Constant": "Don't Starve"
+  "The Constant": "Don't Starve",
+  "Procedurally generated": "Tank Trouble, Classic Minecraft, Terraria: a new maze or world each time"
 };
 // Fictional worlds, each with its own rules for how powers work and how people differ.
 const GI_WORLDS = {
@@ -855,38 +865,74 @@ const giMapByWorld = () => {
   const own = Object.values(GI_MAP_OWN).flat(), any = Object.keys(GI_MAPS).filter((m) => !own.includes(m));
   return Object.fromEntries(Object.keys(GI_WORLDS).map((w) => [w, [...any, ...(GI_MAP_OWN[w] || [])]]));
 };
-// Twists that make a new map every time leave no fixed map.
-const GI_RANDOM_MAP = ["Procedurally generated biomes", "Random maze each round"];
-const giMapByTwist = (none) => Object.fromEntries([...(none ? ["None"] : []), ...Object.keys(GI_MECH)]
-  .map((t) => [t, GI_RANDOM_MAP.includes(t) ? ["None"] : Object.keys(GI_MAPS)]));
-const giMapFit = () => ({ "World & powers": giMapByWorld(), "Twist 1": giMapByTwist(false), "Twist 2": giMapByTwist(true), "Twist 3": giMapByTwist(true) });
+// Maps by loop: Habit RPG has no map, and Point-and-click's puzzles are hand-made, so it never
+// gets a generated one. Every other loop takes any map.
+const GI_MAP_NOT = { "Habit RPG": Object.keys(GI_MAPS).filter((m) => m !== "None"), "Point-and-click": ["Procedurally generated"] };
+const giMapByLoop = () => Object.fromEntries(Object.keys(GI_LOOPS).map((l) =>
+  [l, Object.keys(GI_MAPS).filter((m) => !(GI_MAP_NOT[l] || []).includes(m))]));
+const giMapFit = () => ({ "World & powers": giMapByWorld(), "Gameplay loop": giMapByLoop() });
 const GAME_IDEA = {
   name: "Game Idea Generator", emoji: "🎮", labels: ["Fun"],
   description: "Camera angle, art style, gameplay loop, twists, world & powers and specific world map",
   cats: [
     // UI only: no game world, just screens and cards.
     // The description says 2D or 3D, by the art styles each angle goes with.
-    { name: "Camera angle", items: Object.values(GI_CAM_RENAMED),
-      notes: { "Top-down": "2D", "Side-scrolling": "2D or 3D", "Third person": "3D", "UI only": "2D" } },
+    { name: "Camera angle", items: Object.keys(GI_LOOP_BY_CAM),
+      notes: { "Top-down": "2D", "2D side-scrolling": "2D", "3D side-scrolling": "3D", "Third person": "3D", "UI only": "2D" } },
     // Each art style goes with its own game's camera angle (the style itself says 2D or 3D).
     { name: "Art style", follow: "Camera angle", items: [...GI_ART], badges: Object.fromEntries(GI_ART.map((a) => [a, giArtAngles(a)])) },
     // Each loop goes with the camera angles its own games use.
     { name: "Gameplay loop", items: Object.keys(GI_LOOPS), notes: { ...GI_LOOPS }, fit: { "Camera angle": GI_LOOP_BY_CAM } },
     // Up to 3 twists: Twist 2 and 3 are often "None" (about 60% of rolls get 1 twist, 30% get 2,
     // 10% get 3), Twist 3 only comes when Twist 2 has one, and a twist never comes twice.
-    { name: "Twist 1", items: Object.keys(GI_MECH), notes: { ...GI_MECH }, unique: "twist", fit: { "Gameplay loop": GI_MECH_FIT } },
+    { name: "Twist 1", items: Object.keys(GI_MECH), notes: { ...GI_MECH }, unique: "twist", fit: { "Gameplay loop": GI_MECH_FIT, "Camera angle": giTwistByCam(false) } },
     { name: "Twist 2", items: ["None", ...Object.keys(GI_MECH)], notes: { None: "No second twist", ...GI_MECH }, unique: "twist",
-      often: { item: "None", share: 0.6 }, fit: { "Gameplay loop": GI_MECH_FIT } },
+      often: { item: "None", share: 0.6 }, fit: { "Gameplay loop": GI_MECH_FIT, "Camera angle": giTwistByCam(true), "Twist 1": giTwistPairs(true) } },
     { name: "Twist 3", items: ["None", ...Object.keys(GI_MECH)], notes: { None: "No third twist", ...GI_MECH }, unique: "twist",
-      often: { item: "None", share: 0.75 }, fit: { "Gameplay loop": GI_MECH_FIT, "Twist 2": giTwist3Fit() } },
+      often: { item: "None", share: 0.75 }, fit: { "Gameplay loop": GI_MECH_FIT, "Camera angle": giTwistByCam(true), "Twist 1": giTwistPairs(true), "Twist 2": giTwist3Fit() } },
     { name: "World & powers", items: Object.keys(GI_WORLDS), notes: { ...GI_WORLDS } },
-    // A bonus: most rolls get no map. It goes with the world, and with no random-map twist.
+    // A bonus: most rolls get no map. It goes with the world.
     { name: "Specific world map", items: Object.keys(GI_MAPS), notes: { ...GI_MAPS }, often: { item: "None", share: 0.7 }, fit: giMapFit() },
   ],
 };
 // Each art style above is "Style (Game)"; on the list the game is the option and the style its
 // description ("Risk of Rain 2" / "Clean low-poly 3D").
 const giSource = (s) => /^(.+) \(([^()]+)\)$/.exec(s);
+// Takes gameplay loops off a saved Game Idea list, with their rules in other categories.
+function giDropLoops(gameIdea, gone) {
+  const loop = gameIdea.cats.find((x) => x.name === "Gameplay loop");
+  if (loop) {
+    loop.items = loop.items.filter((x) => !gone.includes(x));
+    for (const k of ["notes", "badges", "weights"]) if (loop[k]) gone.forEach((x) => delete loop[k][x]);
+    if (loop.often && gone.includes(loop.often.item)) delete loop.often;
+    if (loop.offItems) loop.offItems = loop.offItems.filter((x) => !gone.includes(x));
+    Object.values((loop.fit && loop.fit["Camera angle"]) || {}).forEach((r) => gone.forEach((x) => { if (r.includes(x)) r.splice(r.indexOf(x), 1); }));
+  }
+  gameIdea.cats.forEach((c) => { const t = c.fit && c.fit["Gameplay loop"]; if (t) gone.forEach((x) => delete t[x]); });
+}
+// Merges twists on a saved Game Idea list into one (where the first of them was), with the
+// rules of either: it goes with every loop they went with.
+function giMergeTwists(gameIdea, parts, merged) {
+  const gone = parts.filter((x) => x !== merged); // the merged one can keep a part's name
+  gameIdea.cats.filter((c) => /^Twist \d$/.test(c.name)).forEach((c) => {
+    const at = c.items.findIndex((x) => parts.includes(x));
+    if (at >= 0 && !c.items.includes(merged)) c.items.splice(at, 0, merged);
+    c.items = c.items.filter((x) => !gone.includes(x));
+    if (c.items.includes(merged)) c.notes = { ...(c.notes || {}), [merged]: GI_MECH[merged] };
+    for (const k of ["notes", "badges", "weights"]) if (c[k]) gone.forEach((x) => delete c[k][x]);
+    if (c.offItems) c.offItems = c.offItems.filter((x) => !gone.includes(x));
+    Object.values(c.fit || {}).forEach((t) => {
+      if (gone.some((x) => t[x])) t[merged] = [...new Set([...(t[merged] || []), ...gone.flatMap((x) => t[x] || [])])];
+      gone.forEach((x) => delete t[x]);
+      Object.values(t).forEach((r) => {
+        const i = r.findIndex((x) => gone.includes(x));
+        if (i < 0) return;
+        if (!r.includes(merged)) r.splice(i, 0, merged);
+        for (let j = r.length - 1; j >= 0; j--) if (gone.includes(r[j])) r.splice(j, 1);
+      });
+    });
+  });
+}
 // Art style options were named by their style before; once on your phone they take their game's.
 const GI_ART_WAS = { ...Object.fromEntries(GI_ART.filter(giSource).map((s) => [giSource(s)[1], giSource(s)[2]])),
   "Black silhouettes": "Limbo, Badland, Armed with Wings", "3D silhouettes in a grey, foggy world": "INSIDE" };
@@ -4255,8 +4301,7 @@ function load() {
       const row = cat(n) && cat(n).fit && cat(n).fit["Gameplay loop"] && cat(n).fit["Gameplay loop"]["Survivors-like"];
       if (row && row.includes("Bouncing bullets + 1-hit KO")) row.splice(row.indexOf("Bouncing bullets + 1-hit KO"), 1);
     });
-    [["Gameplay loop", "Camera angle"], ["Specific world map", "World & powers"], ["Specific world map", "Twist 1"],
-      ["Specific world map", "Twist 2"], ["Specific world map", "Twist 3"]].forEach(([n, by]) => {
+    [["Gameplay loop", "Camera angle"], ["Specific world map", "World & powers"]].forEach(([n, by]) => {
       const c = cat(n);
       if (!c || !cat(by) || (c.fit && c.fit[by])) return;
       c.fit = { ...(c.fit || {}), [by]: structuredClone(want(n).fit[by]) };
@@ -4305,17 +4350,12 @@ function load() {
       }
       if (loop.notes && loop.notes[mv] === "Ori and the Blind Forest, Hollow Knight") loop.notes[mv] = GI_LOOPS[mv];
     }
-    const gone = ["Life / village sim", "Physics sandbox", "Action RPG", "Word puzzle", "Claw grab", "Music mixing", "Base conquest", "Map strategy"];
-    if (loop) {
-      loop.items = loop.items.filter((x) => !gone.includes(x));
-      for (const k of ["notes", "badges", "weights"]) if (loop[k]) gone.forEach((x) => delete loop[k][x]);
-      if (loop.often && gone.includes(loop.often.item)) delete loop.often;
-      if (loop.offItems) loop.offItems = loop.offItems.filter((x) => !gone.includes(x));
-      Object.values((loop.fit && loop.fit["Camera angle"]) || {}).forEach((r) => gone.forEach((x) => { if (r.includes(x)) r.splice(r.indexOf(x), 1); }));
-    }
-    twistFits.forEach((t) => gone.forEach((x) => delete t[x]));
+    giDropLoops(gameIdea, ["Life / village sim", "Physics sandbox", "Action RPG", "Word puzzle", "Claw grab", "Music mixing", "Base conquest", "Map strategy"]);
   }
   d.gameIdeaLoops3 = true;
+  // Once: Survival crafting goes too (too complex for a first vibecoded game).
+  if (gameIdea && !d.gameIdeaLoops4 && gameIdea.type === "multi") giDropLoops(gameIdea, ["Survival crafting"]);
+  d.gameIdeaLoops4 = true;
   // Once: each art style is named by its game, with the style as its description. A note you
   // wrote yourself stays.
   if (gameIdea && !d.gameIdeaArtNames && gameIdea.type === "multi") {
@@ -4331,6 +4371,134 @@ function load() {
     });
   }
   d.gameIdeaArtNames = true;
+  // Once: the Samorost and Martians from Mars art styles go (under either name they had).
+  if (gameIdea && !d.gameIdeaArt2 && gameIdea.type === "multi") {
+    const art = gameIdea.cats.find((x) => x.name === "Art style");
+    const gone = ["Samorost", "Martians from Mars", "Mossy photo-collage fairy tale", "Cartoon Martian invasion"];
+    if (art) {
+      art.items = art.items.filter((x) => !gone.includes(x));
+      for (const k of ["notes", "badges", "weights"]) if (art[k]) gone.forEach((x) => delete art[k][x]);
+      if (art.offItems) art.offItems = art.offItems.filter((x) => !gone.includes(x));
+    }
+  }
+  d.gameIdeaArt2 = true;
+  // Once: the random-map twists (Tank Trouble's maze, Minecraft's biomes) become the map
+  // "Procedurally generated", which goes with any world.
+  if (gameIdea && !d.gameIdeaMapGen && gameIdea.type === "multi") {
+    const gone = ["Random maze each round", "Procedurally generated biomes"], gen = "Procedurally generated";
+    gameIdea.cats.filter((c) => /^Twist \d$/.test(c.name)).forEach((c) => {
+      c.items = c.items.filter((x) => !gone.includes(x));
+      for (const k of ["notes", "badges", "weights"]) if (c[k]) gone.forEach((x) => delete c[k][x]);
+      if (c.offItems) c.offItems = c.offItems.filter((x) => !gone.includes(x));
+      Object.values(c.fit || {}).forEach((t) => {
+        gone.forEach((x) => delete t[x]);
+        Object.values(t).forEach((r) => gone.forEach((x) => { if (r.includes(x)) r.splice(r.indexOf(x), 1); }));
+      });
+    });
+    const map = gameIdea.cats.find((x) => x.name === "Specific world map");
+    if (map) {
+      if (map.fit) ["Twist 1", "Twist 2", "Twist 3"].forEach((n) => delete map.fit[n]);
+      if (!map.items.includes(gen)) {
+        map.items.push(gen);
+        map.notes = { ...(map.notes || {}), [gen]: GI_MAPS[gen] };
+        Object.values((map.fit && map.fit["World & powers"]) || {}).forEach((r) => { if (!r.includes(gen)) r.push(gen); });
+      }
+    }
+  }
+  d.gameIdeaMapGen = true;
+  // Once: "Combine to upgrade" and "Items stack and chain" become one twist, "Stack and evolve items", where the first of them was,
+  // going with the loops of either.
+  if (gameIdea && !d.gameIdeaStackMerge && gameIdea.type === "multi") giMergeTwists(gameIdea, ["Combine to upgrade", "Items stack and chain"], "Stack and evolve items");
+  d.gameIdeaStackMerge = true;
+  // Once: "Barricades and explosive barrels" and "Deadly level hazards" become one twist, "Dangerous arena", going with the loops of either.
+  if (gameIdea && !d.gameIdeaArenaMerge && gameIdea.type === "multi") giMergeTwists(gameIdea, ["Barricades and explosive barrels", "Deadly level hazards"], "Dangerous arena");
+  d.gameIdeaArenaMerge = true;
+  // Once: Summon minions joins Catch and raise allies; Reshape the land and Burrow and burst out
+  // become Destructible terrain; Make and share levels is now Level editor. Bouncing bullets
+  // never comes with Friendly-fire chaos, and a few twists only come in some camera angles.
+  // Rules you set yourself stay.
+  if (gameIdea && !d.gameIdeaTwistAudit && gameIdea.type === "multi") {
+    giMergeTwists(gameIdea, ["Summon minions", "Catch and raise allies"], "Catch and raise allies");
+    giMergeTwists(gameIdea, ["Reshape the land", "Burrow and burst out"], "Destructible terrain");
+    const twists = gameIdea.cats.filter((c) => /^Twist \d$/.test(c.name));
+    twists.forEach((c) => {
+      if (c.items.includes("Make and share levels") && !c.items.includes("Level editor")) {
+        c.items[c.items.indexOf("Make and share levels")] = "Level editor";
+        renameOption(gameIdea, c, "Make and share levels", "Level editor");
+      }
+    });
+    const want = (n) => GAME_IDEA.cats.find((x) => x.name === n);
+    twists.forEach((c) => {
+      const w = want(c.name);
+      if (!w) return;
+      c.fit = c.fit || {};
+      ["Camera angle", "Twist 1"].forEach((by) => {
+        if (w.fit[by] && !c.fit[by] && gameIdea.cats.some((x) => x.name === by)) c.fit[by] = structuredClone(w.fit[by]);
+      });
+      // Twist 3 by Twist 2: the never-together pair leaves each other's rows.
+      const t = c.fit["Twist 2"];
+      if (t) Object.entries(t).forEach(([a, r]) => {
+        for (let j = r.length - 1; j >= 0; j--) if (giClash(a, r[j])) r.splice(j, 1);
+      });
+    });
+    const cur = gameIdea.description;
+    if (cur && cur !== GAME_IDEA.description && /^Camera angle, art style, gameplay loop, twists/.test(cur)) gameIdea.description = GAME_IDEA.description;
+  }
+  d.gameIdeaTwistAudit = true;
+  // Once: Side-scrolling becomes 2D side-scrolling and 3D side-scrolling, where it was. Rules
+  // for it go to both; built-in art styles take the one their game uses.
+  if (gameIdea && !d.gameIdeaSideSplit && gameIdea.type === "multi") {
+    const cam = gameIdea.cats.find((x) => x.name === "Camera angle"), was = "Side-scrolling", now = ["2D side-scrolling", "3D side-scrolling"];
+    const g = GAME_IDEA.cats.find((x) => x.name === "Camera angle");
+    if (cam && cam.items.includes(was) && !now.some((x) => cam.items.includes(x))) {
+      cam.items.splice(cam.items.indexOf(was), 1, ...now);
+      if (cam.notes) { delete cam.notes[was]; now.forEach((x) => (cam.notes[x] = g.notes[x])); }
+      if (cam.weights) delete cam.weights[was];
+      if (cam.offItems && cam.offItems.includes(was)) cam.offItems = [...cam.offItems.filter((x) => x !== was), ...now];
+      const art = GAME_IDEA.cats.find((x) => x.name === "Art style");
+      gameIdea.cats.forEach((c) => {
+        const t = c.fit && c.fit["Camera angle"];
+        if (t && t[was]) { now.forEach((x) => { if (!t[x]) t[x] = [...t[was]]; }); delete t[was]; }
+        if (followsOf(c).includes("Camera angle") && c.badges) Object.entries(c.badges).forEach(([it, b]) => {
+          if (!b.includes(was)) return;
+          const mine = c.name === "Art style" && art.badges[it];
+          c.badges[it] = mine ? [...art.badges[it]] : [...new Set(b.flatMap((x) => (x === was ? now : [x])))];
+        });
+      });
+    }
+  }
+  d.gameIdeaSideSplit = true;
+  // Once: 3D side-scrolling gets Planet of Lana's art, after INSIDE's.
+  if (gameIdea && !d.gameIdeaArtLana && gameIdea.type === "multi") {
+    const art = gameIdea.cats.find((x) => x.name === "Art style"), g = GAME_IDEA.cats.find((x) => x.name === "Art style"), lana = "Planet of Lana";
+    if (art && !art.items.includes(lana)) {
+      const at = art.items.indexOf("INSIDE");
+      art.items.splice(at < 0 ? art.items.length : at + 1, 0, lana);
+      art.notes = { ...(art.notes || {}), [lana]: g.notes[lana] };
+      setBadges(art, lana, [...g.badges[lana]]);
+    }
+  }
+  d.gameIdeaArtLana = true;
+  // Once: the map follows the loop (no map with Habit RPG, no generated map with Point-and-click);
+  // Destructible terrain also rolls Top-down; Artillery turns loses Slow motion, and Arena duel
+  // loses Jetpacks and Ragdoll physics (they could never roll with it).
+  if (gameIdea && !d.gameIdeaLogic1 && gameIdea.type === "multi") {
+    const own = (n) => GAME_IDEA.cats.find((x) => x.name === n);
+    const map = gameIdea.cats.find((x) => x.name === "Specific world map");
+    if (map && !(map.fit && map.fit["Gameplay loop"]) && gameIdea.cats.some((x) => x.name === "Gameplay loop"))
+      map.fit = { ...(map.fit || {}), "Gameplay loop": structuredClone(own(map.name).fit["Gameplay loop"]) };
+    const drop = { "Artillery turns": ["Slow motion"], "Arena duel": ["Jetpacks", "Ragdoll physics"] };
+    gameIdea.cats.filter((c) => /^Twist \d$/.test(c.name)).forEach((c) => {
+      const byLoop = c.fit && c.fit["Gameplay loop"];
+      if (byLoop) Object.entries(drop).forEach(([l, ts]) => { if (byLoop[l]) byLoop[l] = byLoop[l].filter((t) => !ts.includes(t)); });
+      const row = c.fit && c.fit["Camera angle"] && c.fit["Camera angle"]["Top-down"], t = "Destructible terrain";
+      if (row && c.items.includes(t) && !row.includes(t)) {
+        const want = own(c.name).fit["Camera angle"]["Top-down"], next = want.slice(want.indexOf(t) + 1).find((x) => row.includes(x));
+        row.splice(next ? row.indexOf(next) : row.length, 0, t);
+      }
+    });
+  }
+  d.gameIdeaLogic1 = true;
   // Lists made before "Date created" existed count as created in their current order.
   const base = Date.now() - d.lists.length * 1000;
   d.lists.forEach((l, i) => { if (!l.created) l.created = base + i * 1000; });
