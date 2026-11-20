@@ -5615,12 +5615,19 @@ function renderResult(list) {
 }
 
 // The slots of the `starts` group (e.g. Passive Skill 1–4) among `cats`, with their count category:
-// { name, count, members }, or null when there aren't at least two of them.
+// { name, count, members }, or null when there aren't at least two of them. A list without a
+// count groups its numbered slots that share `unique` the same way (Twist 1–3 → "Twists").
 function comboGroup(list, cats) {
   const s = startsCat(list);
-  const members = s ? cats.filter((c) => c.unique === s.starts.group) : [];
-  if (members.length < 2) return null;
-  return { name: s.name, count: cats.includes(s) ? s : null, members };
+  if (s) {
+    const members = cats.filter((c) => c.unique === s.starts.group);
+    return members.length < 2 ? null : { name: s.name, count: cats.includes(s) ? s : null, members };
+  }
+  const first = cats.find((c) => c.unique && / \d+$/.test(c.name));
+  if (!first) return null;
+  const base = first.name.replace(/ \d+$/, "");
+  const members = cats.filter((c) => c.unique === first.unique && c.name.replace(/ \d+$/, "") === base);
+  return members.length < 2 ? null : { name: `${base}s`, count: null, members };
 }
 
 // Multiple: one row per category with its pick. Tap a row to choose it
