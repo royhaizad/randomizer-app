@@ -3693,6 +3693,11 @@ function load() {
   const fresh = !d;
   const hadIds = new Set(fresh ? [] : d.lists.map((l) => l.id));
   d = d || { lists: listsFromBackup(BACKUP, ORDER), history: {} };
+  // Once: Wheel / Reels start switched on; turning them off after that sticks.
+  if (!d.wheelOn) {
+    d.wheel = true;
+    d.wheelOn = true;
+  }
   // Once: three lists got new names (a list you renamed yourself keeps your name).
   if (!d.listOrder2) {
     const RENAMED = { "Random Pokémon": POKEMON.name, "Random Pal": PALWORLD.name, "Ultimate Pokémon Generator": ULTIMATE.name };
