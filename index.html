@@ -1853,6 +1853,45 @@ const ABILITY_TYPES = Object.fromEntries(Object.entries({
 }).flatMap(([types, names]) => names.split(", ").map((n) => [n, types.split(", ")])));
 POKEMON_FIT["Hidden Ability"].Type = Object.fromEntries(POKEMON.cats.Type.map((t) => [t,
   POKEMON.cats["Hidden Ability"].filter((a) => !ABILITY_TYPES[a] || t.split(" · ").some((x) => ABILITY_TYPES[a].includes(x)))]));
+// Halal places to eat at KLIA2 (terminal, gateway@klia2 mall and airside piers): JAKIM-certified
+// or Muslim-owned, as reported by klia2.info, RouteJunction, AirportMY and Halal Ke Tak? (Nov 2026).
+// Pork-free-only places (DIN by Din Tai Fung) and bars (The Refinery) are left out.
+const KLIA2_HALAL = {
+  name: "Makan KLIA2",
+  emoji: "✈️",
+  description: "Halal places to eat at KLIA2 and gateway@klia2. Check the halal logo at the counter.",
+  labels: ["Makan"],
+  items: {
+    "AHH YUM": [["Malay & local"], "Malaysian kopitiam food. Level 3. Open 24 hours."],
+    "Ah Cheng Laksa": [["Malay & local"], "Asam laksa. gateway@klia2 Level 3 (L3-24A). Open 24 hours. JAKIM-certified since 2013."],
+    "Kitchen by Open House": [["Malay & local"], "Malaysian dishes."],
+    "Grandmama's": [["Malay & local"], "Malaysian home-style dishes."],
+    "OldTown White Coffee": [["Malay & local", "Café"], "Kopitiam food and white coffee. Departure hall Level 3, also airside at Pier J and Pier L."],
+    "Boat Noodle": [["Thai"], "Thai boat noodles. gateway@klia2 Level 3."],
+    "Nando's": [["Western"], "Peri-peri chicken. gateway@klia2 Level 3 (L3-51)."],
+    "Shake Shack": [["Western"], "Burgers and shakes. JAKIM-certified."],
+    "McDonald's": [["Fast food"], "gateway@klia2 Level 3, also airside at the Satellite."],
+    "KFC": [["Fast food"], "gateway@klia2 Level 2 (L2-20 to 22). JAKIM-certified."],
+    "Burger King": [["Fast food"], "Airside at Pier J, Pier L and the Satellite."],
+    "Marrybrown": [["Fast food"], "gateway@klia2 Level 2."],
+    "A&W": [["Fast food"], "Airside at the Satellite. Open 24 hours."],
+    "Jollibee": [["Fast food"], "Fried chicken and spaghetti. Level 3."],
+    "Subway": [["Fast food"], "Sandwiches. gateway@klia2 Level 3."],
+    "Sushi King": [["Japanese"], "Conveyor-belt sushi. gateway@klia2 Level 3."],
+    "Empire Sushi": [["Japanese"], "Sushi and bento. gateway@klia2."],
+    "Starbucks": [["Café"], "gateway@klia2 Level 3. Open 24 hours."],
+    "The Coffee Bean & Tea Leaf": [["Café"], "Airside at Pier J."],
+    "McCafé": [["Café"], "gateway@klia2 Level 3."],
+    "Food Arcade": [["Food court"], "Big food court with local and international stalls. gateway@klia2 Level 2 (arrival floor)."],
+  },
+};
+const klia2HalalList = () => ({
+  id: uid(), name: KLIA2_HALAL.name, emoji: KLIA2_HALAL.emoji, description: KLIA2_HALAL.description,
+  labels: [...KLIA2_HALAL.labels], created: Date.now(),
+  items: Object.keys(KLIA2_HALAL.items),
+  badges: Object.fromEntries(Object.entries(KLIA2_HALAL.items).map(([n, [b]]) => [n, [...b]])),
+  notes: Object.fromEntries(Object.entries(KLIA2_HALAL.items).map(([n, [, t]]) => [n, t])),
+});
 // Every country in the world: the 193 UN members plus Palestine and Vatican City.
 const COUNTRIES = {
   name: "Random country",
@@ -4163,6 +4202,14 @@ function load() {
     });
     d.mamakWeights2 = true;
   }
+  // Once: Makan KLIA2, after Masak apa; if you delete it, it stays gone.
+  if (!d.seededKlia2) {
+    if (!d.lists.some((l) => l.name === KLIA2_HALAL.name)) {
+      const at = d.lists.findIndex((l) => l.name === "Masak apa");
+      d.lists.splice(at < 0 ? d.lists.length : at + 1, 0, klia2HalalList());
+    }
+    d.seededKlia2 = true;
+  }
   // Order mamak, after Masak apa. It comes back if deleted; a list with its name gets, once, any
   // categories and options it is missing, Carbs' "Nasi lemak" becomes "Nasi", and Masak and
   // Protein follow Carbs (labels you already gave an option stay).
@@ -4510,7 +4557,7 @@ function load() {
   // Once (and on new installs): the lists in this order; lists you made go after them.
   // After that, dragging sets the order.
   if (!d.listOrder2) {
-    const ORDER_ALL = [POKEMON.name, PALWORLD.name, ULTIMATE.name, GAME_IDEA.name, MAMAK.name, "Masak apa", COUNTRIES.name, "Dadu"];
+    const ORDER_ALL = [POKEMON.name, PALWORLD.name, ULTIMATE.name, GAME_IDEA.name, MAMAK.name, "Masak apa", KLIA2_HALAL.name, COUNTRIES.name, "Dadu"];
     const at = (l) => { const i = ORDER_ALL.indexOf(l.name); return i < 0 ? ORDER_ALL.length : i; };
     d.lists.sort((a, b) => at(a) - at(b));
   }
